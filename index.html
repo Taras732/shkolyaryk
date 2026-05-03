@@ -3,42 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Школярик — Prototype v3</title>
+<title>Школярик — Prototype v4 (Psychology-Based)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --primary: #FF6B35;
-  --primary-light: #FFE0CC;
-  --secondary: #4ECDC4;
-  --success: #45B764;
-  --error: #FF6B6B;
-  --warning: #FFD93D;
-  --bg: #FFF8F0;
+  /* Primary — soft blue, promotes focus & calm (Mehta & Zhu 2009) */
+  --primary: #5B8DEF;
+  --primary-light: #E8F0FE;
+  --primary-dark: #3A6BC5;
+
+  /* Accent — warm amber, reward/dopamine, not aggressive orange */
+  --accent: #FFB84D;
+  --accent-light: #FFF0D4;
+
+  /* Secondary — friendly green, safety signal */
+  --secondary: #6BCB77;
+  --secondary-light: #E8F8EA;
+
+  --success: #6BCB77;
+  /* Error — warm neutral, NOT red (Elliot et al. 2007: red = threat response in children) */
+  --error-soft: #E8D5C4;
+  --error-text: #A08070;
+  --error-border: #D4A574;
+  --warning: #FFD166;
+
+  /* Backgrounds — cream/warm white, less eye strain (AAP guidelines) */
+  --bg: #FDF6EE;
+  --bg-gradient-start: #FDF6EE;
+  --bg-gradient-end: #F5EDE3;
   --surface: #FFFFFF;
+  --surface-warm: #FFF9F3;
+
   --text: #2D3436;
-  --text-secondary: #636E72;
-  --text-disabled: #B2BEC3;
-  --border: #DFE6E9;
+  --text-secondary: #6B7280;
+  --text-disabled: #B8C0CC;
+  --border: #E5DDD5;
 
-  --island-math: #FF6B35;
-  --island-letters: #4ECDC4;
-  --island-english: #FF85A1;
-  --island-logic: #845EC2;
-  --island-memory: #F9C74F;
-  --island-science: #43AA8B;
-  --island-emotions: #FF6F91;
-  --island-creativity: #4CC9F0;
+  /* Page background */
+  --page-bg: linear-gradient(135deg, #E8E0F0 0%, #F0E8E0 50%, #E0EEF0 100%);
 
-  --shadow-card: 0 2px 4px rgba(0,0,0,0.1);
-  --shadow-btn: 0 1px 3px rgba(0,0,0,0.15);
+  /* Island colors — softer saturation 55-70%, brightness 75-85% */
+  --island-math: #F09B59;
+  --island-letters: #5CC5BE;
+  --island-english: #E88BA0;
+  --island-logic: #9B7BC8;
+  --island-memory: #F0C75A;
+  --island-science: #5AAF8B;
+  --island-emotions: #E88BA0;
+  --island-creativity: #5BB8E0;
+
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-btn: 0 4px 12px rgba(91,141,239,0.25);
 }
 
 body {
   font-family: 'Nunito', sans-serif;
-  background: #E8E0D8;
+  background: var(--page-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -56,14 +79,14 @@ body {
   border-radius: 44px;
   padding: 12px;
   position: relative;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3), inset 0 0 0 2px #333;
+  box-shadow: 0 25px 80px rgba(91,100,140,0.25), 0 8px 24px rgba(0,0,0,0.15);
   flex-shrink: 0;
 }
 
 .phone-screen {
   width: 100%;
   height: 100%;
-  background: var(--bg);
+  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
   border-radius: 34px;
   overflow: hidden;
   position: relative;
@@ -107,19 +130,18 @@ body {
   z-index: 50;
 }
 
-/* Screens */
+/* Screen transitions — SLIDE not fade (spatial metaphor, Piaget) */
 .screen {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--bg);
+  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
   display: none;
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  transition: opacity 0.3s ease, transform 0.3s ease;
   opacity: 0;
   scrollbar-width: none;
 }
@@ -128,12 +150,19 @@ body {
   display: flex;
   opacity: 1;
 }
-.screen.fade-in {
-  animation: fadeIn 0.35s ease forwards;
+.screen.slide-in-right {
+  animation: slideInRight 450ms ease-out forwards;
 }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+.screen.slide-in-left {
+  animation: slideInLeft 450ms ease-out forwards;
+}
+@keyframes slideInRight {
+  from { transform: translateX(60px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-60px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 /* Common Elements */
@@ -142,9 +171,19 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
-h1 { font-size: 24px; font-weight: 700; line-height: 1.4; }
+h1 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+h1.hero-text {
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
 h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
 .body-text { font-size: 16px; font-weight: 400; }
 .caption { font-size: 14px; font-weight: 400; }
@@ -188,16 +227,19 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   width: 100%;
   height: 52px;
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 0 48px;
   font-family: 'Nunito', sans-serif;
   font-size: 16px;
   background: var(--surface);
   color: var(--text);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.input-field:focus { border-color: var(--primary); }
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(91,141,239,0.15);
+}
 .input-field::placeholder { color: var(--text-disabled); }
 .input-field.center-input {
   text-align: center;
@@ -206,18 +248,27 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   height: 56px;
   padding: 0 16px;
 }
+.input-field.input-error {
+  border-color: var(--error-border);
+}
 .input-hint {
   font-size: 12px;
   color: var(--text-secondary);
   margin-top: 4px;
   padding-left: 4px;
 }
+.input-error-text {
+  font-size: 13px;
+  color: var(--error-text);
+  margin-top: 4px;
+  padding-left: 4px;
+}
 
-/* Buttons */
+/* Buttons — bouncy overshoot */
 .btn {
   height: 52px;
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   font-family: 'Nunito', sans-serif;
   font-size: 16px;
   font-weight: 700;
@@ -226,23 +277,29 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
   min-width: 48px;
   min-height: 48px;
 }
 .btn:active { transform: scale(0.95); }
 .btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
   width: 100%;
-  box-shadow: var(--shadow-btn);
+  box-shadow: 0 4px 12px rgba(91,141,239,0.3);
 }
 .btn-primary:hover { filter: brightness(1.05); }
 .btn-secondary {
-  background: var(--primary-light);
+  background: linear-gradient(135deg, var(--primary-light) 0%, #D4E4FD 100%);
   color: var(--primary);
   width: 100%;
-  box-shadow: var(--shadow-btn);
+  box-shadow: 0 2px 8px rgba(91,141,239,0.15);
+}
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent) 0%, #F0A030 100%);
+  color: white;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(255,184,77,0.35);
 }
 .btn-outline {
   background: transparent;
@@ -294,7 +351,9 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   padding: 8px 0;
   min-height: 48px;
   min-width: 48px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.back-btn:active { transform: scale(0.92); }
 
 /* Emoji display */
 .emoji-lg { font-size: 80px; line-height: 1.2; }
@@ -304,11 +363,11 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
 /* Cards */
 .card {
   background: var(--surface);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 16px;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
 }
 .card:active { transform: scale(0.97); }
 
@@ -327,10 +386,11 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--border);
+  transition: background 0.3s, transform 0.3s;
 }
-.dot.filled { background: var(--primary); }
+.dot.filled { background: var(--primary); transform: scale(1.1); }
 
-/* Confetti */
+/* Confetti — max 7 pieces (ADHD/sensory sensitive research) */
 .confetti-container {
   position: absolute;
   top: 0; left: 0;
@@ -341,41 +401,131 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
 }
 .confetti-piece {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  animation: confettiFall 2.5s ease-in forwards;
+  border-radius: 4px;
+  animation: confettiFall 3.5s ease-in forwards;
 }
 @keyframes confettiFall {
   0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(850px) rotate(720deg); opacity: 0; }
+  80% { opacity: 1; }
+  100% { transform: translateY(850px) rotate(540deg); opacity: 0; }
 }
 
-/* Pulse */
-@keyframes pulse {
+/* Gentle Pulse — slower, calmer */
+@keyframes gentlePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.9; }
+}
+.pulse { animation: gentlePulse 2.5s ease-in-out infinite; }
+
+/* Breathing animation — maintains attention without distracting */
+@keyframes breathe {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+  50% { transform: scale(1.03); }
 }
-.pulse { animation: pulse 1.5s ease-in-out infinite; }
+.breathe { animation: breathe 3.5s ease-in-out infinite; }
 
-/* Bounce */
-@keyframes bounce {
+/* Float up — gentle XP text */
+@keyframes floatUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  40% { transform: translateY(-4px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.float-up { animation: floatUp 0.8s ease-out forwards; }
+
+/* Star appear — sequential stagger */
+@keyframes starAppear {
+  0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.star-appear { display: inline-block; opacity: 0; animation: starAppear 0.5s ease-out forwards; }
+.star-appear:nth-child(1) { animation-delay: 0s; }
+.star-appear:nth-child(2) { animation-delay: 0.2s; }
+.star-appear:nth-child(3) { animation-delay: 0.4s; }
+
+/* Gentle shake for wrong answers (Growth Mindset — Dweck 2006) */
+@keyframes gentleShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+.shake { animation: gentleShake 0.3s ease-in-out; }
+
+/* Bounce for emojis on hover */
+@keyframes emojiBounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+  50% { transform: translateY(-6px); }
 }
-.bounce { animation: bounce 0.8s ease-in-out infinite; }
 
-/* Progress bar */
+/* Scale in for speech bubble */
+@keyframes scaleIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.scale-in { animation: scaleIn 0.4s ease-out forwards; }
+
+/* Bob animation for companion */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.bob { animation: bob 2.5s ease-in-out infinite; }
+
+/* Golden glow for avatar */
+@keyframes glowRing {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(255,184,77,0.3), 0 0 20px rgba(255,184,77,0.15); }
+  50% { box-shadow: 0 0 0 6px rgba(255,184,77,0.5), 0 0 30px rgba(255,184,77,0.25); }
+}
+.glow-ring { animation: glowRing 2s ease-in-out infinite; }
+
+/* Decorative floating shapes */
+.deco-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.12;
+  animation: float 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+
+/* Fade in delayed */
+@keyframes fadeInDelayed {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress bar with shimmer */
 .progress-bar {
   height: 6px;
   background: var(--border);
   border-radius: 3px;
   overflow: hidden;
+  position: relative;
 }
 .progress-fill {
   height: 100%;
   border-radius: 3px;
   transition: width 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 2s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
 
 /* Bottom toolbar Hub */
@@ -403,29 +553,46 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   color: var(--text-secondary);
   cursor: pointer;
   min-height: 48px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.hub-toolbar button:active { transform: scale(0.9); }
 .hub-toolbar button span { font-size: 22px; }
 
-/* Island card */
+/* Island card — wobble on tap, gradient bg, colored left border */
 .island-card {
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 16px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: transform 0.15s;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
   min-height: 110px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
 }
-.island-card:active { transform: scale(0.95); }
-.island-card .island-emoji { font-size: 40px; }
+.island-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 20px 0 0 20px;
+}
+.island-card:active { transform: scale(0.93) rotate(-2deg); }
+.island-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.island-card .island-emoji { font-size: 40px; transition: transform 0.3s; }
+.island-card:hover .island-emoji { animation: emojiBounce 0.5s ease-in-out; }
 .island-card .island-name { font-size: 13px; font-weight: 700; color: var(--text); }
 .island-card .island-pct { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 .island-card .island-bar {
   width: 100%;
   height: 4px;
-  background: rgba(0,0,0,0.08);
+  background: rgba(0,0,0,0.06);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -441,13 +608,14 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   gap: 12px;
   padding: 14px 16px;
   background: var(--surface);
-  border-radius: 16px;
+  border-radius: 18px;
   margin-bottom: 12px;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
   cursor: pointer;
-  transition: transform 0.15s;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
 }
 .game-card:active { transform: scale(0.97); }
+.game-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
 .game-card.locked {
   opacity: 0.4;
   cursor: default;
@@ -468,14 +636,15 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   align-items: center;
   justify-content: center;
   z-index: 300;
+  backdrop-filter: blur(4px);
 }
 .pin-modal {
   background: var(--surface);
-  border-radius: 24px;
+  border-radius: 28px;
   padding: 32px 24px;
   width: 85%;
   text-align: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
 }
 .pin-dots {
   display: flex;
@@ -487,10 +656,12 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   width: 16px; height: 16px;
   border-radius: 50%;
   border: 2px solid var(--border);
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
 }
 .pin-dot.filled {
   background: var(--primary);
   border-color: var(--primary);
+  transform: scale(1.1);
 }
 .numpad {
   display: grid;
@@ -511,21 +682,22 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   color: var(--text);
   cursor: pointer;
   justify-self: center;
-  transition: transform 0.1s, background 0.1s;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s;
 }
 .numpad button:active {
-  transform: scale(0.9);
+  transform: scale(0.88);
   background: var(--primary-light);
 }
 
-/* Speech bubble */
+/* Speech bubble — playful, cloud-like */
 .speech-bubble {
-  background: var(--surface);
-  border-radius: 16px;
+  background: #FFFCF7;
+  border-radius: 20px;
   padding: 12px 16px;
   font-size: 15px;
   font-weight: 600;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.05);
   position: relative;
   display: inline-block;
 }
@@ -536,9 +708,11 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   left: 32px;
   width: 16px;
   height: 16px;
-  background: var(--surface);
+  background: #FFFCF7;
   transform: rotate(45deg);
-  box-shadow: 2px 2px 2px rgba(0,0,0,0.05);
+  box-shadow: 2px 2px 2px rgba(0,0,0,0.03);
+  border-right: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 /* Language cards */
@@ -551,7 +725,7 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   border: 2px solid var(--border);
   background: var(--surface);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   margin-bottom: 12px;
   font-size: 18px;
   font-weight: 700;
@@ -559,6 +733,7 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
 .lang-card.selected {
   border-color: var(--primary);
   background: var(--primary-light);
+  transform: scale(1.02);
 }
 .lang-card.unselected { opacity: 0.5; }
 .lang-card .lang-flag { font-size: 36px; }
@@ -578,18 +753,19 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   justify-content: center;
   font-size: 40px;
   cursor: pointer;
-  transition: transform 0.2s, opacity 0.2s;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s, box-shadow 0.3s;
   border: 3px solid transparent;
 }
 .avatar-circle.selected {
   transform: scale(1.15);
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(255,107,53,0.3);
+  animation: glowRing 2s ease-in-out infinite;
 }
 .avatar-circle.dimmed {
   transform: scale(0.9);
   opacity: 0.4;
 }
+.avatar-circle:active { transform: scale(0.95); }
 
 /* Character cards */
 .char-card {
@@ -597,20 +773,27 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  border-radius: 16px;
+  border-radius: 18px;
   border: 2px solid transparent;
   margin-bottom: 10px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.char-card .char-emoji { font-size: 40px; }
+.char-card .char-emoji {
+  font-size: 40px;
+  transition: transform 0.3s;
+}
+.char-card:hover .char-emoji,
+.char-card.selected .char-emoji {
+  animation: emojiBounce 0.5s ease-in-out;
+}
 .char-card .char-name { font-size: 16px; font-weight: 700; }
 .char-card .char-age { font-size: 13px; color: var(--text-secondary); }
 .char-card .char-greeting { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .char-card.selected {
-  border-color: #2E8B57;
+  border-color: var(--secondary);
   transform: scale(1.03);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(107,203,119,0.2);
 }
 .char-card.dimmed { opacity: 0.4; }
 
@@ -622,6 +805,15 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   justify-content: center;
   position: relative;
   min-height: 300px;
+  border: 2px dashed rgba(0,0,0,0.08);
+  border-radius: 24px;
+  margin: 8px 0;
+  background: rgba(255,255,255,0.3);
+}
+
+/* Pulsing star golden glow */
+.game-area .pulse {
+  filter: drop-shadow(0 0 12px rgba(255,184,77,0.4));
 }
 
 /* Tablet frame (screen 14) */
@@ -638,12 +830,12 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   background: #000;
   border-radius: 24px;
   padding: 12px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 25px 80px rgba(91,100,140,0.25), 0 8px 24px rgba(0,0,0,0.15);
 }
 .tablet-screen {
   width: 100%;
   height: 100%;
-  background: var(--bg);
+  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
   border-radius: 16px;
   overflow-y: auto;
   padding: 20px 24px;
@@ -661,7 +853,7 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   border-top: 1px solid var(--border);
   padding: 10px 16px;
   z-index: 1000;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
 }
 .nav-panel-inner {
   display: flex;
@@ -682,7 +874,7 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
 }
 .nav-btn {
   padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
   font-family: 'Nunito', sans-serif;
@@ -692,13 +884,14 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .nav-btn:hover { background: var(--primary-light); }
 .nav-btn.active {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
+  transform: scale(1.05);
 }
 .nav-sep {
   width: 1px;
@@ -708,13 +901,26 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
   margin: 0 2px;
 }
 
-/* Dashed path */
-.dashed-path {
-  position: absolute;
-  border: 2px dashed var(--text-disabled);
-  border-radius: 0;
-  pointer-events: none;
+/* Parent screens subtle pattern */
+.parent-screen-bg {
+  background: linear-gradient(180deg, #F8F2EC 0%, #F0EAE2 100%);
 }
+.parent-screen-bg::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: radial-gradient(circle at 20% 30%, rgba(91,141,239,0.04) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(155,123,200,0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Hub greeting text animation */
+@keyframes greetFade {
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.greet-text { animation: greetFade 0.5s ease-out forwards; }
 </style>
 </head>
 <body>
@@ -725,11 +931,11 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
     <div class="notch"></div>
 
     <!-- ===== SCREEN 1: Login ===== -->
-    <div class="screen active" id="screen1" data-screen="1">
-      <div class="screen-content" style="justify-content: center; gap: 0;">
+    <div class="screen active parent-screen-bg" id="screen1" data-screen="1">
+      <div class="screen-content" style="justify-content: center; gap: 0; z-index:1;">
         <div class="text-center mb-24">
-          <div style="font-size:48px;">📚</div>
-          <h1 style="font-size:28px; color:var(--primary);">Школярик</h1>
+          <div style="font-size:48px;" class="breathe">📚</div>
+          <h1 class="hero-text" style="color:var(--primary);">Школярик</h1>
         </div>
         <h1 class="text-center mb-8">Раді вас бачити! 👋</h1>
         <p class="body-text text-center text-secondary mb-24">Увійдіть до свого акаунту</p>
@@ -753,11 +959,11 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
     </div>
 
     <!-- ===== SCREEN 2: Register ===== -->
-    <div class="screen" id="screen2" data-screen="2">
-      <div class="screen-content">
+    <div class="screen parent-screen-bg" id="screen2" data-screen="2">
+      <div class="screen-content" style="z-index:1;">
         <button class="back-btn" onclick="goTo(1)">← Назад</button>
         <div class="text-center mt-8 mb-16">
-          <div style="font-size:80px;">🐼</div>
+          <div style="font-size:80px;" class="breathe">🐼</div>
         </div>
         <h1 class="text-center">Створіть акаунт</h1>
         <p class="body-text text-center text-secondary mb-24">для батьків 👋</p>
@@ -787,9 +993,9 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
     </div>
 
     <!-- ===== SCREEN 3: Email Confirmation ===== -->
-    <div class="screen" id="screen3" data-screen="3">
-      <div class="screen-content" style="justify-content:center; align-items:center; text-align:center;">
-        <div class="emoji-lg mb-24">📩</div>
+    <div class="screen parent-screen-bg" id="screen3" data-screen="3">
+      <div class="screen-content" style="justify-content:center; align-items:center; text-align:center; z-index:1;">
+        <div class="emoji-lg mb-24 breathe">📩</div>
         <h1 class="mb-8">Перевірте вашу пошту!</h1>
         <p class="body-text text-secondary">Ми надіслали лист на</p>
         <p class="body-text" style="font-weight:700; color:var(--primary);">user@email.com</p>
@@ -800,11 +1006,11 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
     </div>
 
     <!-- ===== SCREEN 4: Forgot Password ===== -->
-    <div class="screen" id="screen4" data-screen="4">
-      <div class="screen-content">
+    <div class="screen parent-screen-bg" id="screen4" data-screen="4">
+      <div class="screen-content" style="z-index:1;">
         <button class="back-btn" onclick="goTo(1)">← Назад</button>
         <div class="text-center mt-32 mb-24">
-          <div class="emoji-lg">🔑</div>
+          <div class="emoji-lg breathe">🔑</div>
         </div>
         <h1 class="text-center mb-8">Відновлення пароля</h1>
         <p class="body-text text-center text-secondary mb-24">Введіть email акаунту</p>
@@ -821,9 +1027,15 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
 
     <!-- ===== SCREEN 5: Language Selection ===== -->
     <div class="screen" id="screen5" data-screen="5">
-      <div class="screen-content" style="justify-content:center; align-items:center;">
-        <div class="emoji-xl mb-16">🌍</div>
-        <h1 class="text-center mb-4">Оберіть мову</h1>
+      <!-- Decorative floating shapes -->
+      <div class="deco-circle" style="width:80px; height:80px; background:var(--primary); top:60px; right:-20px; animation-delay:0s;"></div>
+      <div class="deco-circle" style="width:50px; height:50px; background:var(--accent); top:200px; left:-15px; animation-delay:1.5s;"></div>
+      <div class="deco-circle" style="width:60px; height:60px; background:var(--secondary); bottom:150px; right:10px; animation-delay:3s;"></div>
+      <div class="deco-circle" style="width:40px; height:40px; background:var(--island-logic); bottom:250px; left:20px; animation-delay:2s;"></div>
+
+      <div class="screen-content" style="justify-content:center; align-items:center; z-index:1;">
+        <div class="emoji-xl mb-16 breathe">🌍</div>
+        <h1 class="hero-text text-center mb-4">Оберіть мову</h1>
         <p class="body-text text-secondary text-center mb-32">Choose language</p>
         <div style="width:100%;">
           <div class="lang-card selected" onclick="goTo(6)">
@@ -839,10 +1051,13 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
 
     <!-- ===== SCREEN 6: Child Name ===== -->
     <div class="screen" id="screen6" data-screen="6">
-      <div class="screen-content" style="align-items:center;">
+      <div class="deco-circle" style="width:70px; height:70px; background:var(--accent); top:80px; right:10px; animation-delay:0.5s;"></div>
+      <div class="deco-circle" style="width:45px; height:45px; background:var(--primary); bottom:200px; left:-10px; animation-delay:2s;"></div>
+
+      <div class="screen-content" style="align-items:center; z-index:1;">
         <div style="width:100%;"><button class="back-btn" onclick="goTo(5)">← Назад</button></div>
-        <div style="font-size:80px; margin-top:24px;">📝</div>
-        <h1 class="text-center mt-16 mb-24">Як звати малюка? 📝</h1>
+        <div style="font-size:80px; margin-top:24px;" class="breathe">📝</div>
+        <h1 class="hero-text text-center mt-16 mb-24">Як звати малюка?</h1>
         <input class="input-field center-input" placeholder="Максимко" value="Максимко" maxlength="20" style="width:100%;">
         <div style="text-align:right; width:100%; padding-right:4px; margin-top:4px;">
           <span class="caption text-secondary">9/20</span>
@@ -857,9 +1072,12 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
 
     <!-- ===== SCREEN 7: Age Group ===== -->
     <div class="screen" id="screen7" data-screen="7">
-      <div class="screen-content">
+      <div class="deco-circle" style="width:55px; height:55px; background:var(--secondary); top:50px; left:10px; animation-delay:1s;"></div>
+      <div class="deco-circle" style="width:40px; height:40px; background:var(--island-memory); bottom:120px; right:-10px; animation-delay:2.5s;"></div>
+
+      <div class="screen-content" style="z-index:1;">
         <button class="back-btn" onclick="goTo(6)">← Назад</button>
-        <h1 class="text-center mt-8 mb-16">Скільки років, Максимко?</h1>
+        <h1 class="hero-text text-center mt-8 mb-16">Скільки років, Максимко?</h1>
         <div class="char-card dimmed" style="background:rgba(255,217,61,0.08);" onclick="goTo(8)">
           <span class="char-emoji">🐣</span>
           <div>
@@ -868,7 +1086,7 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
             <div class="char-greeting">Привіт! Я Коко!</div>
           </div>
         </div>
-        <div class="char-card selected" style="background:rgba(144,238,144,0.08); border-color:#2E8B57;" onclick="goTo(8)">
+        <div class="char-card selected" style="background:rgba(144,238,144,0.08); border-color:var(--secondary);" onclick="goTo(8)">
           <span class="char-emoji">🐼</span>
           <div>
             <div class="char-name">Бамбі</div>
@@ -901,9 +1119,12 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
 
     <!-- ===== SCREEN 8: Avatar Selection ===== -->
     <div class="screen" id="screen8" data-screen="8">
-      <div class="screen-content" style="align-items:center;">
+      <div class="deco-circle" style="width:60px; height:60px; background:var(--island-creativity); top:70px; right:-15px; animation-delay:0s;"></div>
+      <div class="deco-circle" style="width:50px; height:50px; background:var(--island-english); bottom:180px; left:-10px; animation-delay:1.8s;"></div>
+
+      <div class="screen-content" style="align-items:center; z-index:1;">
         <div style="width:100%;"><button class="back-btn" onclick="goTo(7)">← Назад</button></div>
-        <h1 class="text-center mt-8 mb-24">Обери свого героя, Максимко! 🎭</h1>
+        <h1 class="hero-text text-center mt-8 mb-24">Обери свого героя, Максимко!</h1>
         <div class="avatar-grid">
           <div class="avatar-circle dimmed" style="background:#FFE0B2;">🐱</div>
           <div class="avatar-circle selected" style="background:#FFF9C4;">🐶</div>
@@ -912,7 +1133,7 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
           <div class="avatar-circle dimmed" style="background:#D7CCC8;">🐻</div>
           <div class="avatar-circle dimmed" style="background:#F3E5F5;">🦄</div>
         </div>
-        <button class="btn btn-primary mt-32" style="width:100%;" onclick="goTo(9)">Це я! ✨</button>
+        <button class="btn btn-accent mt-32" style="width:100%;" onclick="goTo(9)">Це я! ✨</button>
         <div class="step-dots">
           <span class="caption text-secondary">Крок 3 з 3</span>
           <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span>
@@ -924,9 +1145,16 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
     <div class="screen" id="screen9" data-screen="9">
       <div class="confetti-container" id="confetti9"></div>
       <div class="screen-content" style="justify-content:center; align-items:center; text-align:center;" onclick="goTo(10)">
-        <div style="font-size:120px; margin-bottom:8px;">🐶</div>
-        <h1 style="font-size:26px;">✨ Чудово, Максимко! ✨</h1>
-        <div style="font-size:40px; margin-top:16px;">🐼 👏</div>
+        <!-- Avatar with golden glow ring -->
+        <div style="font-size:120px; margin-bottom:8px;" class="glow-ring" id="welcomeAvatar"
+             style="border-radius:50%; display:inline-block; padding:8px;">🐶</div>
+        <h1 class="hero-text" id="welcomeText" style="opacity:0; animation: fadeInDelayed 0.6s ease-out 0.5s forwards;">
+          ✨ Чудово, Максимко! ✨
+        </h1>
+        <div style="font-size:40px; margin-top:16px;">
+          <span class="star-appear">🐼</span>
+          <span class="star-appear">👏</span>
+        </div>
         <p class="caption text-secondary mt-24">Натисни щоб продовжити</p>
       </div>
     </div>
@@ -938,8 +1166,8 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
           <span class="link-small" onclick="goTo(12)">Пропустити</span>
         </div>
         <div style="display:flex; align-items:flex-start; gap:12px; margin-top:16px;">
-          <div style="font-size:48px;">🐼</div>
-          <div class="speech-bubble">Тапни зірку!</div>
+          <div style="font-size:48px;" class="bob">🐼</div>
+          <div class="speech-bubble scale-in">Тапни зірку!</div>
         </div>
         <div class="game-area">
           <div class="pulse" style="font-size:80px; cursor:pointer;" onclick="goTo(11)">⭐</div>
@@ -958,15 +1186,15 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
           <span class="link-small" onclick="goTo(12)">Пропустити</span>
         </div>
         <div style="display:flex; align-items:flex-start; gap:12px; margin-top:16px;">
-          <div style="font-size:48px;">🐼</div>
-          <div class="speech-bubble">Перетягни яблуко в кошик!</div>
+          <div style="font-size:48px;" class="bob">🐼</div>
+          <div class="speech-bubble scale-in">Перетягни яблуко в кошик!</div>
         </div>
         <div class="game-area" onclick="goTo(12)" style="cursor:pointer;">
           <div style="position:absolute; top:40px; left:30px; font-size:64px;">🍎</div>
           <div style="position:absolute; bottom:40px; right:30px; font-size:80px; border:3px dashed var(--text-disabled); border-radius:24px; padding:8px;">🧺</div>
           <svg style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">
-            <line x1="90" y1="115" x2="240" y2="260" stroke="#B2BEC3" stroke-width="2" stroke-dasharray="8,6" />
-            <polygon points="235,250 248,268 228,262" fill="#B2BEC3" />
+            <line x1="90" y1="115" x2="240" y2="260" stroke="#B8C0CC" stroke-width="2" stroke-dasharray="8,6" />
+            <polygon points="235,250 248,268 228,262" fill="#B8C0CC" />
           </svg>
         </div>
         <div class="step-dots">
@@ -980,82 +1208,85 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
     <div class="screen" id="screen12" data-screen="12">
       <div class="confetti-container" id="confetti12"></div>
       <div class="screen-content" style="justify-content:center; align-items:center; text-align:center;">
-        <div style="font-size:100px;">🐼</div>
-        <div style="font-size:36px; margin:12px 0;">⭐⭐⭐</div>
-        <h1>Молодець, Максимко! 🎉</h1>
-        <h2 class="text-teal mt-8 bounce">+5 XP</h2>
+        <div style="font-size:100px;" class="bob">🐼</div>
+        <div style="font-size:36px; margin:12px 0;">
+          <span class="star-appear">⭐</span><span class="star-appear">⭐</span><span class="star-appear">⭐</span>
+        </div>
+        <h1 class="hero-text">Молодець, Максимко!</h1>
+        <h2 class="text-teal mt-8 float-up" style="font-size:22px;">+5 XP</h2>
         <button class="btn btn-primary mt-32" style="width:100%;" onclick="goTo(13)">Почнемо пригоду! →</button>
       </div>
     </div>
 
-    <!-- ===== SCREEN 13: Hub — Phone ===== -->
+    <!-- ===== SCREEN 13: Hub — Phone (MOST IMPORTANT) ===== -->
     <div class="screen" id="screen13" data-screen="13">
-      <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column;">
+      <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; background: linear-gradient(180deg, var(--bg-gradient-start) 0%, #F2E8DC 100%);">
         <!-- Header -->
         <div style="padding:52px 20px 0; display:flex; align-items:center; gap:10px;">
-          <div style="width:36px; height:36px; background:#FFF9C4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px;">🐶</div>
+          <div style="width:40px; height:40px; background:#FFF9C4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">🐶</div>
           <div style="flex:1;">
-            <div style="font-size:15px; font-weight:700;">Привіт, Максимко!</div>
+            <div style="font-size:15px; font-weight:700;" class="greet-text" id="hubGreeting">Привіт, Максимко!</div>
             <div style="font-size:12px; color:var(--text-secondary);">Рівень 3</div>
           </div>
         </div>
-        <!-- XP bar -->
-        <div style="padding:8px 20px 0;">
-          <div class="progress-bar" style="height:6px;">
-            <div class="progress-fill" style="width:42%; background:var(--secondary);"></div>
+        <!-- XP bar — taller with shimmer -->
+        <div style="padding:10px 20px 0;">
+          <div class="progress-bar" style="height:8px;">
+            <div class="progress-fill" style="width:42%; background: linear-gradient(90deg, var(--secondary), #4DB860);"></div>
           </div>
-          <div style="font-size:11px; color:var(--text-secondary); text-align:right; margin-top:2px;">42/100 XP</div>
+          <div style="font-size:11px; color:var(--text-secondary); text-align:right; margin-top:3px;">42/100 XP</div>
         </div>
-        <!-- Companion -->
-        <div style="padding:12px 20px; display:flex; align-items:flex-start; gap:12px;">
-          <div style="font-size:48px;">🐼</div>
-          <div class="speech-bubble" style="font-size:14px;">Що вивчимо сьогодні?</div>
+        <!-- Companion — bigger, more prominent -->
+        <div style="padding:14px 20px; display:flex; align-items:flex-start; gap:14px;">
+          <div style="font-size:56px;" class="bob">🐼</div>
+          <div class="speech-bubble scale-in" style="font-size:15px; margin-top:4px;" id="companionSpeech">Що вивчимо сьогодні?</div>
         </div>
-        <!-- Islands -->
+        <!-- Islands grid with gradients and left border -->
         <div style="padding:0 16px 16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="island-card" style="background:rgba(255,107,53,0.15);" onclick="goTo(15)">
+          <div class="island-card" style="background: linear-gradient(180deg, rgba(240,155,89,0.08) 0%, rgba(240,155,89,0.18) 100%);" onclick="goTo(15)">
+            <style>.island-card:nth-child(1)::before { background: var(--island-math); }</style>
             <span class="island-emoji">🔢</span>
             <span class="island-name">Математика</span>
             <span class="island-pct">42%</span>
             <div class="island-bar"><div class="island-bar-fill" style="width:42%; background:var(--island-math);"></div></div>
           </div>
-          <div class="island-card" style="background:rgba(78,205,196,0.15);" onclick="goTo(15)">
+          <div class="island-card" style="background: linear-gradient(180deg, rgba(92,197,190,0.08) 0%, rgba(92,197,190,0.18) 100%);" onclick="goTo(15)">
             <span class="island-emoji">📖</span>
             <span class="island-name">Букви</span>
             <span class="island-pct">18%</span>
             <div class="island-bar"><div class="island-bar-fill" style="width:18%; background:var(--island-letters);"></div></div>
           </div>
-          <div class="island-card" style="background:rgba(255,133,161,0.15);" onclick="goTo(15)">
+          <div class="island-card" style="background: linear-gradient(180deg, rgba(232,139,160,0.08) 0%, rgba(232,139,160,0.18) 100%);" onclick="goTo(15)">
             <span class="island-emoji">🇬🇧</span>
             <span class="island-name">English</span>
             <span class="island-pct">5%</span>
             <div class="island-bar"><div class="island-bar-fill" style="width:5%; background:var(--island-english);"></div></div>
           </div>
-          <div class="island-card" style="background:rgba(132,94,194,0.15);" onclick="goTo(15)">
+          <div class="island-card" style="background: linear-gradient(180deg, rgba(155,123,200,0.08) 0%, rgba(155,123,200,0.18) 100%);" onclick="goTo(15)">
             <span class="island-emoji">🧩</span>
             <span class="island-name">Логіка</span>
             <span class="island-pct">0%</span>
             <div class="island-bar"><div class="island-bar-fill" style="width:0%; background:var(--island-logic);"></div></div>
           </div>
-          <div class="island-card" style="background:rgba(249,199,79,0.15);" onclick="goTo(15)">
+          <div class="island-card" style="background: linear-gradient(180deg, rgba(240,199,90,0.08) 0%, rgba(240,199,90,0.18) 100%);" onclick="goTo(15)">
             <span class="island-emoji">🧠</span>
             <span class="island-name">Пам'ять</span>
             <span class="island-pct">12%</span>
             <div class="island-bar"><div class="island-bar-fill" style="width:12%; background:var(--island-memory);"></div></div>
           </div>
-          <div class="island-card" style="background:rgba(67,170,139,0.15);" onclick="goTo(15)">
+          <div class="island-card" style="background: linear-gradient(180deg, rgba(90,175,139,0.08) 0%, rgba(90,175,139,0.18) 100%);" onclick="goTo(15)">
             <span class="island-emoji">🔬</span>
             <span class="island-name">Наука</span>
             <span class="island-pct">0%</span>
             <div class="island-bar"><div class="island-bar-fill" style="width:0%; background:var(--island-science);"></div></div>
           </div>
-          <div class="island-card" style="background:rgba(255,111,145,0.15);" onclick="goTo(15)">
+          <div class="island-card" style="background: linear-gradient(180deg, rgba(232,139,160,0.08) 0%, rgba(232,139,160,0.18) 100%);" onclick="goTo(15)">
             <span class="island-emoji">💚</span>
             <span class="island-name">Емоції</span>
             <span class="island-pct">0%</span>
             <div class="island-bar"><div class="island-bar-fill" style="width:0%; background:var(--island-emotions);"></div></div>
           </div>
-          <div class="island-card" style="background:rgba(76,201,240,0.15);" onclick="goTo(15)">
+          <div class="island-card" style="background: linear-gradient(180deg, rgba(91,184,224,0.08) 0%, rgba(91,184,224,0.18) 100%);" onclick="goTo(15)">
             <span class="island-emoji">🎨</span>
             <span class="island-name">Творчість</span>
             <span class="island-pct">0%</span>
@@ -1088,7 +1319,7 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
         </div>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
           <span style="font-size:14px; font-weight:600;">⭐ 12/30</span>
-          <div class="progress-bar" style="flex:1;">
+          <div class="progress-bar" style="flex:1; height:6px;">
             <div class="progress-fill" style="width:42%; background:var(--island-math);"></div>
           </div>
           <span style="font-size:14px; font-weight:600; color:var(--island-math);">42%</span>
@@ -1169,11 +1400,13 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
     <div class="screen" id="screen17" data-screen="17">
       <div class="confetti-container" id="confetti17"></div>
       <div class="screen-content" style="justify-content:center; align-items:center; text-align:center;">
-        <div style="font-size:100px;">🐼</div>
-        <div style="font-size:36px; margin:12px 0;">⭐⭐⭐</div>
-        <h1>Чудово, Максимко! 🎉</h1>
+        <div style="font-size:100px;" class="bob">🐼</div>
+        <div style="font-size:36px; margin:12px 0;">
+          <span class="star-appear">⭐</span><span class="star-appear">⭐</span><span class="star-appear">⭐</span>
+        </div>
+        <h1 class="hero-text">Чудово, Максимко!</h1>
         <p class="caption text-secondary mt-4">Математика · Порахуй</p>
-        <h2 class="text-teal mt-16 bounce">+15 XP</h2>
+        <h2 class="text-teal mt-16 float-up" style="font-size:22px;">+15 XP</h2>
         <button class="btn btn-secondary mt-32" style="width:100%;" onclick="goTo(17)">Грати ще раз 🔄</button>
         <button class="btn btn-outline mt-8" style="width:100%;" onclick="goTo(15)">Назад до острова ←</button>
       </div>
@@ -1189,68 +1422,68 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
     <div class="tablet-screen">
       <!-- Header -->
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-        <div style="width:40px; height:40px; background:#FFF9C4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px;">🐶</div>
+        <div style="width:40px; height:40px; background:#FFF9C4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">🐶</div>
         <div style="flex:1;">
           <div style="font-size:16px; font-weight:700;">Привіт, Максимко!</div>
           <div style="font-size:13px; color:var(--text-secondary);">Рівень 3</div>
         </div>
         <div style="width:200px;">
           <div class="progress-bar" style="height:8px;">
-            <div class="progress-fill" style="width:42%; background:var(--secondary);"></div>
+            <div class="progress-fill" style="width:42%; background: linear-gradient(90deg, var(--secondary), #4DB860);"></div>
           </div>
           <div style="font-size:11px; color:var(--text-secondary); text-align:right; margin-top:2px;">42/100 XP</div>
         </div>
       </div>
       <!-- Companion -->
       <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:20px;">
-        <div style="font-size:52px;">🐼</div>
-        <div class="speech-bubble">Що вивчимо сьогодні?</div>
+        <div style="font-size:52px;" class="bob">🐼</div>
+        <div class="speech-bubble scale-in">Що вивчимо сьогодні?</div>
       </div>
       <!-- 4 column grid -->
       <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px;">
-        <div class="island-card" style="background:rgba(255,107,53,0.15);">
+        <div class="island-card" style="background: linear-gradient(180deg, rgba(240,155,89,0.08) 0%, rgba(240,155,89,0.18) 100%);">
           <span class="island-emoji">🔢</span>
           <span class="island-name">Математика</span>
           <span class="island-pct">42%</span>
           <div class="island-bar"><div class="island-bar-fill" style="width:42%; background:var(--island-math);"></div></div>
         </div>
-        <div class="island-card" style="background:rgba(78,205,196,0.15);">
+        <div class="island-card" style="background: linear-gradient(180deg, rgba(92,197,190,0.08) 0%, rgba(92,197,190,0.18) 100%);">
           <span class="island-emoji">📖</span>
           <span class="island-name">Букви</span>
           <span class="island-pct">18%</span>
           <div class="island-bar"><div class="island-bar-fill" style="width:18%; background:var(--island-letters);"></div></div>
         </div>
-        <div class="island-card" style="background:rgba(255,133,161,0.15);">
+        <div class="island-card" style="background: linear-gradient(180deg, rgba(232,139,160,0.08) 0%, rgba(232,139,160,0.18) 100%);">
           <span class="island-emoji">🇬🇧</span>
           <span class="island-name">English</span>
           <span class="island-pct">5%</span>
           <div class="island-bar"><div class="island-bar-fill" style="width:5%; background:var(--island-english);"></div></div>
         </div>
-        <div class="island-card" style="background:rgba(132,94,194,0.15);">
+        <div class="island-card" style="background: linear-gradient(180deg, rgba(155,123,200,0.08) 0%, rgba(155,123,200,0.18) 100%);">
           <span class="island-emoji">🧩</span>
           <span class="island-name">Логіка</span>
           <span class="island-pct">0%</span>
           <div class="island-bar"><div class="island-bar-fill" style="width:0%; background:var(--island-logic);"></div></div>
         </div>
-        <div class="island-card" style="background:rgba(249,199,79,0.15);">
+        <div class="island-card" style="background: linear-gradient(180deg, rgba(240,199,90,0.08) 0%, rgba(240,199,90,0.18) 100%);">
           <span class="island-emoji">🧠</span>
           <span class="island-name">Пам'ять</span>
           <span class="island-pct">12%</span>
           <div class="island-bar"><div class="island-bar-fill" style="width:12%; background:var(--island-memory);"></div></div>
         </div>
-        <div class="island-card" style="background:rgba(67,170,139,0.15);">
+        <div class="island-card" style="background: linear-gradient(180deg, rgba(90,175,139,0.08) 0%, rgba(90,175,139,0.18) 100%);">
           <span class="island-emoji">🔬</span>
           <span class="island-name">Наука</span>
           <span class="island-pct">0%</span>
           <div class="island-bar"><div class="island-bar-fill" style="width:0%; background:var(--island-science);"></div></div>
         </div>
-        <div class="island-card" style="background:rgba(255,111,145,0.15);">
+        <div class="island-card" style="background: linear-gradient(180deg, rgba(232,139,160,0.08) 0%, rgba(232,139,160,0.18) 100%);">
           <span class="island-emoji">💚</span>
           <span class="island-name">Емоції</span>
           <span class="island-pct">0%</span>
           <div class="island-bar"><div class="island-bar-fill" style="width:0%; background:var(--island-emotions);"></div></div>
         </div>
-        <div class="island-card" style="background:rgba(76,201,240,0.15);">
+        <div class="island-card" style="background: linear-gradient(180deg, rgba(91,184,224,0.08) 0%, rgba(91,184,224,0.18) 100%);">
           <span class="island-emoji">🎨</span>
           <span class="island-name">Творчість</span>
           <span class="island-pct">0%</span>
@@ -1258,7 +1491,7 @@ h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
         </div>
       </div>
       <!-- Toolbar -->
-      <div style="display:flex; gap:16px; justify-content:center; margin-top:24px; padding:16px; background:var(--surface); border-radius:16px;">
+      <div style="display:flex; gap:16px; justify-content:center; margin-top:24px; padding:16px; background:var(--surface); border-radius:16px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
         <button class="btn btn-ghost">🏆 Бейджі</button>
         <button class="btn btn-ghost">👤 Аватар</button>
         <button class="btn btn-ghost">🔒 Батькам</button>
@@ -1309,19 +1542,25 @@ const screenNames = {
   13:'Hub', 14:'Tablet', 15:'Games', 16:'PIN', 17:'Result'
 };
 
+// Track navigation direction for slide animations
+const screenOrder = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+
 function goTo(n) {
   if (n === currentScreen && n !== 17) return;
   if (autoNavTimeout) { clearTimeout(autoNavTimeout); autoNavTimeout = null; }
 
+  const goingForward = n >= currentScreen;
+
   // Hide all screens
   document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('active', 'fade-in');
+    s.classList.remove('active', 'slide-in-right', 'slide-in-left');
   });
 
-  // Show target
+  // Show target with directional slide
   const target = document.getElementById('screen' + n);
   if (target) {
-    target.classList.add('active', 'fade-in');
+    target.classList.add('active');
+    target.classList.add(goingForward ? 'slide-in-right' : 'slide-in-left');
   }
 
   // Update nav buttons
@@ -1351,27 +1590,71 @@ function goTo(n) {
   if (n === 9) {
     autoNavTimeout = setTimeout(() => goTo(10), 3000);
   }
+
+  // Hub: random daily greeting
+  if (n === 13) {
+    setHubGreeting();
+  }
+
+  // Apply island left border colors via JS
+  if (n === 13 || n === 14) {
+    applyIslandBorders();
+  }
 }
 
+// Confetti — max 7 pieces, bigger, slower (ADHD/sensory research)
 function spawnConfetti(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = '';
-  const colors = ['#FF6B35','#4ECDC4','#FFD93D','#FF85A1','#845EC2','#45B764','#4CC9F0','#FF6F91'];
-  for (let i = 0; i < 40; i++) {
+  const colors = ['#5B8DEF','#6BCB77','#FFB84D','#E88BA0','#9B7BC8','#5BB8E0','#F0C75A'];
+  for (let i = 0; i < 7; i++) {
     const piece = document.createElement('div');
     piece.className = 'confetti-piece';
-    piece.style.left = Math.random() * 100 + '%';
-    piece.style.top = '-10px';
-    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-    piece.style.animationDelay = (Math.random() * 1.2) + 's';
-    piece.style.animationDuration = (1.8 + Math.random() * 1.5) + 's';
-    piece.style.width = (6 + Math.random() * 8) + 'px';
-    piece.style.height = (6 + Math.random() * 8) + 'px';
-    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.left = (10 + Math.random() * 80) + '%';
+    piece.style.top = '-20px';
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDelay = (Math.random() * 0.8) + 's';
+    piece.style.animationDuration = (3 + Math.random() * 1) + 's';
+    piece.style.width = (12 + Math.random() * 6) + 'px';
+    piece.style.height = (12 + Math.random() * 6) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '4px';
     container.appendChild(piece);
   }
 }
+
+// Hub: random greeting
+function setHubGreeting() {
+  const greetings = [
+    'Привіт, Максимко!',
+    'Доброго ранку!',
+    'Час грати!',
+    'Радий тебе бачити!',
+    'Давай вчитися!'
+  ];
+  const el = document.getElementById('hubGreeting');
+  if (el) {
+    el.textContent = greetings[Math.floor(Math.random() * greetings.length)];
+  }
+}
+
+// Apply colored left borders to island cards
+function applyIslandBorders() {
+  const islandColors = [
+    'var(--island-math)', 'var(--island-letters)', 'var(--island-english)',
+    'var(--island-logic)', 'var(--island-memory)', 'var(--island-science)',
+    'var(--island-emotions)', 'var(--island-creativity)'
+  ];
+  document.querySelectorAll('.island-card').forEach((card, i) => {
+    const colorIdx = i % islandColors.length;
+    card.style.borderLeft = '3px solid ' + ['#F09B59','#5CC5BE','#E88BA0','#9B7BC8','#F0C75A','#5AAF8B','#E88BA0','#5BB8E0'][colorIdx];
+  });
+}
+
+// Apply island borders on initial load
+document.addEventListener('DOMContentLoaded', () => {
+  applyIslandBorders();
+});
 </script>
 </body>
 </html>
