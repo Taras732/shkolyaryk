@@ -39,16 +39,26 @@ function modeForDifficulty(difficulty: number): RecognizeDigitMode | 'mixed' {
   return 'mixed';
 }
 
-function generateTask(index: number, difficulty: number): Task<RecognizeDigitAnswer> {
-  const effectiveMode = modeForDifficulty(difficulty);
-  const mode: RecognizeDigitMode =
-    effectiveMode === 'mixed'
-      ? Math.random() < 0.5
-        ? 'digit-to-qty'
-        : 'qty-to-digit'
-      : effectiveMode;
+// Build a mode sequence that guarantees at least 2 of each mode when
+// 'mixed', avoiding an accidental run of one mode across all 5 tasks.
+function buildModeSequence(difficulty: number): RecognizeDigitMode[] {
+  const effective = modeForDifficulty(difficulty);
+  if (effective !== 'mixed') return Array(TASKS_PER_LEVEL).fill(effective);
+  const modes: RecognizeDigitMode[] = ['digit-to-qty', 'digit-to-qty', 'qty-to-digit', 'qty-to-digit'];
+  modes.push(Math.random() < 0.5 ? 'digit-to-qty' : 'qty-to-digit');
+  return shuffle(modes);
+}
 
-  const target = randInt(MIN_NUMBER, MAX_NUMBER);
+function generateTask(index: number, mode: RecognizeDigitMode, usedNumbers: Set<number>): Task<RecognizeDigitAnswer> {
+  // Avoid repeating the same number as target within a round.
+  let target = randInt(MIN_NUMBER, MAX_NUMBER);
+  let attempts = 0;
+  while (usedNumbers.has(target) && attempts < 20) {
+    target = randInt(MIN_NUMBER, MAX_NUMBER);
+    attempts++;
+  }
+  usedNumbers.add(target);
+
   const payload: RecognizeDigitPayload = {
     mode,
     correctNumber: target,
@@ -58,9 +68,11 @@ function generateTask(index: number, difficulty: number): Task<RecognizeDigitAns
 }
 
 function generateLevel(difficulty: number): LevelSpec<RecognizeDigitAnswer> {
+  const modes = buildModeSequence(difficulty);
+  const usedNumbers = new Set<number>();
   const tasks: Task<RecognizeDigitAnswer>[] = [];
   for (let i = 0; i < TASKS_PER_LEVEL; i++) {
-    tasks.push(generateTask(i, difficulty));
+    tasks.push(generateTask(i, modes[i], usedNumbers));
   }
   return {
     seed: `recognize-digit-${Date.now()}`,
