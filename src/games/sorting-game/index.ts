@@ -68,14 +68,16 @@ function paramsFor(difficulty: number, ageGroupId: AgeGroupId | undefined): Leve
   return { itemCount: 5, inputTimeLimitSec: 6 };
 }
 
-function pickSet(minItems: number): SortableSet {
+// Pre-select a shuffled queue of sets for the full round so no set
+// repeats within a single play (8 sets ≥ 5 tasks, so always unique).
+function buildRoundQueue(minItems: number): SortableSet[] {
   const eligible = SETS.filter((s) => s.items.length >= minItems);
   const pool = eligible.length > 0 ? eligible : SETS;
-  return pool[randInt(0, pool.length - 1)];
+  return shuffle(pool);
 }
 
-function generateTask(index: number, cfg: LevelConfig): Task<SortingAnswer> {
-  const set = pickSet(cfg.itemCount);
+function generateTask(index: number, cfg: LevelConfig, queue: SortableSet[]): Task<SortingAnswer> {
+  const set = queue[index % queue.length];
   const count = Math.min(cfg.itemCount, set.items.length);
   const correctItems = set.items.slice(0, count);
 
@@ -98,9 +100,10 @@ function generateTask(index: number, cfg: LevelConfig): Task<SortingAnswer> {
 
 function generateLevel(difficulty: number, ageGroupId?: AgeGroupId): LevelSpec<SortingAnswer> {
   const cfg = paramsFor(difficulty, ageGroupId);
+  const queue = buildRoundQueue(cfg.itemCount);
   const tasks: Task<SortingAnswer>[] = [];
   for (let i = 0; i < TASKS_PER_LEVEL; i++) {
-    tasks.push(generateTask(i, cfg));
+    tasks.push(generateTask(i, cfg, queue));
   }
   return {
     seed: `sorting-game-${Date.now()}`,
