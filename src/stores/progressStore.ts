@@ -17,6 +17,7 @@ interface ProgressState {
   badgesByProfile: Record<string, string[]>;
   gameProgressByProfile: Record<string, Record<string, GameProgress>>;
   unlockedLevelByProfile: Record<string, Record<string, DifficultyLevel>>;
+  updatedAtByProfile: Record<string, number>;
   addXp: (profileId: string, amount: number) => void;
   awardBadge: (profileId: string, badgeId: string) => void;
   recordGameSession: (profileId: string, gameId: string, score: number, difficulty: number) => void;
@@ -24,6 +25,16 @@ interface ProgressState {
   unlockNextLevel: (profileId: string, gameId: string, currentLevel: DifficultyLevel) => void;
   getXp: (profileId: string) => number;
   getLevel: (profileId: string) => number;
+  mergeRemoteProgress: (
+    profileId: string,
+    remote: {
+      xp: number;
+      badges: string[];
+      gameProgress: Record<string, GameProgress>;
+      unlockedLevels: Record<string, DifficultyLevel>;
+      updatedAt: number;
+    },
+  ) => void;
 }
 
 const XP_PER_LEVEL = 100;
@@ -35,12 +46,14 @@ export const useProgressStore = create<ProgressState>()(
       badgesByProfile: {},
       gameProgressByProfile: {},
       unlockedLevelByProfile: {},
+      updatedAtByProfile: {},
       addXp: (profileId, amount) =>
         set((state) => ({
           xpByProfile: {
             ...state.xpByProfile,
             [profileId]: (state.xpByProfile[profileId] ?? 0) + amount,
           },
+          updatedAtByProfile: { ...state.updatedAtByProfile, [profileId]: Date.now() },
         })),
       awardBadge: (profileId, badgeId) =>
         set((state) => {
@@ -48,6 +61,7 @@ export const useProgressStore = create<ProgressState>()(
           if (current.includes(badgeId)) return state;
           return {
             badgesByProfile: { ...state.badgesByProfile, [profileId]: [...current, badgeId] },
+            updatedAtByProfile: { ...state.updatedAtByProfile, [profileId]: Date.now() },
           };
         }),
       recordGameSession: (profileId, gameId, score, difficulty) =>
@@ -66,6 +80,7 @@ export const useProgressStore = create<ProgressState>()(
               ...state.gameProgressByProfile,
               [profileId]: { ...profileGames, [gameId]: updated },
             },
+            updatedAtByProfile: { ...state.updatedAtByProfile, [profileId]: Date.now() },
           };
         }),
       getUnlockedLevel: (profileId, gameId) =>
@@ -82,10 +97,30 @@ export const useProgressStore = create<ProgressState>()(
               ...state.unlockedLevelByProfile,
               [profileId]: { ...profileLevels, [gameId]: next },
             },
+            updatedAtByProfile: { ...state.updatedAtByProfile, [profileId]: Date.now() },
           };
         }),
       getXp: (profileId) => get().xpByProfile[profileId] ?? 0,
       getLevel: (profileId) => Math.floor((get().xpByProfile[profileId] ?? 0) / XP_PER_LEVEL) + 1,
+      // Applies remote progress only if remote.updatedAt > local (LWW).
+      mergeRemoteProgress: (profileId, remote) =>
+        set((state) => {
+          const localUpdatedAt = state.updatedAtByProfile[profileId] ?? 0;
+          if (remote.updatedAt <= localUpdatedAt) return state;
+          return {
+            xpByProfile: { ...state.xpByProfile, [profileId]: remote.xp },
+            badgesByProfile: { ...state.badgesByProfile, [profileId]: remote.badges },
+            gameProgressByProfile: {
+              ...state.gameProgressByProfile,
+              [profileId]: remote.gameProgress,
+            },
+            unlockedLevelByProfile: {
+              ...state.unlockedLevelByProfile,
+              [profileId]: remote.unlockedLevels,
+            },
+            updatedAtByProfile: { ...state.updatedAtByProfile, [profileId]: remote.updatedAt },
+          };
+        }),
     }),
     {
       name: 'progress',

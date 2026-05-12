@@ -9,16 +9,18 @@ export interface ChildProfile {
   ageGroupId: AgeGroupId;
   avatarId: string;
   createdAt: number;
+  updatedAt: number;
 }
 
 interface ChildProfilesState {
   profiles: ChildProfile[];
   activeProfileId: string | null;
-  addProfile: (profile: Omit<ChildProfile, 'id' | 'createdAt'>) => string;
-  updateProfile: (id: string, patch: Partial<Omit<ChildProfile, 'id' | 'createdAt'>>) => void;
+  addProfile: (profile: Omit<ChildProfile, 'id' | 'createdAt' | 'updatedAt'>) => string;
+  updateProfile: (id: string, patch: Partial<Omit<ChildProfile, 'id' | 'createdAt' | 'updatedAt'>>) => void;
   removeProfile: (id: string) => void;
   setActiveProfile: (id: string) => void;
   getActiveProfile: () => ChildProfile | null;
+  mergeRemoteProfiles: (remoteProfiles: ChildProfile[]) => void;
 }
 
 const generateId = (): string =>
@@ -30,8 +32,9 @@ export const useChildProfilesStore = create<ChildProfilesState>()(
       profiles: [],
       activeProfileId: null,
       addProfile: (input) => {
+        const now = Date.now();
         const id = generateId();
-        const profile: ChildProfile = { ...input, id, createdAt: Date.now() };
+        const profile: ChildProfile = { ...input, id, createdAt: now, updatedAt: now };
         set((state) => ({
           profiles: [...state.profiles, profile],
           activeProfileId: state.activeProfileId ?? id,
@@ -40,7 +43,9 @@ export const useChildProfilesStore = create<ChildProfilesState>()(
       },
       updateProfile: (id, patch) =>
         set((state) => ({
-          profiles: state.profiles.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+          profiles: state.profiles.map((p) =>
+            p.id === id ? { ...p, ...patch, updatedAt: Date.now() } : p,
+          ),
         })),
       removeProfile: (id) =>
         set((state) => {
@@ -56,12 +61,44 @@ export const useChildProfilesStore = create<ChildProfilesState>()(
         const { profiles, activeProfileId } = get();
         return profiles.find((p) => p.id === activeProfileId) ?? null;
       },
+      // Applies remote profiles that won LWW resolution (remote.updatedAt > local.updatedAt).
+      mergeRemoteProfiles: (remoteProfiles) =>
+        set((state) => {
+          const localMap = new Map(state.profiles.map((p) => [p.id, p]));
+          for (const remote of remoteProfiles) {
+            localMap.set(remote.id, remote);
+          }
+          const profiles = Array.from(localMap.values());
+          const activeStillExists = profiles.some((p) => p.id === state.activeProfileId);
+          return {
+            profiles,
+            activeProfileId: activeStillExists
+              ? state.activeProfileId
+              : (profiles[0]?.id ?? null),
+          };
+        }),
     }),
     {
       name: 'child-profiles',
       storage: createJSONStorage(() => mmkvStorage),
-      version: 2,
-      migrate: () => ({ profiles: [], activeProfileId: null }),
+      version: 3,
+      migrate: (persisted, version) => {
+        // v2 → v3: backfill updatedAt from createdAt for existing profiles
+        if (version < 3) {
+          const state = persisted as {
+            profiles?: Array<Record<string, unknown>>;
+            activeProfileId?: string | null;
+          };
+          return {
+            profiles: (state.profiles ?? []).map((p) => ({
+              ...p,
+              updatedAt: (p['updatedAt'] as number | undefined) ?? (p['createdAt'] as number | undefined) ?? Date.now(),
+            })),
+            activeProfileId: state.activeProfileId ?? null,
+          };
+        }
+        return persisted as { profiles: ChildProfile[]; activeProfileId: string | null };
+      },
     },
   ),
 );

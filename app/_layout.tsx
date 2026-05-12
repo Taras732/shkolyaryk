@@ -33,6 +33,7 @@ import { useAuthStore } from '@/src/stores/authStore';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import { useAuthSession } from '@/src/hooks/useAuthSession';
+import { useProfileSync } from '@/src/hooks/useProfileSync';
 
 export const unstable_settings = {
   initialRouteName: 'splash',
@@ -47,6 +48,7 @@ export default function RootLayout() {
   });
 
   useAuthSession();
+  useProfileSync();
 
   const router = useRouter();
   const segments = useSegments();
