@@ -13,23 +13,31 @@ export function Checkbox({ checked, onChange, disabled }: CheckboxProps) {
     <Pressable
       onPress={() => !disabled && onChange(!checked)}
       disabled={disabled}
-      hitSlop={8}
-      style={[
-        styles.box,
-        checked ? styles.boxChecked : styles.boxUnchecked,
-        disabled ? styles.disabled : null,
-      ]}
+      style={[styles.touchTarget, disabled ? styles.disabled : null]}
     >
-      {checked ? (
-        <AppText style={styles.mark} color="#FFFFFF">
-          ✓
-        </AppText>
-      ) : null}
+      <View
+        style={[
+          styles.box,
+          checked ? styles.boxChecked : styles.boxUnchecked,
+        ]}
+      >
+        {checked ? (
+          <AppText style={styles.mark} color="#FFFFFF">
+            ✓
+          </AppText>
+        ) : null}
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  touchTarget: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   box: {
     width: 22,
     height: 22,
