@@ -50,6 +50,10 @@ export default function HubScreen() {
             onPress={onHeaderPress}
             disabled={!canSwitchProfile}
             accessibilityRole="button"
+            accessibilityLabel={canSwitchProfile
+              ? t('hub.profileSwitchA11yLabel', { name: activeProfile?.name ?? '' })
+              : t('hub.profileA11yLabel', { name: activeProfile?.name ?? '' })
+            }
           >
             <View style={styles.avatar}>
               <AppText style={{ fontSize: 28 }}>{activeProfile?.avatarId ?? '🐱'}</AppText>
@@ -64,7 +68,12 @@ export default function HubScreen() {
               <AppText style={styles.switchHint}>⇄</AppText>
             ) : null}
           </Pressable>
-          <Pressable style={styles.parentBtn} onPress={() => router.push('/(parent)/dashboard')}>
+          <Pressable
+            style={styles.parentBtn}
+            onPress={() => router.push('/(parent)/dashboard')}
+            accessibilityRole="button"
+            accessibilityLabel={t('hub.parentMode')}
+          >
             <AppText style={{ fontSize: 22 }}>👨‍👩‍👧</AppText>
           </Pressable>
         </View>
@@ -103,6 +112,8 @@ export default function HubScreen() {
               key={island.id}
               style={{ ...styles.card, backgroundColor: island.color }}
               onPress={() => router.push({ pathname: '/(main)/island/[id]', params: { id: island.id } })}
+              accessibilityRole="button"
+              accessibilityLabel={t('hub.islandA11yLabel', { name: island.name })}
             >
               <AppText style={{ fontSize: 40 }}>{island.icon}</AppText>
               <AppText variant="body" color={island.textColor ?? '#fff'} style={{ fontWeight: '700', textAlign: 'center' }}>
