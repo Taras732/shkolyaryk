@@ -15,7 +15,7 @@ export const colors = {
   bgGradientStart: '#DFE6FF',
   bgGradientEnd: '#F7E6FF',
   text: '#1F1B3A',
-  textMuted: '#7A749A',
+  textMuted: '#635E82',
   textDisabled: '#C4C0D9',
   border: '#E4DFF5',
   islandMath: '#FF6B35',
