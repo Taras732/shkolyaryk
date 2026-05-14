@@ -83,7 +83,10 @@
     "tabAvatar": "Avatar",
     "tabParents": "Parents",
     "soon": "Soon",
-    "badgesTitle": "My badges"
+    "badgesTitle": "My badges",
+    "islandA11yLabel": "{{name}}, island",
+    "profileA11yLabel": "Profile {{name}}",
+    "profileSwitchA11yLabel": "Profile {{name}}, switch"
   },
   "badges": {
     "first-game": { "name": "First step", "description": "Finished your first game" },
@@ -304,6 +307,18 @@
       "name": "Continents and oceans",
       "rules": "Answer questions about continents and oceans.\n\nFor example: «Which continent do pandas live on?» → Asia.\n\n🟢 Easy: basic continent facts\n🟡 Medium: + oceans\n🔴 Hard: deeper facts + timer\n\nBuilds geographic knowledge for grades 3-4."
     },
+    "plantGrow": {
+      "name": "Plant growth",
+      "prompt": "Which stage is this?",
+      "rules": "A plant at a certain growth stage will appear on screen.\n\nIdentify the stage: 🌰 seed, 🌱 sprout, 🌿 plant, 🌸 flower, or 🍎 fruit.\n\n🟢 Easy: 3 stages (seed, sprout, fruit)\n🟡 Medium: all 5 stages, 4 answer choices\n🔴 Hard: all 5 stages + timer",
+      "stages": {
+        "seed": "seed",
+        "sprout": "sprout",
+        "sapling": "plant",
+        "flower": "flower",
+        "fruit": "fruit"
+      }
+    },
     "timesFlashcards": {
       "name": "Times flashcards",
       "show": "Show answer",
@@ -429,6 +444,7 @@
       "uaSymbols": "Symbols of our country",
       "worldFlags": "Countries and continents",
       "continentsOceans": "Continents and oceans",
+      "plantGrow": "Which plant growth stage?",
       "breathing": "Breathe with the balloon",
     }
   },
