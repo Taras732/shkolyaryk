@@ -86,7 +86,8 @@
     "badgesTitle": "Мої бейджі",
     "islandA11yLabel": "{{name}}, острів",
     "profileA11yLabel": "Профіль {{name}}",
-    "profileSwitchA11yLabel": "Профіль {{name}}, змінити"
+    "profileSwitchA11yLabel": "Профіль {{name}}, змінити",
+    "xpCardA11yHint": "Відкриває сторінку прогресу"
   },
   "badges": {
     "first-game": { "name": "Перший крок", "description": "Завершив першу гру" },
@@ -115,6 +116,9 @@
     "again": "Ще раз",
     "otherGame": "Інша гра",
     "toHub": "До Hub",
+    "againA11yHint": "Починає цю гру знову",
+    "otherGameA11yHint": "Повертає до списку ігор острова",
+    "toHubA11yHint": "Повертає на головний екран",
     "exitConfirm": "Вийти?",
     "exitConfirmMsg": "Прогрес рівня втратиться.",
     "rules": "Правила",
@@ -409,6 +413,14 @@
       },
       "progress": "Вдих {{current}} з {{total}}"
     },
+    "safetyBasic": {
+      "name": "Безпека",
+      "whatWouldYouDo": "Що ти зробиш?",
+      "resultSafe": "Правильно! Ти в безпеці 🛡️",
+      "resultUnsafe": "Будь обережний! ⚠️",
+      "next": "Далі",
+      "rules": "На екрані — ситуація.\n\n🛡️ Обери найбезпечніший варіант.\n💡 Побачиш, що сталось після твого вибору.\n\n🟢 Легко та середньо: без таймера\n🔴 Важко: таймер 25 секунд (2-4 клас)\n\nЦі знання можуть стати в пригоді у справжньому житті!"
+    },
     "taglines": {
       "tapTheDot": "Злови рухому крапку",
       "countObjects": "Порахуй скільки предметів",
@@ -446,6 +458,7 @@
       "worldFlags": "Країни і континенти",
       "continentsOceans": "Материки й океани",
       "breathing": "Дихай разом з кулькою",
+      "safetyBasic": "Вчимо правила безпеки",
     }
   },
   "parent": {

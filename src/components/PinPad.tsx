@@ -1,6 +1,7 @@
 import { View, StyleSheet, Pressable, Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
 import { AppText } from './AppText';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import { colors, radius, spacing, shadows } from '../constants/theme';
 
 const PIN_LENGTH = 4;
@@ -12,17 +13,19 @@ interface PinPadProps {
 }
 
 export function PinPad({ value, error = false, onChange }: PinPadProps) {
+  const reducedMotion = useReducedMotion();
   const shake = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!error) return;
+    if (reducedMotion) return;
     Animated.sequence([
       Animated.timing(shake, { toValue: -10, duration: 60, useNativeDriver: true }),
       Animated.timing(shake, { toValue: 10, duration: 60, useNativeDriver: true }),
       Animated.timing(shake, { toValue: -6, duration: 60, useNativeDriver: true }),
       Animated.timing(shake, { toValue: 0, duration: 60, useNativeDriver: true }),
     ]).start();
-  }, [error, shake]);
+  }, [error, shake, reducedMotion]);
 
   const handleKey = (key: string) => {
     if (key === 'back') {

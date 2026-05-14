@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, ActivityIndicator, StyleSheet, type PressableProps, type ViewStyle } from 'react-native';
 import { colors, radius, spacing, shadows } from '../constants/theme';
 import { AppText } from './AppText';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 type Size = 'sm' | 'md' | 'lg' | 'xl';
 type Tone = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -35,6 +36,7 @@ export function AppButton({
   ...rest
 }: AppButtonProps) {
   const [pressed, setPressed] = useState(false);
+  const reducedMotion = useReducedMotion();
   const isDisabled = disabled || loading;
 
   const backgroundColor =
@@ -61,7 +63,7 @@ export function AppButton({
     ...borderStyle,
     ...(fullWidth ? { width: '100%' } : {}),
     opacity: isDisabled ? 0.4 : 1,
-    transform: pressed && !isDisabled ? [{ scale: 0.96 }] : [{ scale: 1 }],
+    transform: pressed && !isDisabled && !reducedMotion ? [{ scale: 0.96 }] : [{ scale: 1 }],
     ...(tone === 'primary' && !isDisabled ? (pressed ? shadows.btnPressed : shadows.btn) : {}),
     ...style,
   };

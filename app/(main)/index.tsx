@@ -8,6 +8,7 @@ import { ISLANDS } from '@/src/constants/islands';
 import { colors, spacing, radius, shadows } from '@/src/constants/theme';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
 import { useProgressStore } from '@/src/stores/progressStore';
+import { useReducedMotion } from '@/src/hooks/useReducedMotion';
 import { t } from '@/src/i18n';
 
 export default function HubScreen() {
@@ -28,6 +29,7 @@ export default function HubScreen() {
     }
   }, [activeProfileId, profiles, setActiveProfile, router]);
 
+  const reducedMotion = useReducedMotion();
   const canSwitchProfile = profiles.length >= 2;
   const onHeaderPress = () => {
     if (canSwitchProfile) router.replace('/(main)/profile-picker');
@@ -79,17 +81,23 @@ export default function HubScreen() {
         </View>
 
         <Pressable
-          style={({ pressed }) => [styles.xpCard, pressed && styles.xpCardPressed]}
+          style={({ pressed }) => [styles.xpCard, pressed && !reducedMotion && styles.xpCardPressed]}
           onPress={() => router.push('/(main)/progress')}
           accessibilityRole="button"
           accessibilityLabel={t('hub.level', { level })}
+          accessibilityHint={t('hub.xpCardA11yHint')}
         >
           <View style={styles.xpRow}>
             <View>
               <AppText variant="caption" color="rgba(255,255,255,0.85)">
                 {t('hub.level', { level })}
               </AppText>
-              <AppText variant="h2" color="#fff" style={{ fontWeight: '800' }}>
+              <AppText
+                variant="h2"
+                color="#fff"
+                style={{ fontWeight: '800' }}
+                accessibilityLiveRegion="polite"
+              >
                 {xpInLevel} / {xpForLevel} XP
               </AppText>
             </View>
