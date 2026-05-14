@@ -23,6 +23,9 @@ export function BottomTabBar({ tabs, activeKey }: { tabs: BottomTab[]; activeKey
               styles.tab,
               pressed && !tab.disabled ? { opacity: 0.6 } : null,
             ]}
+            accessibilityRole="tab"
+            accessibilityLabel={tab.label}
+            accessibilityState={{ selected: isActive, disabled: tab.disabled ?? false }}
           >
             <AppText
               style={[styles.icon, isActive ? styles.iconActive : null, tab.disabled ? styles.disabled : null]}

@@ -47,15 +47,15 @@ export default function GameResultScreen() {
           <StarsReveal stars={stars} />
         </View>
 
-        <View style={styles.xpCard}>
+        <View style={styles.xpCard} accessibilityLiveRegion="polite" accessibilityLabel={`${t('game.xpEarned')} +${xp} XP`}>
           <AppText variant="caption" color={colors.textMuted}>{t('game.xpEarned')}</AppText>
           <AppText variant="h1" color={colors.primary}>+{xp} XP</AppText>
         </View>
 
         <View style={styles.actions}>
-          <AppButton title={t('game.again')} tone="primary" size="lg" onPress={handleAgain} fullWidth />
-          <AppButton title={t('game.otherGame')} tone="outline" size="md" onPress={handleOther} fullWidth />
-          <AppButton title={t('game.toHub')} tone="ghost" size="md" onPress={handleHub} fullWidth />
+          <AppButton title={t('game.again')} tone="primary" size="lg" onPress={handleAgain} fullWidth accessibilityHint={t('game.againA11yHint')} />
+          <AppButton title={t('game.otherGame')} tone="outline" size="md" onPress={handleOther} fullWidth accessibilityHint={t('game.otherGameA11yHint')} />
+          <AppButton title={t('game.toHub')} tone="ghost" size="md" onPress={handleHub} fullWidth accessibilityHint={t('game.toHubA11yHint')} />
         </View>
       </View>
     </SafeAreaView>
