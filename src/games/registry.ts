@@ -36,6 +36,7 @@ import uaSymbols from './ua-symbols';
 import worldFlags from './world-flags';
 import continentsOceans from './continents-oceans';
 import plantGrow from './plant-grow';
+import heroEmotion from './hero-emotion';
 
 const registry = new Map<string, GameDefinition<any, any>>();
 
@@ -102,3 +103,4 @@ registerGame(uaSymbols);
 registerGame(worldFlags);
 registerGame(continentsOceans);
 registerGame(plantGrow);
+registerGame(heroEmotion);

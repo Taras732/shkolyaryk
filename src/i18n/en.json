@@ -208,6 +208,23 @@
         "sleepy": "sleepy"
       }
     },
+    "heroEmotion": {
+      "name": "Hero & Emotions",
+      "prompt": "How would the hero feel?",
+      "rules": "A situation — picture and description — will appear on screen.\n\nPick the emotion the hero would feel in that situation.\n\nThere are 5 tasks per level. Fewer mistakes = more stars:\n⭐⭐⭐ no mistakes\n⭐⭐ 1-2 mistakes\n⭐ more",
+      "situations": {
+        "birthday":    "It's a birthday party! 🎉",
+        "rainStuck":   "It's raining outside, can't go out",
+        "puppy":       "Found a puppy!",
+        "bigAnimal":   "Met a big lion",
+        "toyBroke":    "Favourite toy broke",
+        "gift":        "Received an unexpected gift",
+        "toySnatched": "Someone took your toy",
+        "wonGame":     "Won the game!",
+        "fire":        "Saw fire nearby",
+        "lostToy":     "Can't find favourite toy"
+      }
+    },
     "memoryMatch": {
       "name": "Find the pair",
       "prompt": "Match the pairs",
@@ -293,6 +310,15 @@
         "solid": "solid",
         "liquid": "liquid",
         "gas": "gas"
+      }
+    },
+    "sinkFloat": {
+      "name": "Sink or Float",
+      "prompt": "What happens when you put this in water?",
+      "rules": "An object will appear on screen.\n\nDecide: does it ⬇️ sink or ⬆️ float in water?\n\n🟢 Easy: basic items (stone, coin, anchor, wood, apple, duck)\n🟡 Medium: full pool (brick, scissors, key, leaf, sponge, ball)\n🔴 Hard: full pool + timer (faster for older grades)",
+      "choices": {
+        "sink": "Sinks",
+        "float": "Floats"
       }
     },
     "uaSymbols": {
