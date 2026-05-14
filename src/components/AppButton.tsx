@@ -16,7 +16,7 @@ interface AppButtonProps extends Omit<PressableProps, 'style'> {
 }
 
 const sizeStyles: Record<Size, { minHeight: number; paddingVertical: number; paddingHorizontal: number }> = {
-  sm: { minHeight: 40, paddingVertical: spacing.sm, paddingHorizontal: spacing.md },
+  sm: { minHeight: 44, paddingVertical: spacing.sm, paddingHorizontal: spacing.md },
   md: { minHeight: 48, paddingVertical: spacing.smd, paddingHorizontal: spacing.lg },
   lg: { minHeight: 56, paddingVertical: spacing.md, paddingHorizontal: spacing.lg },
   xl: { minHeight: 64, paddingVertical: spacing.lg, paddingHorizontal: spacing.xl },
