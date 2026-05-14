@@ -12,7 +12,7 @@ export function ScreenHeader({ title, onBack, backLabel = '‹' }: ScreenHeaderP
   return (
     <View style={styles.header}>
       {onBack ? (
-        <Pressable style={styles.iconBtn} onPress={onBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Назад">
+        <Pressable style={styles.iconBtn} onPress={onBack} accessibilityRole="button" accessibilityLabel="Назад">
           <AppText style={styles.iconGlyph} color={colors.primary}>
             {backLabel}
           </AppText>
@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   iconBtn: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.full,
     backgroundColor: 'rgba(255,255,255,0.7)',
     alignItems: 'center',
@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
     ...shadows.card,
   },
   iconBtnSpacer: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
   },
   iconGlyph: {
     fontSize: 24,
