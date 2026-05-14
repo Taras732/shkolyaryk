@@ -105,7 +105,7 @@ export default function HubScreen() {
               onPress={() => router.push({ pathname: '/(main)/island/[id]', params: { id: island.id } })}
             >
               <AppText style={{ fontSize: 40 }}>{island.icon}</AppText>
-              <AppText variant="body" color="#fff" style={{ fontWeight: '700', textAlign: 'center' }}>
+              <AppText variant="body" color={island.textColor ?? '#fff'} style={{ fontWeight: '700', textAlign: 'center' }}>
                 {island.name}
               </AppText>
             </Pressable>
