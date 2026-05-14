@@ -7,6 +7,8 @@ export interface Island {
   name: string;
   icon: string;
   color: string;
+  /** Text color for contrast on island.color. Defaults to '#fff' if omitted. */
+  textColor?: string;
   category: IslandCategory;
   description: string;
 }
@@ -16,7 +18,7 @@ export const ISLANDS: Island[] = [
   { id: 'letters', name: 'Букви', icon: '📖', color: colors.islandLetters, category: 'intellect', description: 'Алфавіт, склади, слова' },
   { id: 'english', name: 'English', icon: '🇬🇧', color: colors.islandEnglish, category: 'intellect', description: 'ABC, перші слова' },
   { id: 'logic', name: 'Логіка', icon: '🧩', color: colors.islandLogic, category: 'intellect', description: 'Судоку, послідовності, лабіринт' },
-  { id: 'memory', name: 'Пам\'ять', icon: '🧠', color: colors.islandMemory, category: 'intellect', description: 'Пари, Simon Says' },
+  { id: 'memory', name: 'Пам\'ять', icon: '🧠', color: colors.islandMemory, textColor: '#1F1B3A', category: 'intellect', description: 'Пари, Simon Says' },
   { id: 'science', name: 'Наука', icon: '🔬', color: colors.islandScience, category: 'mental', description: 'Природа, фізика' },
   { id: 'emotions', name: 'Емоції', icon: '💚', color: colors.islandEmotions, category: 'mental', description: 'Почуття, дихання' },
   { id: 'creativity', name: 'Творчість', icon: '🎨', color: colors.islandCreativity, category: 'mental', description: 'Малювання, пазли' },
