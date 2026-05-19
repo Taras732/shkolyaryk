@@ -83,7 +83,11 @@
     "tabAvatar": "Avatar",
     "tabParents": "Parents",
     "soon": "Soon",
-    "badgesTitle": "My badges"
+    "badgesTitle": "My badges",
+    "islandA11yLabel": "{{name}}, island",
+    "profileA11yLabel": "Profile {{name}}",
+    "profileSwitchA11yLabel": "Profile {{name}}, switch",
+    "xpCardA11yHint": "Opens progress screen"
   },
   "badges": {
     "first-game": { "name": "First step", "description": "Finished your first game" },
@@ -112,6 +116,9 @@
     "again": "Again",
     "otherGame": "Other game",
     "toHub": "To Hub",
+    "againA11yHint": "Starts this game again",
+    "otherGameA11yHint": "Returns to the island game list",
+    "toHubA11yHint": "Returns to the home screen",
     "exitConfirm": "Leave?",
     "exitConfirmMsg": "Level progress will be lost.",
     "rules": "Rules",
@@ -304,6 +311,18 @@
       "name": "Continents and oceans",
       "rules": "Answer questions about continents and oceans.\n\nFor example: «Which continent do pandas live on?» → Asia.\n\n🟢 Easy: basic continent facts\n🟡 Medium: + oceans\n🔴 Hard: deeper facts + timer\n\nBuilds geographic knowledge for grades 3-4."
     },
+    "plantGrow": {
+      "name": "Plant growth",
+      "prompt": "Which stage is this?",
+      "rules": "A plant at a certain growth stage will appear on screen.\n\nIdentify the stage: 🌰 seed, 🌱 sprout, 🌿 plant, 🌸 flower, or 🍎 fruit.\n\n🟢 Easy: 3 stages (seed, sprout, fruit)\n🟡 Medium: all 5 stages, 4 answer choices\n🔴 Hard: all 5 stages + timer",
+      "stages": {
+        "seed": "seed",
+        "sprout": "sprout",
+        "sapling": "plant",
+        "flower": "flower",
+        "fruit": "fruit"
+      }
+    },
     "timesFlashcards": {
       "name": "Times flashcards",
       "show": "Show answer",
@@ -394,6 +413,14 @@
       },
       "progress": "Breath {{current}} of {{total}}"
     },
+    "safetyBasic": {
+      "name": "Safety",
+      "whatWouldYouDo": "What would you do?",
+      "resultSafe": "Great choice! You're safe 🛡️",
+      "resultUnsafe": "Be careful! ⚠️",
+      "next": "Next",
+      "rules": "A situation will appear on screen.\n\n🛡️ Pick the safest option.\n💡 See what happens after your choice.\n\n🟢 Easy and medium: no timer\n🔴 Hard: 25-second timer (grades 2-4)\n\nThese skills can help you in real life!"
+    },
     "taglines": {
       "tapTheDot": "Tap the moving dot",
       "countObjects": "Count the objects",
@@ -416,6 +443,7 @@
       "sortingGame": "Sort items in correct order",
       "colors": "Pick the named color",
       "waterStates": "Solid, liquid or gas?",
+      "sinkFloat": "Does it sink or float in water?",
       "lifeScenarios": "How would you act in different situations",
       "timesTables": "Multiplication and division with hint",
       "columnArithmetic": "Column addition and subtraction",
@@ -429,7 +457,9 @@
       "uaSymbols": "Symbols of our country",
       "worldFlags": "Countries and continents",
       "continentsOceans": "Continents and oceans",
+      "plantGrow": "Which plant growth stage?",
       "breathing": "Breathe with the balloon",
+      "safetyBasic": "Learn safety rules",
     }
   },
   "parent": {

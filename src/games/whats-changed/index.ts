@@ -78,11 +78,21 @@ function pickReplacement(original: string, used: string[], subtle: boolean): str
   return candidates[randInt(0, candidates.length - 1)];
 }
 
-function generateTask(index: number, cfg: LevelConfig): Task<ChangedAnswer> {
-  const picked = shuffle(flatPool()).slice(0, cfg.itemCount);
+// Build a thematic emoji pool for the entire round from 2-3 categories.
+// This gives "Fruits + Animals" rounds instead of a random cross-category
+// mix that looks incoherent across 5 tasks.
+function buildRoundPool(): string[] {
+  const categoryKeys = Object.keys(CATEGORIES);
+  const shuffledKeys = shuffle(categoryKeys);
+  const selectedKeys = shuffledKeys.slice(0, 2 + Math.floor(Math.random() * 2)); // 2 or 3 cats
+  return selectedKeys.flatMap((k) => CATEGORIES[k]);
+}
+
+function generateTask(index: number, cfg: LevelConfig, roundPool: string[]): Task<ChangedAnswer> {
+  const picked = shuffle(roundPool).slice(0, cfg.itemCount);
   const before = picked.slice();
   const after = picked.slice();
-  const changedIndex = randInt(0, cfg.itemCount - 1);
+  const changedIndex = randInt(0, picked.length - 1);
   const replacement = pickReplacement(before[changedIndex], picked, cfg.subtleReplace);
   after[changedIndex] = replacement;
 
@@ -98,9 +108,10 @@ function generateTask(index: number, cfg: LevelConfig): Task<ChangedAnswer> {
 
 function generateLevel(difficulty: number, ageGroupId?: AgeGroupId): LevelSpec<ChangedAnswer> {
   const cfg = paramsFor(difficulty, ageGroupId);
+  const roundPool = buildRoundPool();
   const tasks: Task<ChangedAnswer>[] = [];
   for (let i = 0; i < TASKS_PER_LEVEL; i++) {
-    tasks.push(generateTask(i, cfg));
+    tasks.push(generateTask(i, cfg, roundPool));
   }
   return {
     seed: `whats-changed-${Date.now()}`,

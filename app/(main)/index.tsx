@@ -8,6 +8,7 @@ import { ISLANDS } from '@/src/constants/islands';
 import { colors, spacing, radius, shadows } from '@/src/constants/theme';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
 import { useProgressStore } from '@/src/stores/progressStore';
+import { useReducedMotion } from '@/src/hooks/useReducedMotion';
 import { t } from '@/src/i18n';
 
 export default function HubScreen() {
@@ -28,6 +29,7 @@ export default function HubScreen() {
     }
   }, [activeProfileId, profiles, setActiveProfile, router]);
 
+  const reducedMotion = useReducedMotion();
   const canSwitchProfile = profiles.length >= 2;
   const onHeaderPress = () => {
     if (canSwitchProfile) router.replace('/(main)/profile-picker');
@@ -50,6 +52,10 @@ export default function HubScreen() {
             onPress={onHeaderPress}
             disabled={!canSwitchProfile}
             accessibilityRole="button"
+            accessibilityLabel={canSwitchProfile
+              ? t('hub.profileSwitchA11yLabel', { name: activeProfile?.name ?? '' })
+              : t('hub.profileA11yLabel', { name: activeProfile?.name ?? '' })
+            }
           >
             <View style={styles.avatar}>
               <AppText style={{ fontSize: 28 }}>{activeProfile?.avatarId ?? '🐱'}</AppText>
@@ -64,23 +70,34 @@ export default function HubScreen() {
               <AppText style={styles.switchHint}>⇄</AppText>
             ) : null}
           </Pressable>
-          <Pressable style={styles.parentBtn} onPress={() => router.push('/(parent)/dashboard')}>
+          <Pressable
+            style={styles.parentBtn}
+            onPress={() => router.push('/(parent)/dashboard')}
+            accessibilityRole="button"
+            accessibilityLabel={t('hub.parentMode')}
+          >
             <AppText style={{ fontSize: 22 }}>👨‍👩‍👧</AppText>
           </Pressable>
         </View>
 
         <Pressable
-          style={({ pressed }) => [styles.xpCard, pressed && styles.xpCardPressed]}
+          style={({ pressed }) => [styles.xpCard, pressed && !reducedMotion && styles.xpCardPressed]}
           onPress={() => router.push('/(main)/progress')}
           accessibilityRole="button"
           accessibilityLabel={t('hub.level', { level })}
+          accessibilityHint={t('hub.xpCardA11yHint')}
         >
           <View style={styles.xpRow}>
             <View>
               <AppText variant="caption" color="rgba(255,255,255,0.85)">
                 {t('hub.level', { level })}
               </AppText>
-              <AppText variant="h2" color="#fff" style={{ fontWeight: '800' }}>
+              <AppText
+                variant="h2"
+                color="#fff"
+                style={{ fontWeight: '800' }}
+                accessibilityLiveRegion="polite"
+              >
                 {xpInLevel} / {xpForLevel} XP
               </AppText>
             </View>
@@ -103,9 +120,11 @@ export default function HubScreen() {
               key={island.id}
               style={{ ...styles.card, backgroundColor: island.color }}
               onPress={() => router.push({ pathname: '/(main)/island/[id]', params: { id: island.id } })}
+              accessibilityRole="button"
+              accessibilityLabel={t('hub.islandA11yLabel', { name: island.name })}
             >
               <AppText style={{ fontSize: 40 }}>{island.icon}</AppText>
-              <AppText variant="body" color="#fff" style={{ fontWeight: '700', textAlign: 'center' }}>
+              <AppText variant="body" color={island.textColor ?? '#fff'} style={{ fontWeight: '700', textAlign: 'center' }}>
                 {island.name}
               </AppText>
             </Pressable>

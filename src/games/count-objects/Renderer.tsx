@@ -6,8 +6,25 @@ import { colors, radius, spacing, fontFamily } from '../../constants/theme';
 import { t } from '../../i18n';
 import type { RendererProps } from '../types';
 
+export type ItemKey =
+  | 'apple'
+  | 'star'
+  | 'fish'
+  | 'flower'
+  | 'car'
+  | 'bee'
+  | 'leaf'
+  | 'strawberry'
+  | 'snowflake'
+  | 'mitten'
+  | 'cloud'
+  | 'moon'
+  | 'butterfly'
+  | 'mushroom'
+  | 'duck';
+
 export interface CountPayload {
-  itemKey: 'apple';
+  itemKey: ItemKey;
   correctCount: number;
   positions: { xFrac: number; yFrac: number }[];
 }
@@ -17,8 +34,22 @@ export type CountAnswer = number;
 const SPRITE_SIZE = 40;
 const MAX_DIGITS = 2;
 
-const ITEM_EMOJI: Record<CountPayload['itemKey'], string> = {
+const ITEM_EMOJI: Record<ItemKey, string> = {
   apple: '🍎',
+  star: '⭐',
+  fish: '🐠',
+  flower: '🌸',
+  car: '🚗',
+  bee: '🐝',
+  leaf: '🍃',
+  strawberry: '🍓',
+  snowflake: '❄️',
+  mitten: '🧤',
+  cloud: '☁️',
+  moon: '🌙',
+  butterfly: '🦋',
+  mushroom: '🍄',
+  duck: '🦆',
 };
 
 export function Renderer({ task, onAnswer, disabled }: RendererProps<CountAnswer>) {

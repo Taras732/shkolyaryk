@@ -93,9 +93,7 @@ function generateChoices(correct: number, valueMax: number): number[] {
   return shuffle(Array.from(pool).slice(0, CHOICES_COUNT));
 }
 
-function generateTask(index: number, params: LevelParams): Task<ExprAnswer> {
-  const op: ExprOp =
-    params.allowSubtraction && Math.random() < 0.5 ? '−' : '+';
+function generateTask(index: number, params: LevelParams, op: ExprOp): Task<ExprAnswer> {
   const { a, b } = op === '+'
     ? generateAddition(params.valueMax)
     : generateSubtraction(params.valueMax);
@@ -110,11 +108,23 @@ function generateTask(index: number, params: LevelParams): Task<ExprAnswer> {
   return { id: `t${index}`, payload, timeLimitSec: params.timeLimitSec };
 }
 
+// Build a balanced operator sequence for the round so the player always
+// sees a mix of + and − when subtraction is enabled, rather than an
+// accidental run of one operator.
+function buildOpSequence(params: LevelParams): ExprOp[] {
+  if (!params.allowSubtraction) return Array(TASKS_PER_LEVEL).fill('+');
+  // Guarantee at least 2 of each operator, randomise the rest.
+  const ops: ExprOp[] = ['+', '+', '−', '−'];
+  ops.push(Math.random() < 0.5 ? '+' : '−');
+  return shuffle(ops);
+}
+
 function generateLevel(difficulty: number, ageGroupId?: AgeGroupId): LevelSpec<ExprAnswer> {
   const params = paramsFor(difficulty, ageGroupId);
+  const ops = buildOpSequence(params);
   const tasks: Task<ExprAnswer>[] = [];
   for (let i = 0; i < TASKS_PER_LEVEL; i++) {
-    tasks.push(generateTask(i, params));
+    tasks.push(generateTask(i, params, ops[i]));
   }
   return {
     seed: `math-expressions-${Date.now()}`,

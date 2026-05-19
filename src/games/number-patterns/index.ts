@@ -39,12 +39,14 @@ function paramsFor(difficulty: number, ageGroupId: AgeGroupId | undefined): Leve
   if (group === 'grade1') {
     if (difficulty <= 1) return { maxValue: 20, steps: [1, 2], allowDescending: false, nonLinear: false };
     if (difficulty === 2) return { maxValue: 30, steps: [2, 3, 5], allowDescending: false, nonLinear: false };
-    return { maxValue: 30, steps: [2, 3, 5], allowDescending: true, nonLinear: false, timeLimitSec: 10 };
+    // diff3: introduce triangular/doubling for variety alongside linear
+    return { maxValue: 30, steps: [2, 3, 5], allowDescending: true, nonLinear: true, timeLimitSec: 10 };
   }
   if (group === 'grade2') {
     if (difficulty <= 1) return { maxValue: 100, steps: [2, 5, 10], allowDescending: false, nonLinear: false };
-    if (difficulty === 2) return { maxValue: 100, steps: [3, 5, 10], allowDescending: true, nonLinear: false };
-    return { maxValue: 100, steps: [3, 5, 10], allowDescending: true, nonLinear: false, timeLimitSec: 10 };
+    // diff2+: mix in non-linear patterns to break linear monotony
+    if (difficulty === 2) return { maxValue: 100, steps: [3, 5, 10], allowDescending: true, nonLinear: true };
+    return { maxValue: 100, steps: [3, 5, 10], allowDescending: true, nonLinear: true, timeLimitSec: 10 };
   }
   if (group === 'grade3') {
     if (difficulty <= 1) return { maxValue: 500, steps: [5, 10, 25], allowDescending: false, nonLinear: false };

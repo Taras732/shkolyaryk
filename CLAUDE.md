@@ -72,3 +72,50 @@ Dev-login через `login.tsx` працює без Supabase (пряме `setSe
 
 ## GitHub
 `Taras732/kids_app` (потрібен `gh auth login` для push).
+
+## Anti-monotony Pattern (Track 1 Phase 6 — 2026-05-11)
+
+All procedural game generators MUST produce variety across 3 axes per round:
+
+### 1. Content variety — themed pools, not single hardcoded items
+```typescript
+// BAD — hardcoded item every task
+const payload = { itemKey: 'apple', ... };
+
+// GOOD — pick theme once per round, vary item per task
+const ROUND_THEMES = [ ['flower','bee','leaf','butterfly','mushroom'], ... ];
+const roundItems = pickRoundItems(); // shuffle a theme
+tasks[i] = { itemKey: roundItems[i] };
+```
+
+### 2. No repeated targets/content within a round
+```typescript
+// BAD — random per task, may repeat
+const target = randInt(MIN, MAX);
+
+// GOOD — track used values, skip repeats
+const used = new Set<number>();
+while (used.has(target)) target = randInt(MIN, MAX);
+used.add(target);
+```
+
+### 3. Mechanic/mode balance — guarantee mix, not chance
+```typescript
+// BAD — 50/50 random per task can give all-same operator
+const op = Math.random() < 0.5 ? '+' : '−';
+
+// GOOD — build balanced sequence upfront, then shuffle
+const ops: ExprOp[] = ['+', '+', '−', '−', randomPick(['+','−'])];
+const opSeq = shuffle(ops); // guaranteed 2+ of each
+tasks[i] = generateTask(i, params, opSeq[i]);
+```
+
+### 4. No-repeat category/theme within round (sorting, whats-changed, memory)
+```typescript
+// BAD — pickSet() random per task, repeats possible
+// GOOD — pre-shuffle the set list, index by task position
+const queue = shuffle(eligibleSets);
+tasks[i] = generateTask(queue[i % queue.length]);
+```
+
+QA gate: replay 5 rounds per game, score variety 1–5. Reject if any round scores < 4.

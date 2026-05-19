@@ -1,10 +1,22 @@
 import type { GameDefinition, LevelSpec, Task } from '../types';
 import type { AgeGroupId } from '../../constants/ageGroups';
-import { Renderer, type CountAnswer, type CountPayload } from './Renderer';
+import { Renderer, type CountAnswer, type CountPayload, type ItemKey } from './Renderer';
 
 const TASKS_PER_LEVEL = 5;
 const MIN_DIST_FRAC = 0.14;
 const SPRITE_MARGIN = 0.08;
+
+// Round-level themed pools — each round picks one theme so content
+// feels cohesive (e.g. "Garden" round shows flowers, bees, leaves)
+// while still varying the item per task within the round.
+const ROUND_THEMES: ItemKey[][] = [
+  ['flower', 'bee', 'leaf', 'butterfly', 'mushroom'],  // garden
+  ['apple', 'strawberry', 'duck', 'flower', 'bee'],    // farm
+  ['fish', 'star', 'cloud', 'moon', 'duck'],            // ocean/sky
+  ['star', 'cloud', 'moon', 'butterfly', 'snowflake'], // night sky
+  ['snowflake', 'mitten', 'star', 'moon', 'cloud'],    // winter
+  ['car', 'cloud', 'star', 'leaf', 'duck'],             // city
+];
 
 function randInt(min: number, max: number) {
   return min + Math.floor(Math.random() * (max - min + 1));
@@ -12,6 +24,27 @@ function randInt(min: number, max: number) {
 
 function randFloat(min: number, max: number) {
   return min + Math.random() * (max - min);
+}
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Returns TASKS_PER_LEVEL item keys from a randomly selected round theme.
+// Shuffles the theme pool so item order within round varies each play.
+function pickRoundItems(): ItemKey[] {
+  const theme = ROUND_THEMES[randInt(0, ROUND_THEMES.length - 1)];
+  const shuffled = shuffle(theme);
+  const result: ItemKey[] = [];
+  for (let i = 0; i < TASKS_PER_LEVEL; i++) {
+    result.push(shuffled[i % shuffled.length]);
+  }
+  return result;
 }
 
 function generatePositions(count: number): { xFrac: number; yFrac: number }[] {
@@ -73,11 +106,12 @@ function paramsFor(difficulty: number, ageGroupId: AgeGroupId | undefined): Leve
 
 function generateLevel(difficulty: number, ageGroupId?: AgeGroupId): LevelSpec<CountAnswer> {
   const { maxCount, timeLimitSec } = paramsFor(difficulty, ageGroupId);
+  const roundItems = pickRoundItems();
   const tasks: Task<CountAnswer>[] = [];
   for (let i = 0; i < TASKS_PER_LEVEL; i++) {
     const correctCount = randInt(1, maxCount);
     const payload: CountPayload = {
-      itemKey: 'apple',
+      itemKey: roundItems[i],
       correctCount,
       positions: generatePositions(correctCount),
     };

@@ -35,6 +35,8 @@ import timesFlashcards from './times-flashcards';
 import uaSymbols from './ua-symbols';
 import worldFlags from './world-flags';
 import continentsOceans from './continents-oceans';
+import plantGrow from './plant-grow';
+import sinkFloat from './sink-float';
 
 const registry = new Map<string, GameDefinition<any, any>>();
 
@@ -100,3 +102,5 @@ registerGame(timesFlashcards);
 registerGame(uaSymbols);
 registerGame(worldFlags);
 registerGame(continentsOceans);
+registerGame(plantGrow);
+registerGame(sinkFloat);
