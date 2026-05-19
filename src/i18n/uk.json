@@ -510,6 +510,7 @@
     "schedule": "Розклад ігор",
     "scheduleHint": "Скоро: дозволені години доступу до ігор.",
     "activityEmpty": "Статистика з'явиться після першої гри.",
+    "noSessionsYet": "Ще немає сесій",
     "changePin": "Змінити PIN",
     "changeLanguage": "Мова застосунку",
     "sound": "Звуки",

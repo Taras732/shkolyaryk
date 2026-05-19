@@ -71,7 +71,7 @@ export default function ParentDashboardScreen() {
       unlockedLevelByProfile: {},
     });
     useOnboardingStore.setState({ hasChosenLanguage, hasSeenWelcome });
-    usePinStore.setState({ pinHash: null, failedAttempts: 0, lockedUntil: null, unlocked: false });
+    await usePinStore.getState().clearPin();
     useSettingsStore.setState({ locale, parentPin: null, dailyTimeLimitMinutes: null });
     useAnalyticsStore.setState({ events: [] });
     setDeleting(false);
@@ -242,10 +242,13 @@ function ProgressTab() {
 function TimeTab() {
   const activeId = useChildProfilesStore((s) => s.activeProfileId);
   const getTodayMins = usePlaySessionsStore((s) => s.todayMinutes);
+  const hasSessions = usePlaySessionsStore((s) =>
+    activeId ? s.sessions.some((sess) => sess.profileId === activeId) : s.sessions.length > 0,
+  );
   const dailyLimit = useSettingsStore((s) => s.dailyTimeLimitMinutes);
 
   const todayMins = activeId ? getTodayMins(activeId) : 0;
-  const todayLabel = `${Math.round(todayMins)} хв`;
+  const todayLabel = hasSessions ? `${Math.round(todayMins)} хв` : t('parent.noSessionsYet');
   const limitLabel = dailyLimit != null ? `${dailyLimit} хв` : '—';
 
   return (

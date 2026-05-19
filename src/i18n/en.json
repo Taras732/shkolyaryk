@@ -510,6 +510,7 @@
     "schedule": "Play schedule",
     "scheduleHint": "Coming soon: allowed hours for playing.",
     "activityEmpty": "Stats will appear after the first game.",
+    "noSessionsYet": "No sessions yet",
     "changePin": "Change PIN",
     "changeLanguage": "App language",
     "sound": "Sounds",
