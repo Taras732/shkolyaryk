@@ -9,6 +9,7 @@ import {
   type SessionState,
   type Task,
 } from './types';
+import { usePlaySessionsStore } from '../stores/playSessionsStore';
 
 const FEEDBACK_CORRECT_MS = 1000;
 const FEEDBACK_WRONG_MS = 1200;
@@ -100,6 +101,7 @@ export function useGameSession<TAnswer = unknown>(
   gameId: string,
   difficulty: number = 1.0,
   ageGroupId?: AgeGroupId,
+  profileId?: string,
 ): UseGameSessionResult<TAnswer> {
   const game = getGame(gameId);
   if (!game) {
@@ -125,6 +127,8 @@ export function useGameSession<TAnswer = unknown>(
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const taskTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [taskStartedAt, setTaskStartedAt] = useState<number | null>(null);
+  const sessionStartMsRef = useRef<number | null>(null);
+  const sessionRecordedRef = useRef(false);
 
   useEffect(() => {
     if (timerRef.current) {
@@ -177,6 +181,34 @@ export function useGameSession<TAnswer = unknown>(
     };
   }, [state.phase, state.taskIndex, state.levelSpec, setTaskStartedAt]);
 
+  // Track when playing actually begins (only once per session lifetime)
+  useEffect(() => {
+    if (state.phase === 'playing' && sessionStartMsRef.current === null) {
+      sessionStartMsRef.current = Date.now();
+    }
+  }, [state.phase]);
+
+  // Record completed session into playSessionsStore
+  useEffect(() => {
+    if (
+      state.phase === 'finished' &&
+      !sessionRecordedRef.current &&
+      profileId &&
+      sessionStartMsRef.current !== null
+    ) {
+      sessionRecordedRef.current = true;
+      const endedAt = Date.now();
+      usePlaySessionsStore.getState().addSession({
+        profileId,
+        gameId,
+        startedAt: sessionStartMsRef.current,
+        endedAt,
+        durationMs: endedAt - sessionStartMsRef.current,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.phase, profileId, gameId]);
+
   const start = useCallback(() => dispatch({ type: 'START' }), []);
 
   const submit = useCallback(
@@ -191,6 +223,8 @@ export function useGameSession<TAnswer = unknown>(
   );
 
   const reset = useCallback(() => {
+    sessionStartMsRef.current = null;
+    sessionRecordedRef.current = false;
     const levelSpec = game.generateLevel(difficulty, ageGroupId) as LevelSpec<TAnswer>;
     dispatch({
       type: 'RESET',

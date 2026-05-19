@@ -206,7 +206,7 @@ function GameplayContainer({
   onExit,
   onFinished,
 }: GameplayProps) {
-  const session = useGameSession(gameId, difficulty, ageGroupId);
+  const session = useGameSession(gameId, difficulty, ageGroupId, profileId ?? undefined);
   const game = getGame(gameId)!;
   const Renderer = game.Renderer;
 

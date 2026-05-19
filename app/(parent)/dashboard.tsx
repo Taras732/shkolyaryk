@@ -9,6 +9,7 @@ import { t } from '@/src/i18n';
 import { signOut, deleteAccount } from '@/src/hooks/useAuthActions';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
 import { useProgressStore } from '@/src/stores/progressStore';
+import { usePlaySessionsStore } from '@/src/stores/playSessionsStore';
 import { usePinStore } from '@/src/stores/pinStore';
 import { useSettingsStore } from '@/src/stores/settingsStore';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
@@ -191,19 +192,23 @@ function TabButton({ icon, label, active, onPress }: { icon: string; label: stri
   );
 }
 
+const BAR_MAX_PX = 108;
+const DAY_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+
 function ProgressTab() {
   const activeId = useChildProfilesStore((s) => s.activeProfileId);
   const getXp = useProgressStore((s) => s.getXp);
   const getLevel = useProgressStore((s) => s.getLevel);
   const badgesMap = useProgressStore((s) => s.badgesByProfile);
+  const getStreak = usePlaySessionsStore((s) => s.streakDays);
+  const getWeekDays = usePlaySessionsStore((s) => s.weekDayMinutes);
 
   const xp = activeId ? getXp(activeId) : 0;
   const level = activeId ? getLevel(activeId) : 1;
   const badges = activeId ? (badgesMap[activeId]?.length ?? 0) : 0;
-  const streak = 0;
-
-  const week = [40, 65, 30, 80, 55, 90, 60];
-  const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+  const streak = activeId ? getStreak(activeId) : 0;
+  const weekMins = activeId ? getWeekDays(activeId) : Array(7).fill(0) as number[];
+  const maxMin = Math.max(...weekMins, 1);
 
   return (
     <View style={{ gap: spacing.md }}>
@@ -217,10 +222,10 @@ function ProgressTab() {
       <View style={styles.panel}>
         <AppText variant="h2" style={styles.panelTitle}>{t('parent.weekActivity')}</AppText>
         <View style={styles.bars}>
-          {week.map((h, i) => (
+          {weekMins.map((mins, i) => (
             <View key={i} style={styles.barCol}>
-              <View style={[styles.bar, { height: h * 1.2 }]} />
-              <AppText variant="caption" color={colors.textMuted}>{days[i]}</AppText>
+              <View style={[styles.bar, { height: Math.max(2, (mins / maxMin) * BAR_MAX_PX) }]} />
+              <AppText variant="caption" color={colors.textMuted}>{DAY_LABELS[i]}</AppText>
             </View>
           ))}
         </View>
@@ -235,11 +240,19 @@ function ProgressTab() {
 }
 
 function TimeTab() {
+  const activeId = useChildProfilesStore((s) => s.activeProfileId);
+  const getTodayMins = usePlaySessionsStore((s) => s.todayMinutes);
+  const dailyLimit = useSettingsStore((s) => s.dailyTimeLimitMinutes);
+
+  const todayMins = activeId ? getTodayMins(activeId) : 0;
+  const todayLabel = `${Math.round(todayMins)} хв`;
+  const limitLabel = dailyLimit != null ? `${dailyLimit} хв` : '—';
+
   return (
     <View style={{ gap: spacing.md }}>
       <View style={styles.statRow}>
-        <StatCard value="0 хв" label={t('parent.statToday')} />
-        <StatCard value="—" label={t('parent.statLimit')} />
+        <StatCard value={todayLabel} label={t('parent.statToday')} />
+        <StatCard value={limitLabel} label={t('parent.statLimit')} />
       </View>
       <View style={styles.panel}>
         <AppText variant="h2" style={styles.panelTitle}>{t('parent.dailyLimit')}</AppText>
