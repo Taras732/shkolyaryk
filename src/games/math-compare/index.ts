@@ -213,6 +213,7 @@ const mathCompare: GameDefinition<LevelSpec<CompareAnswer>, CompareAnswer> = {
     const p = task.payload as ComparePayload;
     return { correct: answer === p.correct };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

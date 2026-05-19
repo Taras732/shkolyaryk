@@ -82,6 +82,7 @@ const englishWordPicture: GameDefinition<LevelSpec<WordAnswer>, WordAnswer> = {
     const p = task.payload as WordPicturePayload;
     return { correct: answer === p.word };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

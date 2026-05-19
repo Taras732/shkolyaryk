@@ -162,6 +162,7 @@ const clockTime: GameDefinition<LevelSpec<ClockTimeAnswer>, ClockTimeAnswer> = {
     const p = task.payload as ClockTimePayload;
     return { correct: answer === `${p.target.hour}:${p.target.minute}` };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

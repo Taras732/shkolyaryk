@@ -95,6 +95,7 @@ const digitSpan: GameDefinition<LevelSpec<DigitSpanAnswer>, DigitSpanAnswer> = {
     const p = task.payload as DigitSpanPayload;
     return { correct: arraysEqual(answer, p.sequence) };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

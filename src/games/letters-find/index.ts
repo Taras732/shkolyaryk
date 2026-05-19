@@ -54,6 +54,7 @@ const lettersFind: GameDefinition<LevelSpec<LetterAnswer>, LetterAnswer> = {
     const p = task.payload as LetterPayload;
     return { correct: answer === p.target };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

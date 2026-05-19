@@ -242,6 +242,7 @@ const moneyBasics: GameDefinition<LevelSpec<MoneyAnswer>, MoneyAnswer> = {
     const p = task.payload as MoneyPayload;
     return { correct: answer === p.correctKop };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

@@ -36,6 +36,14 @@ export interface LevelLabel {
   labelKey: string;
 }
 
+export interface GradeFit {
+  kindergarten: boolean;
+  grade1: boolean;
+  grade2: boolean;
+  grade3: boolean;
+  grade4: boolean;
+}
+
 export interface GameDefinition<TLevelSpec extends LevelSpec<any> = LevelSpec<any>, TAnswer = any> {
   id: string;
   islandId: string;
@@ -44,6 +52,7 @@ export interface GameDefinition<TLevelSpec extends LevelSpec<any> = LevelSpec<an
   rulesKey?: string;
   hasDifficulty?: boolean;
   availableFor?: AgeGroupId[];
+  gradeFit?: GradeFit;
   levelLabels?: Record<1 | 2 | 3, LevelLabel>;
   generateLevel: (difficulty: number, ageGroupId?: AgeGroupId) => TLevelSpec;
   validateAnswer: (task: Task<TAnswer>, answer: TAnswer) => ValidationResult;

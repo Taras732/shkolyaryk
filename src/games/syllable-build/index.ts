@@ -57,6 +57,7 @@ const syllableBuild: GameDefinition<LevelSpec<SyllableAnswer>, SyllableAnswer> =
     const p = task.payload as SyllablePayload;
     return { correct: answer === p.targetVowel };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

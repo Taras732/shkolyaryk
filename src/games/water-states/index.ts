@@ -104,6 +104,7 @@ const waterStates: GameDefinition<LevelSpec<WaterStateAnswer>, WaterStateAnswer>
     const p = task.payload as WaterStatePayload;
     return { correct: answer === p.target };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

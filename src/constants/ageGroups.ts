@@ -11,7 +11,7 @@ export interface AgeGroup {
 export const AGE_GROUPS: AgeGroup[] = [
   {
     id: 'preschool',
-    name: 'Малюк',
+    name: 'Дошкільнята',
     focus: 'Кольори, форми, рахунок 1-5, перші букви',
     uiScale: 1.3,
     fontScale: 1.3,

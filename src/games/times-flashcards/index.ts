@@ -87,6 +87,7 @@ const timesFlashcards: GameDefinition<LevelSpec<FlashAnswer>, FlashAnswer> = {
   validateAnswer(_task, answer) {
     return { correct: answer === 'known' };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

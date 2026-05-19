@@ -102,6 +102,7 @@ const countObjects: GameDefinition<LevelSpec<CountAnswer>, CountAnswer> = {
     const p = task.payload as CountPayload;
     return { correct: answer === p.correctCount };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

@@ -202,6 +202,7 @@ const measures: GameDefinition<LevelSpec<MeasuresAnswer>, MeasuresAnswer> = {
     }
     return { correct: answer === p.correct };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

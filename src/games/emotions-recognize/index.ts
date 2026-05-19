@@ -72,6 +72,7 @@ const emotionsRecognize: GameDefinition<LevelSpec<EmotionAnswer>, EmotionAnswer>
     const p = task.payload as EmotionPayload;
     return { correct: answer === p.target };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

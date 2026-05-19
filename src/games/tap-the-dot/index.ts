@@ -45,6 +45,7 @@ const tapTheDot: GameDefinition<LevelSpec<DotAnswer>, DotAnswer> = {
     const dist = Math.hypot(answer.tapX - answer.dotX, answer.tapY - answer.dotY);
     return { correct: dist <= answer.radius + HIT_TOLERANCE };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

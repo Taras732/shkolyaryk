@@ -91,6 +91,7 @@ const lifeScenarios: GameDefinition<LevelSpec<LifeScenarioAnswer>, LifeScenarioA
     const chosen = p.actions.find((a) => a.key === answer.actionKey);
     return { correct: !!chosen?.isBest };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

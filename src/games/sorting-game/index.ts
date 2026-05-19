@@ -126,6 +126,7 @@ const sortingGame: GameDefinition<LevelSpec<SortingAnswer>, SortingAnswer> = {
     const p = task.payload as SortingPayload;
     return { correct: arraysEqual(answer, p.correctOrder) };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

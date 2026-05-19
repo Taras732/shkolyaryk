@@ -83,6 +83,7 @@ const colorsFind: GameDefinition<LevelSpec<ColorAnswer>, ColorAnswer> = {
     const p = task.payload as ColorPayload;
     return { correct: answer === p.target };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

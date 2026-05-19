@@ -114,6 +114,7 @@ const plantGrow: GameDefinition<LevelSpec<PlantGrowAnswer>, PlantGrowAnswer> = {
     const p = task.payload as PlantGrowPayload;
     return { correct: answer === p.targetStage };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

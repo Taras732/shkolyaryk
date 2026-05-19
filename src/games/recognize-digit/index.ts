@@ -86,6 +86,7 @@ const recognizeDigit: GameDefinition<LevelSpec<RecognizeDigitAnswer>, RecognizeD
     const p = task.payload as RecognizeDigitPayload;
     return { correct: answer === p.correctNumber };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

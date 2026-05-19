@@ -68,7 +68,7 @@
   "onboarding": {
     "chooseLanguage": "Choose language",
     "enterName": "What's your name?",
-    "chooseAgeGroup": "What grade are you in?",
+    "chooseAgeGroup": "Child's grade",
     "chooseAvatar": "Pick an avatar",
     "welcome": "Welcome, {{name}}!",
     "tutorialStart": "Let me show you how to play"

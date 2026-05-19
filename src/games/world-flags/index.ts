@@ -157,6 +157,7 @@ const worldFlags: GameDefinition<LevelSpec<QuizAnswer>, QuizAnswer> = {
     const p = task.payload as QuizPayload;
     return { correct: answer === p.correctId };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer: QuizRenderer,
 };
 

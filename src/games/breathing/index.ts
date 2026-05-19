@@ -35,6 +35,7 @@ const breathing: GameDefinition<LevelSpec<BreathingAnswer>, BreathingAnswer> = {
   validateAnswer() {
     return { correct: true };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

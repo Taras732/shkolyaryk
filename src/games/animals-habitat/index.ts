@@ -75,6 +75,7 @@ const animalsHabitat: GameDefinition<LevelSpec<AnimalAnswer>, AnimalAnswer> = {
     const p = task.payload as AnimalPayload;
     return { correct: answer === p.target };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 

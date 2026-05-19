@@ -68,7 +68,7 @@
   "onboarding": {
     "chooseLanguage": "Оберіть мову",
     "enterName": "Як тебе звати?",
-    "chooseAgeGroup": "Який у тебе клас?",
+    "chooseAgeGroup": "Клас дитини",
     "chooseAvatar": "Обери аватар",
     "welcome": "Вітаємо, {{name}}!",
     "tutorialStart": "Зараз я покажу як грати"

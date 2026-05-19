@@ -185,6 +185,7 @@ const timesTables: GameDefinition<LevelSpec<TimesAnswer>, TimesAnswer> = {
     const p = task.payload as TimesPayload;
     return { correct: answer === p.correct };
   },
+  gradeFit: { kindergarten: true, grade1: true, grade2: true, grade3: true, grade4: true },
   Renderer,
 };
 
