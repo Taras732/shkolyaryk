@@ -199,6 +199,14 @@
       "prompt": "What's this in English?",
       "rules": "A picture and 3 English words will appear.\n\nTap the correct word for the picture.\n\nThere are 5 tasks per level. Fewer mistakes = more stars:\n⭐⭐⭐ no mistakes\n⭐⭐ 1-2 mistakes\n⭐ more"
     },
+    "listenMatch": {
+      "name": "Listen & Match",
+      "prompt": "Tap the word you hear",
+      "tapToHear": "Tap to hear",
+      "noAudio": "Audio unavailable",
+      "fallbackHint": "Read the word",
+      "rules": "You'll hear a word — find it among the options.\n\nTap the 🔊 picture to hear it again.\n\nIf audio is unavailable, the word is shown as text.\n\nThere are 5 tasks per level. Fewer mistakes = more stars:\n⭐⭐⭐ no mistakes\n⭐⭐ 1-2 mistakes\n⭐ more"
+    },
     "emotions": {
       "name": "Emotions",
       "prompt": "Which emotion is this?",
