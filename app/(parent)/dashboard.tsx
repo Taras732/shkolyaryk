@@ -72,6 +72,7 @@ export default function ParentDashboardScreen() {
       gameProgressByProfile: {},
       unlockedLevelByProfile: {},
       sessionsByProfile: {},
+      multiplyMasteryByProfile: {},
     });
     useOnboardingStore.setState({ hasChosenLanguage, hasSeenWelcome });
     usePinStore.setState({ pinHash: null, failedAttempts: 0, lockedUntil: null, unlocked: false });
@@ -196,6 +197,7 @@ function TabButton({ icon, label, active, onPress }: { icon: string; label: stri
 }
 
 const NO_SESSIONS: SessionLog[] = [];
+const NO_NUMS: number[] = [];
 const WEEK_DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
 
 function gameLabel(gameId: string): string {
@@ -220,6 +222,9 @@ function ProgressTab() {
   const badgesMap = useProgressStore((s) => s.badgesByProfile);
   const sessions = useProgressStore((s) =>
     activeId ? s.sessionsByProfile[activeId] ?? NO_SESSIONS : NO_SESSIONS,
+  );
+  const multiplyMastery = useProgressStore((s) =>
+    activeId ? s.multiplyMasteryByProfile[activeId] ?? NO_NUMS : NO_NUMS,
   );
 
   const xp = activeId ? getXp(activeId) : 0;
@@ -252,6 +257,18 @@ function ProgressTab() {
           ))}
         </View>
       </View>
+
+      {multiplyMastery.length > 0 ? (
+        <View style={styles.panel}>
+          <AppText variant="h2" style={styles.panelTitle}>{t('parent.multiplyMastery')}</AppText>
+          <AppText variant="body" color={colors.text} style={{ fontWeight: '600' }}>
+            {t('trainer.progressLabel', { done: multiplyMastery.length, total: 10 })}
+          </AppText>
+          <AppText variant="caption" color={colors.textMuted}>
+            {multiplyMastery.map((n) => `×${n}`).join('   ')}
+          </AppText>
+        </View>
+      ) : null}
 
       <View style={styles.panel}>
         <AppText variant="h2" style={styles.panelTitle}>{t('parent.recentActivity')}</AppText>

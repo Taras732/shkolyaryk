@@ -482,6 +482,7 @@
     "yesterday": "Yesterday",
     "todayByIsland": "Today by island",
     "reportGames": "{{n}} games",
+    "multiplyMastery": "Times table",
     "timeHint": "Coming soon: daily time limit & schedule.",
     "weekActivity": "Weekly activity (min)",
     "recentActivity": "Recent activity",
@@ -531,8 +532,25 @@
     "startGame": "Play 🎮",
     "doneTitle": "Great! Now play",
     "doneHint": "You're ready — reinforce it in the game",
+    "trainerBtn": "🔢 Learn by number",
     "parentTipTitle": "Tip for parents",
     "progress": "{{current}} of {{total}}"
+  },
+  "trainer": {
+    "title": "Learn the times table",
+    "pickPrompt": "Pick a number to learn",
+    "progressLabel": "Mastered {{done}} of {{total}}",
+    "mix": "🎲 Mix — all together",
+    "studyTitle": "Multiplying by {{n}}",
+    "studyHint": "Look and memorize. When ready — start the quiz.",
+    "ready": "I'm ready!",
+    "correctOf": "Correct: {{correct}} of {{total}}",
+    "masteredNow": "Number {{n}} mastered! 🟢",
+    "almostThere": "Almost! Try again 💪",
+    "mixDone": "Nice practice! 🎉",
+    "nextNumber": "Next number →",
+    "tryAgain": "Again",
+    "toPicker": "Back to numbers"
   },
   "picker": {
     "title": "Who's playing?",

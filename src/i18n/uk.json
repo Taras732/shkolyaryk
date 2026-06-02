@@ -481,6 +481,7 @@
     "yesterday": "Вчора",
     "todayByIsland": "Сьогодні по островах",
     "reportGames": "{{n}} ігор",
+    "multiplyMastery": "Таблиця множення",
     "timeHint": "Скоро: налаштування денного ліміту часу та розклад.",
     "weekActivity": "Активність за тиждень (хв)",
     "recentActivity": "Останні активності",
@@ -530,8 +531,25 @@
     "startGame": "Грати 🎮",
     "doneTitle": "Молодець! Тепер пограй",
     "doneHint": "Ти готовий — закріпи це у грі",
+    "trainerBtn": "🔢 Вивчати по цифрах",
     "parentTipTitle": "Порада батькам",
     "progress": "{{current}} з {{total}}"
+  },
+  "trainer": {
+    "title": "Вчимо таблицю множення",
+    "pickPrompt": "Обери цифру, яку вчимо",
+    "progressLabel": "Освоєно {{done}} з {{total}}",
+    "mix": "🎲 Мікс — усе разом",
+    "studyTitle": "Множимо на {{n}}",
+    "studyHint": "Подивись і запам’ятай. Коли готовий — почни тести.",
+    "ready": "Я готовий(ва)!",
+    "correctOf": "Правильно: {{correct}} з {{total}}",
+    "masteredNow": "Цифру {{n}} освоєно! 🟢",
+    "almostThere": "Майже! Спробуй ще раз 💪",
+    "mixDone": "Гарна практика! 🎉",
+    "nextNumber": "Наступна цифра →",
+    "tryAgain": "Ще раз",
+    "toPicker": "До вибору цифри"
   },
   "picker": {
     "title": "Хто гратиме?",

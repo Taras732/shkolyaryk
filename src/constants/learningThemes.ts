@@ -28,6 +28,8 @@ export interface LearningTheme {
   gameId: string;
   /** Підказка батькам (як пояснювати вдома). */
   parentTip: string;
+  /** Маршрут покрокового тренажера (якщо є) — показується окремою кнопкою. */
+  trainerRoute?: string;
 }
 
 // ── 1 клас ───────────────────────────────────────────────
@@ -201,6 +203,7 @@ const multiplication: LearningTheme = {
     { statement: '2 × 5 = 10', correct: true },
   ],
   gameId: 'times-tables',
+  trainerRoute: '/multiply',
   parentTip: 'Спершу покажіть суть на предметах (тарілки × яблука), і лише потім вчіть напам’ять. По 5–10 хвилин щодня. Помилки складайте в окрему "пачку для повторення".',
 };
 

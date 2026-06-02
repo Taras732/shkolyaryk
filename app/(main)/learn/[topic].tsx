@@ -36,6 +36,10 @@ export default function LearnTopicScreen() {
   const goPlay = () =>
     router.replace({ pathname: '/(main)/game/[id]', params: { id: theme.gameId } });
 
+  const goTrainer = () => {
+    if (theme.trainerRoute) router.push(theme.trainerRoute as never);
+  };
+
   // ── Теорія ───────────────────────────────────────────────
   if (phase === 'theory') {
     return (
@@ -69,6 +73,9 @@ export default function LearnTopicScreen() {
           </View>
 
           <AppButton title={t('learn.checkTitle')} tone="primary" size="xl" onPress={() => setPhase('checks')} />
+          {theme.trainerRoute ? (
+            <AppButton title={t('learn.trainerBtn')} tone="outline" size="xl" onPress={goTrainer} />
+          ) : null}
           <AppButton title={t('common.back')} tone="ghost" onPress={() => router.back()} />
         </ScrollView>
       </SafeAreaView>
@@ -161,7 +168,10 @@ export default function LearnTopicScreen() {
         <AppText variant="body" color={colors.textMuted} style={styles.centerText}>
           {t('learn.doneHint')}
         </AppText>
-        <AppButton title={t('learn.startGame')} tone="primary" size="xl" onPress={goPlay} />
+        {theme.trainerRoute ? (
+          <AppButton title={t('learn.trainerBtn')} tone="primary" size="xl" onPress={goTrainer} />
+        ) : null}
+        <AppButton title={t('learn.startGame')} tone={theme.trainerRoute ? 'outline' : 'primary'} size="xl" onPress={goPlay} />
         <AppButton title={t('common.back')} tone="ghost" onPress={() => router.replace('/(main)')} />
       </View>
     </SafeAreaView>

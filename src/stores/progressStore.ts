@@ -33,11 +33,15 @@ interface ProgressState {
   gameProgressByProfile: Record<string, Record<string, GameProgress>>;
   unlockedLevelByProfile: Record<string, Record<string, DifficultyLevel>>;
   sessionsByProfile: Record<string, SessionLog[]>;
+  /** Освоєні множники таблиці множення (1..10) per profile. */
+  multiplyMasteryByProfile: Record<string, number[]>;
   addXp: (profileId: string, amount: number) => void;
   awardBadge: (profileId: string, badgeId: string) => void;
   recordGameSession: (profileId: string, gameId: string, score: number, difficulty: number) => void;
   logSession: (profileId: string, log: SessionLog) => void;
   getSessions: (profileId: string) => SessionLog[];
+  markMultiplyMastered: (profileId: string, multiplier: number) => void;
+  getMultiplyMastery: (profileId: string) => number[];
   getUnlockedLevel: (profileId: string, gameId: string) => DifficultyLevel;
   unlockNextLevel: (profileId: string, gameId: string, currentLevel: DifficultyLevel) => void;
   getXp: (profileId: string) => number;
@@ -54,6 +58,7 @@ export const useProgressStore = create<ProgressState>()(
       gameProgressByProfile: {},
       unlockedLevelByProfile: {},
       sessionsByProfile: {},
+      multiplyMasteryByProfile: {},
       addXp: (profileId, amount) =>
         set((state) => ({
           xpByProfile: {
@@ -96,6 +101,18 @@ export const useProgressStore = create<ProgressState>()(
           };
         }),
       getSessions: (profileId) => get().sessionsByProfile[profileId] ?? [],
+      markMultiplyMastered: (profileId, multiplier) =>
+        set((state) => {
+          const current = state.multiplyMasteryByProfile[profileId] ?? [];
+          if (current.includes(multiplier)) return state;
+          return {
+            multiplyMasteryByProfile: {
+              ...state.multiplyMasteryByProfile,
+              [profileId]: [...current, multiplier].sort((a, b) => a - b),
+            },
+          };
+        }),
+      getMultiplyMastery: (profileId) => get().multiplyMasteryByProfile[profileId] ?? [],
       getUnlockedLevel: (profileId, gameId) =>
         (get().unlockedLevelByProfile[profileId]?.[gameId] ?? 1) as DifficultyLevel,
       unlockNextLevel: (profileId, gameId, currentLevel) =>
