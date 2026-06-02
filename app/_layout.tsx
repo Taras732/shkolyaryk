@@ -1,8 +1,14 @@
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { AppState, type AppStateStatus, Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 const MOBILE_VIEWPORT_MAX = 500;
+
+/**
+ * Якщо застосунок був у фоні довше за цей час і додано >1 дитини,
+ * при поверненні показуємо вибір профілю (кейс «один телефон — кілька дітей»).
+ */
+const RESELECT_AFTER_BACKGROUND_MS = 60_000;
 
 function hasOAuthCallbackInUrl(): boolean {
   if (Platform.OS !== 'web' || typeof window === 'undefined') return false;
@@ -69,13 +75,44 @@ export default function RootLayout() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isLoading = useAuthStore((s) => s.isLoading);
   const hasProfiles = useChildProfilesStore((s) => s.profiles.length > 0);
+  const profilesCount = useChildProfilesStore((s) => s.profiles.length);
   const hasSeenWelcome = useOnboardingStore((s) => s.hasSeenWelcome);
   const onboardingHydrated = useOnboardingStore((s) => s.hydrated);
   const bootShownRef = useRef(false);
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  const backgroundedAtRef = useRef<number | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Повернення з фону → вибір дитини (один телефон — кілька дітей)
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (next: AppStateStatus) => {
+      const prev = appStateRef.current;
+      appStateRef.current = next;
+
+      if (next === 'background' || next === 'inactive') {
+        if (backgroundedAtRef.current === null) backgroundedAtRef.current = Date.now();
+        return;
+      }
+      if (next !== 'active' || (prev !== 'background' && prev !== 'inactive')) return;
+
+      const away = backgroundedAtRef.current ? Date.now() - backgroundedAtRef.current : 0;
+      backgroundedAtRef.current = null;
+      if (away < RESELECT_AFTER_BACKGROUND_MS) return;
+      if (!isAuthenticated || profilesCount < 2) return;
+
+      const segs = segments as unknown as string[];
+      if (segs[0] !== '(main)') return;        // лише дитячі екрани
+      if (segs.includes('game')) return;        // не вибивати дитину з гри
+      if (segs.includes('onboarding')) return;
+      if (segs.includes('profile-picker')) return;
+
+      router.replace('/(main)/profile-picker');
+    });
+    return () => sub.remove();
+  }, [isAuthenticated, profilesCount, segments, router]);
 
   useEffect(() => {
     if (!mounted || bootShownRef.current) return;
