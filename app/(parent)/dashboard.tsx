@@ -11,7 +11,8 @@ import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
 import { useProgressStore, type SessionLog } from '@/src/stores/progressStore';
 import { usePinStore } from '@/src/stores/pinStore';
 import { getGame } from '@/src/games/registry';
-import { dayMinutes, weekMinutes, streakDays, recentSessions, startOfDay } from '@/src/utils/sessionStats';
+import { getIslandById } from '@/src/constants/islands';
+import { dayMinutes, weekMinutes, streakDays, recentSessions, startOfDay, todayIslandBreakdown } from '@/src/utils/sessionStats';
 import { useSettingsStore } from '@/src/stores/settingsStore';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import { useAnalyticsStore } from '@/src/stores/analyticsStore';
@@ -282,9 +283,8 @@ function TimeTab() {
     activeId ? s.sessionsByProfile[activeId] ?? NO_SESSIONS : NO_SESSIONS,
   );
   const todayMin = dayMinutes(sessions);
-  const todayGames = recentSessions(sessions, 100).filter(
-    (s) => startOfDay(s.finishedAt) === startOfDay(Date.now()),
-  ).length;
+  const islands = todayIslandBreakdown(sessions);
+  const todayGames = islands.reduce((acc, i) => acc + i.games, 0);
 
   return (
     <View style={{ gap: spacing.md }}>
@@ -292,13 +292,34 @@ function TimeTab() {
         <StatCard value={`${todayMin} хв`} label={t('parent.statToday')} />
         <StatCard value={String(todayGames)} label={t('parent.statGamesToday')} />
       </View>
+
+      <View style={styles.panel}>
+        <AppText variant="h2" style={styles.panelTitle}>{t('parent.todayByIsland')}</AppText>
+        {islands.length === 0 ? (
+          <AppText variant="caption" color={colors.textMuted}>{t('parent.activityEmpty')}</AppText>
+        ) : (
+          islands.map((isl) => {
+            const meta = getIslandById(isl.islandId);
+            return (
+              <View key={isl.islandId} style={styles.activityRow}>
+                <AppText style={{ fontSize: 22 }}>{meta?.icon ?? '🎮'}</AppText>
+                <View style={{ flex: 1 }}>
+                  <AppText variant="body" color={colors.text} style={{ fontWeight: '600' }} numberOfLines={1}>
+                    {meta?.name ?? isl.islandId}
+                  </AppText>
+                  <AppText variant="caption" color={colors.textMuted}>
+                    {t('parent.reportGames', { n: isl.games })} · {isl.minutes} хв · {'⭐'.repeat(Math.min(isl.stars, 5))}
+                  </AppText>
+                </View>
+              </View>
+            );
+          })
+        )}
+      </View>
+
       <View style={styles.panel}>
         <AppText variant="h2" style={styles.panelTitle}>{t('parent.dailyLimit')}</AppText>
         <AppText variant="caption" color={colors.textMuted}>{t('parent.timeHint')}</AppText>
-      </View>
-      <View style={styles.panel}>
-        <AppText variant="h2" style={styles.panelTitle}>{t('parent.schedule')}</AppText>
-        <AppText variant="caption" color={colors.textMuted}>{t('parent.scheduleHint')}</AppText>
       </View>
     </View>
   );

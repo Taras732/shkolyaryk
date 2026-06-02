@@ -480,6 +480,8 @@
     "statGamesToday": "Games today",
     "today": "Today",
     "yesterday": "Yesterday",
+    "todayByIsland": "Today by island",
+    "reportGames": "{{n}} games",
     "timeHint": "Coming soon: daily time limit & schedule.",
     "weekActivity": "Weekly activity (min)",
     "recentActivity": "Recent activity",

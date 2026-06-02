@@ -76,3 +76,43 @@ export function streakDays(sessions: SessionLog[], nowTs: number = Date.now()): 
 export function recentSessions(sessions: SessionLog[], n: number = 8): SessionLog[] {
   return [...sessions].sort((a, b) => b.finishedAt - a.finishedAt).slice(0, n);
 }
+
+export interface IslandStat {
+  islandId: string;
+  games: number;
+  minutes: number;
+  stars: number;
+  mistakes: number;
+}
+
+/** Розбивка активності по островах за проміжок [fromTs, toTs). */
+export function islandBreakdown(
+  sessions: SessionLog[],
+  fromTs: number,
+  toTs: number,
+): IslandStat[] {
+  const inRange = sessions.filter((s) => s.finishedAt >= fromTs && s.finishedAt < toTs);
+  const byIsland = new Map<string, IslandStat>();
+  for (const s of inRange) {
+    const cur =
+      byIsland.get(s.islandId) ??
+      { islandId: s.islandId, games: 0, minutes: 0, stars: 0, mistakes: 0 };
+    cur.games += 1;
+    cur.minutes += s.durationMs / 60000;
+    cur.stars += s.stars;
+    cur.mistakes += s.mistakes;
+    byIsland.set(s.islandId, cur);
+  }
+  return Array.from(byIsland.values())
+    .map((x) => ({ ...x, minutes: Math.round(x.minutes) }))
+    .sort((a, b) => b.games - a.games);
+}
+
+/** Розбивка по островах за сьогодні — для денного звіту батькам. */
+export function todayIslandBreakdown(
+  sessions: SessionLog[],
+  nowTs: number = Date.now(),
+): IslandStat[] {
+  const from = startOfDay(nowTs);
+  return islandBreakdown(sessions, from, from + DAY_MS);
+}
