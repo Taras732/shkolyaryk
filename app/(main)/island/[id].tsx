@@ -5,6 +5,7 @@ import { AppText } from '@/src/components/AppText';
 import { AppButton } from '@/src/components/AppButton';
 import { getIslandById } from '@/src/constants/islands';
 import { listGamesByIsland, listGamesByIslandForGroup } from '@/src/games/registry';
+import { listThemesByIsland } from '@/src/constants/learningThemes';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
 import { colors, radius, spacing, shadows } from '@/src/constants/theme';
 import { t } from '@/src/i18n';
@@ -28,6 +29,9 @@ export default function IslandScreen() {
   const games = activeProfile
     ? listGamesByIslandForGroup(islandId, activeProfile.ageGroupId)
     : listGamesByIsland(islandId);
+  const themes = activeProfile
+    ? listThemesByIsland(islandId, activeProfile.ageGroupId)
+    : [];
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -39,6 +43,27 @@ export default function IslandScreen() {
           <AppText variant="body" color={colors.textMuted} style={styles.desc}>
             {island.description}
           </AppText>
+        ) : null}
+
+        {themes.length > 0 ? (
+          <View style={styles.gamesList}>
+            <AppText variant="h2" style={styles.sectionHeading}>{t('learn.sectionTitle')}</AppText>
+            {themes.map((th) => (
+              <Pressable
+                key={th.id}
+                style={styles.themeCard}
+                onPress={() => router.push(`/(main)/learn/${th.id}` as never)}
+              >
+                <AppText style={styles.gameIcon}>{th.icon}</AppText>
+                <View style={{ flex: 1 }}>
+                  <AppText variant="h2" numberOfLines={1}>{th.title}</AppText>
+                  <AppText variant="caption" color={colors.textMuted} numberOfLines={2}>
+                    {th.intro}
+                  </AppText>
+                </View>
+              </Pressable>
+            ))}
+          </View>
         ) : null}
 
         <View style={styles.gamesList}>
@@ -99,6 +124,10 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.md,
   },
+  sectionHeading: {
+    alignSelf: 'flex-start',
+    marginBottom: spacing.xs,
+  },
   gameCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -106,6 +135,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.xl,
     padding: spacing.md,
+    ...shadows.card,
+  },
+  themeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.primaryLight,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    borderWidth: 2,
+    borderColor: colors.primary,
     ...shadows.card,
   },
   gameIcon: {

@@ -8,8 +8,10 @@ import { colors, radius, spacing, shadows, fontFamily } from '@/src/constants/th
 import { t } from '@/src/i18n';
 import { signOut, deleteAccount } from '@/src/hooks/useAuthActions';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
-import { useProgressStore } from '@/src/stores/progressStore';
+import { useProgressStore, type SessionLog } from '@/src/stores/progressStore';
 import { usePinStore } from '@/src/stores/pinStore';
+import { getGame } from '@/src/games/registry';
+import { dayMinutes, weekMinutes, streakDays, recentSessions, startOfDay } from '@/src/utils/sessionStats';
 import { useSettingsStore } from '@/src/stores/settingsStore';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import { useAnalyticsStore } from '@/src/stores/analyticsStore';
@@ -68,6 +70,7 @@ export default function ParentDashboardScreen() {
       badgesByProfile: {},
       gameProgressByProfile: {},
       unlockedLevelByProfile: {},
+      sessionsByProfile: {},
     });
     useOnboardingStore.setState({ hasChosenLanguage, hasSeenWelcome });
     usePinStore.setState({ pinHash: null, failedAttempts: 0, lockedUntil: null, unlocked: false });
@@ -191,19 +194,41 @@ function TabButton({ icon, label, active, onPress }: { icon: string; label: stri
   );
 }
 
+const NO_SESSIONS: SessionLog[] = [];
+const WEEK_DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+
+function gameLabel(gameId: string): string {
+  const g = getGame(gameId);
+  if (!g) return gameId;
+  return g.name.startsWith('game.') ? t(g.name) : g.name;
+}
+
+function relativeDay(ts: number): string {
+  const today = startOfDay(Date.now());
+  const day = startOfDay(ts);
+  const diffDays = Math.round((today - day) / (24 * 60 * 60 * 1000));
+  if (diffDays <= 0) return t('parent.today');
+  if (diffDays === 1) return t('parent.yesterday');
+  return new Date(ts).toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' });
+}
+
 function ProgressTab() {
   const activeId = useChildProfilesStore((s) => s.activeProfileId);
   const getXp = useProgressStore((s) => s.getXp);
   const getLevel = useProgressStore((s) => s.getLevel);
   const badgesMap = useProgressStore((s) => s.badgesByProfile);
+  const sessions = useProgressStore((s) =>
+    activeId ? s.sessionsByProfile[activeId] ?? NO_SESSIONS : NO_SESSIONS,
+  );
 
   const xp = activeId ? getXp(activeId) : 0;
   const level = activeId ? getLevel(activeId) : 1;
   const badges = activeId ? (badgesMap[activeId]?.length ?? 0) : 0;
-  const streak = 0;
+  const streak = streakDays(sessions);
 
-  const week = [40, 65, 30, 80, 55, 90, 60];
-  const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+  const week = weekMinutes(sessions);
+  const weekMax = Math.max(...week, 1);
+  const recent = recentSessions(sessions, 6);
 
   return (
     <View style={{ gap: spacing.md }}>
@@ -217,10 +242,11 @@ function ProgressTab() {
       <View style={styles.panel}>
         <AppText variant="h2" style={styles.panelTitle}>{t('parent.weekActivity')}</AppText>
         <View style={styles.bars}>
-          {week.map((h, i) => (
+          {week.map((m, i) => (
             <View key={i} style={styles.barCol}>
-              <View style={[styles.bar, { height: h * 1.2 }]} />
-              <AppText variant="caption" color={colors.textMuted}>{days[i]}</AppText>
+              <AppText variant="caption" color={colors.textMuted}>{m > 0 ? m : ''}</AppText>
+              <View style={[styles.bar, { height: m > 0 ? (m / weekMax) * 110 + 6 : 2 }]} />
+              <AppText variant="caption" color={colors.textMuted}>{WEEK_DAYS[i]}</AppText>
             </View>
           ))}
         </View>
@@ -228,18 +254,43 @@ function ProgressTab() {
 
       <View style={styles.panel}>
         <AppText variant="h2" style={styles.panelTitle}>{t('parent.recentActivity')}</AppText>
-        <AppText variant="caption" color={colors.textMuted}>{t('parent.activityEmpty')}</AppText>
+        {recent.length === 0 ? (
+          <AppText variant="caption" color={colors.textMuted}>{t('parent.activityEmpty')}</AppText>
+        ) : (
+          recent.map((s, i) => (
+            <View key={`${s.finishedAt}-${i}`} style={styles.activityRow}>
+              <View style={{ flex: 1 }}>
+                <AppText variant="body" color={colors.text} style={{ fontWeight: '600' }} numberOfLines={1}>
+                  {gameLabel(s.gameId)}
+                </AppText>
+                <AppText variant="caption" color={colors.textMuted}>
+                  {relativeDay(s.finishedAt)} · {'⭐'.repeat(s.stars)}
+                </AppText>
+              </View>
+              <AppText variant="caption" color={colors.textMuted}>+{s.xpEarned} XP</AppText>
+            </View>
+          ))
+        )}
       </View>
     </View>
   );
 }
 
 function TimeTab() {
+  const activeId = useChildProfilesStore((s) => s.activeProfileId);
+  const sessions = useProgressStore((s) =>
+    activeId ? s.sessionsByProfile[activeId] ?? NO_SESSIONS : NO_SESSIONS,
+  );
+  const todayMin = dayMinutes(sessions);
+  const todayGames = recentSessions(sessions, 100).filter(
+    (s) => startOfDay(s.finishedAt) === startOfDay(Date.now()),
+  ).length;
+
   return (
     <View style={{ gap: spacing.md }}>
       <View style={styles.statRow}>
-        <StatCard value="0 хв" label={t('parent.statToday')} />
-        <StatCard value="—" label={t('parent.statLimit')} />
+        <StatCard value={`${todayMin} хв`} label={t('parent.statToday')} />
+        <StatCard value={String(todayGames)} label={t('parent.statGamesToday')} />
       </View>
       <View style={styles.panel}>
         <AppText variant="h2" style={styles.panelTitle}>{t('parent.dailyLimit')}</AppText>
@@ -418,6 +469,14 @@ const styles = StyleSheet.create({
     ...shadows.card,
   },
   panelTitle: { marginBottom: spacing.xs },
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
   bars: {
     flexDirection: 'row',
     alignItems: 'flex-end',

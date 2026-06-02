@@ -10,16 +10,34 @@ export interface GameProgress {
   lastPlayedAt: number;
 }
 
+/** Один завершений ігровий сеанс — основа аналітики та звітів батькам. */
+export interface SessionLog {
+  gameId: string;
+  islandId: string;
+  difficulty: number;
+  stars: number;
+  xpEarned: number;
+  mistakes: number;
+  totalTasks: number;
+  durationMs: number;
+  finishedAt: number;
+}
+
 export type DifficultyLevel = 1 | 2 | 3;
+
+const MAX_SESSIONS_PER_PROFILE = 300;
 
 interface ProgressState {
   xpByProfile: Record<string, number>;
   badgesByProfile: Record<string, string[]>;
   gameProgressByProfile: Record<string, Record<string, GameProgress>>;
   unlockedLevelByProfile: Record<string, Record<string, DifficultyLevel>>;
+  sessionsByProfile: Record<string, SessionLog[]>;
   addXp: (profileId: string, amount: number) => void;
   awardBadge: (profileId: string, badgeId: string) => void;
   recordGameSession: (profileId: string, gameId: string, score: number, difficulty: number) => void;
+  logSession: (profileId: string, log: SessionLog) => void;
+  getSessions: (profileId: string) => SessionLog[];
   getUnlockedLevel: (profileId: string, gameId: string) => DifficultyLevel;
   unlockNextLevel: (profileId: string, gameId: string, currentLevel: DifficultyLevel) => void;
   getXp: (profileId: string) => number;
@@ -35,6 +53,7 @@ export const useProgressStore = create<ProgressState>()(
       badgesByProfile: {},
       gameProgressByProfile: {},
       unlockedLevelByProfile: {},
+      sessionsByProfile: {},
       addXp: (profileId, amount) =>
         set((state) => ({
           xpByProfile: {
@@ -68,6 +87,15 @@ export const useProgressStore = create<ProgressState>()(
             },
           };
         }),
+      logSession: (profileId, log) =>
+        set((state) => {
+          const existing = state.sessionsByProfile[profileId] ?? [];
+          const next = [...existing, log].slice(-MAX_SESSIONS_PER_PROFILE);
+          return {
+            sessionsByProfile: { ...state.sessionsByProfile, [profileId]: next },
+          };
+        }),
+      getSessions: (profileId) => get().sessionsByProfile[profileId] ?? [],
       getUnlockedLevel: (profileId, gameId) =>
         (get().unlockedLevelByProfile[profileId]?.[gameId] ?? 1) as DifficultyLevel,
       unlockNextLevel: (profileId, gameId, currentLevel) =>

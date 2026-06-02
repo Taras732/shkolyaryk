@@ -476,6 +476,9 @@
     "statBadges": "Бейджі",
     "statToday": "Сьогодні",
     "statLimit": "Ліміт",
+    "statGamesToday": "Ігор сьогодні",
+    "today": "Сьогодні",
+    "yesterday": "Вчора",
     "timeHint": "Скоро: налаштування денного ліміту часу та розклад.",
     "weekActivity": "Активність за тиждень (хв)",
     "recentActivity": "Останні активності",
@@ -510,6 +513,23 @@
     "cancel": "Скасувати",
     "save": "Зберегти",
     "ok": "OK"
+  },
+  "learn": {
+    "sectionTitle": "Спочатку вивчи",
+    "theoryTitle": "Як це працює",
+    "examplesTitle": "Подивись приклади",
+    "checkTitle": "Перевір себе",
+    "checkPrompt": "Це правильно?",
+    "answerTrue": "✅ Правильно",
+    "answerFalse": "❌ Неправильно",
+    "correctMark": "Так, вірно! 🎉",
+    "wrongMark": "А ось і ні 🙂",
+    "continueBtn": "Далі",
+    "startGame": "Грати 🎮",
+    "doneTitle": "Молодець! Тепер пограй",
+    "doneHint": "Ти готовий — закріпи це у грі",
+    "parentTipTitle": "Порада батькам",
+    "progress": "{{current}} з {{total}}"
   },
   "picker": {
     "title": "Хто гратиме?",

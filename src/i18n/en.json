@@ -477,6 +477,9 @@
     "statBadges": "Badges",
     "statToday": "Today",
     "statLimit": "Limit",
+    "statGamesToday": "Games today",
+    "today": "Today",
+    "yesterday": "Yesterday",
     "timeHint": "Coming soon: daily time limit & schedule.",
     "weekActivity": "Weekly activity (min)",
     "recentActivity": "Recent activity",
@@ -511,6 +514,23 @@
     "cancel": "Cancel",
     "save": "Save",
     "ok": "OK"
+  },
+  "learn": {
+    "sectionTitle": "Learn first",
+    "theoryTitle": "How it works",
+    "examplesTitle": "Look at examples",
+    "checkTitle": "Check yourself",
+    "checkPrompt": "Is this correct?",
+    "answerTrue": "✅ Correct",
+    "answerFalse": "❌ Wrong",
+    "correctMark": "Yes, right! 🎉",
+    "wrongMark": "Nope, not quite 🙂",
+    "continueBtn": "Next",
+    "startGame": "Play 🎮",
+    "doneTitle": "Great! Now play",
+    "doneHint": "You're ready — reinforce it in the game",
+    "parentTipTitle": "Tip for parents",
+    "progress": "{{current}} of {{total}}"
   },
   "picker": {
     "title": "Who's playing?",

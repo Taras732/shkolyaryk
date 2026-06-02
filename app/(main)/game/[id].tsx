@@ -12,7 +12,7 @@ import type { AgeGroupId } from '@/src/constants/ageGroups';
 import { getGame } from '@/src/games/registry';
 import { useGameSession } from '@/src/games/useGameSession';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
-import { useProgressStore, type DifficultyLevel } from '@/src/stores/progressStore';
+import { useProgressStore, type DifficultyLevel, type SessionLog } from '@/src/stores/progressStore';
 import { evaluateBadges } from '@/src/utils/badgeEngine';
 import { colors, radius, spacing, shadows } from '@/src/constants/theme';
 import { t } from '@/src/i18n';
@@ -34,6 +34,7 @@ export default function GameScreen() {
   const activeProfile = useChildProfilesStore((s) => s.getActiveProfile());
   const addXp = useProgressStore((s) => s.addXp);
   const recordGameSession = useProgressStore((s) => s.recordGameSession);
+  const logSession = useProgressStore((s) => s.logSession);
   const awardBadge = useProgressStore((s) => s.awardBadge);
   const unlockNextLevel = useProgressStore((s) => s.unlockNextLevel);
   const unlockedLevel = useProgressStore((s) =>
@@ -162,6 +163,7 @@ export default function GameScreen() {
       profileId={activeProfile?.id ?? null}
       addXp={addXp}
       recordGameSession={recordGameSession}
+      logSession={logSession}
       awardBadge={awardBadge}
       unlockNextLevel={unlockNextLevel}
       hasDifficulty={hasDifficulty}
@@ -184,6 +186,7 @@ interface GameplayProps {
   profileId: string | null;
   addXp: (profileId: string, amount: number) => void;
   recordGameSession: (profileId: string, gameId: string, score: number, difficulty: number) => void;
+  logSession: (profileId: string, log: SessionLog) => void;
   awardBadge: (profileId: string, badgeId: string) => void;
   unlockNextLevel: (profileId: string, gameId: string, currentLevel: DifficultyLevel) => void;
   hasDifficulty: boolean;
@@ -199,6 +202,7 @@ function GameplayContainer({
   profileId,
   addXp,
   recordGameSession,
+  logSession,
   awardBadge,
   unlockNextLevel,
   hasDifficulty,
@@ -212,6 +216,7 @@ function GameplayContainer({
 
   const [confirmExit, setConfirmExit] = useState(false);
   const committedRef = useRef(false);
+  const startedAtRef = useRef<number>(Date.now());
 
   useEffect(() => {
     // auto-start playing (skip intro inside useGameSession — we already had intro screen)
@@ -227,6 +232,17 @@ function GameplayContainer({
         const stars = session.stars as 1 | 2 | 3;
         recordGameSession(profileId, gameId, stars, difficulty);
         addXp(profileId, session.xpEarned);
+        logSession(profileId, {
+          gameId,
+          islandId: game.islandId,
+          difficulty,
+          stars,
+          xpEarned: session.xpEarned,
+          mistakes: session.mistakes,
+          totalTasks: session.totalTasks,
+          durationMs: Date.now() - startedAtRef.current,
+          finishedAt: Date.now(),
+        });
         if (hasDifficulty && stars >= 1) {
           unlockNextLevel(profileId, gameId, difficulty);
         }
@@ -236,7 +252,7 @@ function GameplayContainer({
       }
       onFinished(session.stars as 1 | 2 | 3, session.xpEarned);
     }
-  }, [session.phase, session.stars, session.xpEarned, profileId, gameId, difficulty, hasDifficulty, addXp, recordGameSession, awardBadge, unlockNextLevel, onFinished]);
+  }, [session.phase, session.stars, session.xpEarned, session.mistakes, session.totalTasks, profileId, gameId, difficulty, hasDifficulty, addXp, recordGameSession, logSession, awardBadge, unlockNextLevel, onFinished, game.islandId]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
