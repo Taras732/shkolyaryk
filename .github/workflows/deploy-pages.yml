@@ -34,6 +34,9 @@ jobs:
           EXPO_PUBLIC_MMKV_ENCRYPTION_KEY: ${{ secrets.EXPO_PUBLIC_MMKV_ENCRYPTION_KEY }}
         run: npx expo export -p web
 
+      - name: Inject PWA / iOS standalone head tags
+        run: node scripts/inject-pwa-head.mjs
+
       - name: Disable Jekyll
         run: touch dist/.nojekyll
 
