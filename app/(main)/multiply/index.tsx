@@ -15,6 +15,9 @@ type Phase = 'picker' | 'study' | 'quiz' | 'result';
 const MULTIPLIERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const QUESTIONS_PER_ROUND = 10;
 const MASTERY_THRESHOLD = 8;
+// Стабільний референс — інакше Zustand-селектор повертає новий [] щоразу
+// і useSyncExternalStore зациклює рендер (білий екран).
+const EMPTY_MASTERY: number[] = [];
 
 interface Question {
   a: number;
@@ -76,7 +79,7 @@ export default function MultiplyTrainerScreen() {
   const profile = useChildProfilesStore((s) => s.getActiveProfile());
   const profileId = profile?.id ?? null;
   const mastery = useProgressStore((s) =>
-    profileId ? s.multiplyMasteryByProfile[profileId] ?? [] : [],
+    profileId ? s.multiplyMasteryByProfile[profileId] ?? EMPTY_MASTERY : EMPTY_MASTERY,
   );
   const markMastered = useProgressStore((s) => s.markMultiplyMastered);
   const logSession = useProgressStore((s) => s.logSession);
