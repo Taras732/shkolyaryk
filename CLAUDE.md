@@ -71,7 +71,7 @@ Dev-login через `login.tsx` працює без Supabase (пряме `setSe
 - US-001 (Ініціалізація) — **in progress**: каркас створено, Supabase Auth і повний UI Kit — далі
 
 ## GitHub
-`Taras732/kids_app` (потрібен `gh auth login` для push).
+`Taras732/shkolyaryk` (потрібен `gh auth login` для push).
 
 ## Anti-monotony Pattern (Track 1 Phase 6 — 2026-05-11)
 
