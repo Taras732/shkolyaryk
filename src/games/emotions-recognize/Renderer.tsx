@@ -12,6 +12,8 @@ export interface EmotionPayload {
   target: EmotionId;
   emoji: string;
   candidates: EmotionId[];
+  // Pre-reader mode: face emoji per candidate, shown above the name as a cue.
+  candidateEmojis?: Record<string, string>;
 }
 
 export function Renderer({ task, onAnswer, disabled }: RendererProps<EmotionAnswer>) {
@@ -42,6 +44,7 @@ export function Renderer({ task, onAnswer, disabled }: RendererProps<EmotionAnsw
           <EmotionButton
             key={id}
             id={id}
+            emoji={payload.candidateEmojis?.[id]}
             onPress={() => handlePress(id)}
             disabled={isDisabled}
           />
@@ -53,11 +56,12 @@ export function Renderer({ task, onAnswer, disabled }: RendererProps<EmotionAnsw
 
 interface EmotionButtonProps {
   id: EmotionId;
+  emoji?: string;
   onPress: () => void;
   disabled: boolean;
 }
 
-function EmotionButton({ id, onPress, disabled }: EmotionButtonProps) {
+function EmotionButton({ id, emoji, onPress, disabled }: EmotionButtonProps) {
   const label = t(`game.emotions.names.${id}`);
   return (
     <Pressable
@@ -72,6 +76,7 @@ function EmotionButton({ id, onPress, disabled }: EmotionButtonProps) {
       accessibilityLabel={label}
       hitSlop={4}
     >
+      {emoji ? <AppText style={styles.buttonEmoji}>{emoji}</AppText> : null}
       <AppText style={styles.buttonText} color={disabled ? colors.textDisabled : colors.text}>
         {label}
       </AppText>
@@ -121,7 +126,13 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.xs,
     paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.sm,
+  },
+  buttonEmoji: {
+    fontSize: 40,
+    lineHeight: 46,
   },
   buttonDisabled: {
     opacity: 0.5,
