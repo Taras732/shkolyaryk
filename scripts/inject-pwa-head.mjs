@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 const FILE = 'dist/index.html';
 // Фіксований GH Pages підшлях (= app.json experiments.baseUrl). Не з env —
 // щоб уникнути MSYS-конвертації шляхів у Git Bash і будь-яких сюрпризів у CI.
-const base = '/kids_app';
+const base = '/shkolyaryk';
 
 if (!existsSync(FILE)) {
   console.error(`[inject-pwa-head] ${FILE} not found — run \`expo export -p web\` first`);
