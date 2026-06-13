@@ -23,6 +23,12 @@ export interface LevelSpec<TAnswer = unknown> {
 
 export interface ValidationResult {
   correct: boolean;
+  // Optional human-readable labels for the mistake-review overlay shown on a
+  // wrong answer: what the child picked vs. what was correct. Lets the child
+  // understand the mistake instead of just being told "wrong". Games fill
+  // these where it's meaningful; when absent the overlay just pauses.
+  chosenLabel?: string;
+  correctLabel?: string;
 }
 
 export interface RendererProps<TAnswer = unknown> {

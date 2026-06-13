@@ -11,7 +11,6 @@ import {
 } from './types';
 
 const FEEDBACK_CORRECT_MS = 1000;
-const FEEDBACK_WRONG_MS = 1200;
 
 function makeSessionId(): string {
   try {
@@ -81,6 +80,11 @@ function reducer(state: SessionState<any>, action: Action): SessionState<any> {
   }
 }
 
+export interface MistakeReview {
+  chosenLabel?: string;
+  correctLabel?: string;
+}
+
 export interface UseGameSessionResult<TAnswer = unknown> {
   sessionId: string;
   phase: Phase;
@@ -91,8 +95,12 @@ export interface UseGameSessionResult<TAnswer = unknown> {
   stars: 0 | 1 | 2 | 3;
   xpEarned: number;
   taskStartedAt: number | null;
+  /** Set when the last answer was wrong — drives the mistake-review overlay. */
+  review: MistakeReview | null;
   start: () => void;
   submit: (answer: TAnswer) => void;
+  /** Dismiss the wrong-answer overlay and advance (child taps "Next"). */
+  dismissFeedback: () => void;
   reset: () => void;
 }
 
@@ -125,21 +133,20 @@ export function useGameSession<TAnswer = unknown>(
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const taskTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [taskStartedAt, setTaskStartedAt] = useState<number | null>(null);
+  const [review, setReview] = useState<MistakeReview | null>(null);
 
   useEffect(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+    // Correct answers auto-advance (keep the positive loop fast). Wrong
+    // answers wait for the child to tap "Next" — giving them time to see
+    // their choice vs. the correct one and actually learn from the mistake.
     if (state.phase === 'feedback-correct') {
       timerRef.current = setTimeout(
         () => dispatch({ type: 'FEEDBACK_DONE' }),
         FEEDBACK_CORRECT_MS
-      );
-    } else if (state.phase === 'feedback-wrong') {
-      timerRef.current = setTimeout(
-        () => dispatch({ type: 'FEEDBACK_DONE' }),
-        FEEDBACK_WRONG_MS
       );
     }
     return () => {
@@ -167,6 +174,8 @@ export function useGameSession<TAnswer = unknown>(
     }
     setTaskStartedAt(Date.now());
     taskTimerRef.current = setTimeout(() => {
+      // Ran out of time — no choice to review, just mark wrong.
+      setReview(null);
       dispatch({ type: 'SUBMIT_WRONG' });
     }, limit * 1000);
     return () => {
@@ -184,14 +193,23 @@ export function useGameSession<TAnswer = unknown>(
       if (state.phase !== 'playing') return;
       const task = state.levelSpec.tasks[state.taskIndex] as Task<TAnswer>;
       if (!task) return;
-      const { correct } = game.validateAnswer(task, answer);
-      dispatch({ type: correct ? 'SUBMIT_CORRECT' : 'SUBMIT_WRONG' });
+      const result = game.validateAnswer(task, answer);
+      if (result.correct) {
+        setReview(null);
+        dispatch({ type: 'SUBMIT_CORRECT' });
+      } else {
+        setReview({ chosenLabel: result.chosenLabel, correctLabel: result.correctLabel });
+        dispatch({ type: 'SUBMIT_WRONG' });
+      }
     },
     [game, state.phase, state.taskIndex, state.levelSpec]
   );
 
+  const dismissFeedback = useCallback(() => dispatch({ type: 'FEEDBACK_DONE' }), []);
+
   const reset = useCallback(() => {
     const levelSpec = game.generateLevel(difficulty, ageGroupId) as LevelSpec<TAnswer>;
+    setReview(null);
     dispatch({
       type: 'RESET',
       levelSpec,
@@ -214,8 +232,10 @@ export function useGameSession<TAnswer = unknown>(
     stars: state.stars,
     xpEarned: state.xpEarned,
     taskStartedAt,
+    review,
     start,
     submit,
+    dismissFeedback,
     reset,
   };
 }

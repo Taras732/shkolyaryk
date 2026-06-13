@@ -68,10 +68,17 @@ function paramsFor(difficulty: number, ageGroupId: AgeGroupId | undefined): Leve
   return { itemCount: 5, inputTimeLimitSec: 6 };
 }
 
+// Sets too abstract for younger kids — moon phases (new→full moon cycle)
+// require knowing the lunar cycle, which 3-8 y/o rarely do. Older only.
+const OLDER_ONLY_SETS = new Set(['moon']);
+
 // Pre-select a shuffled queue of sets for the full round so no set
 // repeats within a single play (8 sets ≥ 5 tasks, so always unique).
-function buildRoundQueue(minItems: number): SortableSet[] {
-  const eligible = SETS.filter((s) => s.items.length >= minItems);
+function buildRoundQueue(minItems: number, ageGroupId: AgeGroupId | undefined): SortableSet[] {
+  const group = ageGroupId ?? 'preschool';
+  const isOlder = group === 'grade3' || group === 'grade4';
+  let eligible = SETS.filter((s) => s.items.length >= minItems);
+  if (!isOlder) eligible = eligible.filter((s) => !OLDER_ONLY_SETS.has(s.key));
   const pool = eligible.length > 0 ? eligible : SETS;
   return shuffle(pool);
 }
@@ -100,7 +107,7 @@ function generateTask(index: number, cfg: LevelConfig, queue: SortableSet[]): Ta
 
 function generateLevel(difficulty: number, ageGroupId?: AgeGroupId): LevelSpec<SortingAnswer> {
   const cfg = paramsFor(difficulty, ageGroupId);
-  const queue = buildRoundQueue(cfg.itemCount);
+  const queue = buildRoundQueue(cfg.itemCount, ageGroupId);
   const tasks: Task<SortingAnswer>[] = [];
   for (let i = 0; i < TASKS_PER_LEVEL; i++) {
     tasks.push(generateTask(i, cfg, queue));

@@ -10,7 +10,7 @@ import { FeedbackOverlay } from '@/src/components/game/FeedbackOverlay';
 import { TimerBar } from '@/src/components/game/TimerBar';
 import type { AgeGroupId } from '@/src/constants/ageGroups';
 import { getGame } from '@/src/games/registry';
-import { useGameSession } from '@/src/games/useGameSession';
+import { useGameSession, type MistakeReview } from '@/src/games/useGameSession';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
 import { useProgressStore, type DifficultyLevel, type SessionLog } from '@/src/stores/progressStore';
 import { evaluateBadges } from '@/src/utils/badgeEngine';
@@ -18,6 +18,17 @@ import { colors, radius, spacing, shadows } from '@/src/constants/theme';
 import { t } from '@/src/i18n';
 
 type Screen = 'intro' | 'level-picker' | 'playing';
+
+// Turns a wrong answer into review lines for the feedback overlay, so the
+// child sees their choice next to the correct one. Empty when the game
+// provides no labels (overlay then just pauses on "Next").
+function buildReviewLines(review: MistakeReview | null): string[] {
+  if (!review) return [];
+  const lines: string[] = [];
+  if (review.chosenLabel) lines.push(`${t('game.youChose')}: ${review.chosenLabel}`);
+  if (review.correctLabel) lines.push(`${t('game.correctAnswer')}: ${review.correctLabel}`);
+  return lines;
+}
 
 const DEFAULT_LEVEL_META: Record<DifficultyLevel, { emoji: string; labelKey: string }> = {
   1: { emoji: '🟢', labelKey: 'game.level.easy' },
@@ -304,7 +315,10 @@ function GameplayContainer({
           visible={session.phase === 'feedback-correct' || session.phase === 'feedback-wrong'}
           kind={session.phase === 'feedback-correct' ? 'correct' : 'wrong'}
           messageCorrect={t('game.correct')}
-          messageWrong={t('game.tryAgain')}
+          messageWrong={t('game.wrong')}
+          detailLines={buildReviewLines(session.review)}
+          nextLabel={t('game.next')}
+          onDismiss={session.dismissFeedback}
         />
       </View>
 

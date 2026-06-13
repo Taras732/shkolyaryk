@@ -139,7 +139,11 @@ const countObjects: GameDefinition<LevelSpec<CountAnswer>, CountAnswer> = {
   generateLevel,
   validateAnswer(task, answer) {
     const p = task.payload as CountPayload;
-    return { correct: answer === p.correctCount };
+    return {
+      correct: answer === p.correctCount,
+      chosenLabel: String(answer),
+      correctLabel: String(p.correctCount),
+    };
   },
   Renderer,
 };
