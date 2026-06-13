@@ -78,6 +78,7 @@ function generateTask(index: number, cfg: LevelConfig): Task<QuizAnswer> {
       })),
       correctId: target.key,
       gridLayout: true,
+      hideLabels: true,
     };
   }
   return { id: `t${index}`, payload };

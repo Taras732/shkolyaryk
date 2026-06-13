@@ -93,6 +93,42 @@ export function generateSolvedSudoku(): number[][] {
 
 export type SudokuCell = number | null;
 
+// Returns true if value v at (row, col) does not duplicate within its row,
+// column, or 3×3 block. Treats null/0 as empty (ignored).
+export function hasConflict(grid: SudokuCell[][], row: number, col: number): boolean {
+  const v = grid[row][col];
+  if (v === null || v === 0) return false;
+  for (let c = 0; c < 9; c++) {
+    if (c !== col && grid[row][c] === v) return true;
+  }
+  for (let r = 0; r < 9; r++) {
+    if (r !== row && grid[r][col] === v) return true;
+  }
+  const br = Math.floor(row / 3) * 3;
+  const bc = Math.floor(col / 3) * 3;
+  for (let r = br; r < br + 3; r++) {
+    for (let c = bc; c < bc + 3; c++) {
+      if ((r !== row || c !== col) && grid[r][c] === v) return true;
+    }
+  }
+  return false;
+}
+
+// True if the grid is a fully filled, rule-valid sudoku that preserves all
+// of the puzzle's original givens. Does NOT compare against any reference solution.
+export function isValidSolution(grid: SudokuCell[][], puzzle: SudokuCell[][]): boolean {
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const v = grid[r][c];
+      if (v === null || v < 1 || v > 9) return false;
+      const given = puzzle[r][c];
+      if (given !== null && given !== v) return false;
+      if (hasConflict(grid, r, c)) return false;
+    }
+  }
+  return true;
+}
+
 export function buildPuzzle(solved: number[][], givenCount: number): SudokuCell[][] {
   const puzzle: SudokuCell[][] = solved.map((row) => [...row]);
   const positions: [number, number][] = [];

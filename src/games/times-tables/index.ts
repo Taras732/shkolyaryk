@@ -22,10 +22,10 @@ function paramsFor(difficulty: number, ageGroupId: AgeGroupId | undefined): Leve
 
   if (group === 'grade2') {
     if (difficulty <= 1)
-      return { tables: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], maxMultiplicand: 10, allowDivision: false };
+      return { tables: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], maxMultiplicand: 10, allowDivision: false };
     if (difficulty === 2)
-      return { tables: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], maxMultiplicand: 10, allowDivision: true };
-    return { tables: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], maxMultiplicand: 10, allowDivision: true };
+      return { tables: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], maxMultiplicand: 10, allowDivision: true };
+    return { tables: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], maxMultiplicand: 10, allowDivision: true };
   }
 
   if (group === 'grade3') {

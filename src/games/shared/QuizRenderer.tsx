@@ -18,6 +18,8 @@ export interface QuizPayload {
   correctId: string;
   /** when true, choices render as a 2×2 big grid; otherwise vertical list. */
   gridLayout?: boolean;
+  /** when true, choice text labels are hidden (e.g. name-to-emoji: show only emoji). */
+  hideLabels?: boolean;
 }
 
 export type QuizAnswer = string;
@@ -68,7 +70,9 @@ export function QuizRenderer({ task, onAnswer, disabled }: RendererProps<QuizAns
                 {c.emoji}
               </AppText>
             ) : null}
-            <AppText style={styles.choiceLabel}>{c.label}</AppText>
+            {payload.hideLabels ? null : (
+              <AppText style={styles.choiceLabel}>{c.label}</AppText>
+            )}
           </Pressable>
         ))}
       </View>

@@ -1,4 +1,5 @@
 import type { GameDefinition, LevelSpec, Task } from '../types';
+import type { AgeGroupId } from '../../constants/ageGroups';
 import {
   Renderer,
   type EmotionAnswer,
@@ -39,18 +40,27 @@ function pickCandidates(target: EmotionId): EmotionId[] {
   return shuffle([target, ...picked]);
 }
 
-function generateTask(index: number): Task<EmotionAnswer> {
+function generateTask(index: number, showEmoji: boolean): Task<EmotionAnswer> {
   const target = EMOTION_IDS[randInt(0, EMOTION_IDS.length - 1)];
   const emoji = EMOTIONS[target];
   const candidates = pickCandidates(target);
-  const payload: EmotionPayload = { target, emoji, candidates };
+  const candidateEmojis = showEmoji
+    ? candidates.reduce<Record<string, string>>((acc, id) => {
+        acc[id] = EMOTIONS[id];
+        return acc;
+      }, {})
+    : undefined;
+  const payload: EmotionPayload = { target, emoji, candidates, candidateEmojis };
   return { id: `t${index}`, payload };
 }
 
-function generateLevel(difficulty: number): LevelSpec<EmotionAnswer> {
+function generateLevel(difficulty: number, ageGroupId?: AgeGroupId): LevelSpec<EmotionAnswer> {
+  // Pre-readers can't read emotion names — show the face on each choice too.
+  // Older groups keep text-only choices so they actually learn the words.
+  const showEmoji = ageGroupId === 'preschool';
   const tasks: Task<EmotionAnswer>[] = [];
   for (let i = 0; i < TASKS_PER_LEVEL; i++) {
-    tasks.push(generateTask(i));
+    tasks.push(generateTask(i, showEmoji));
   }
   return {
     seed: `emotions-recognize-${Date.now()}`,

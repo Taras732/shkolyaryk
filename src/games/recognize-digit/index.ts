@@ -96,7 +96,11 @@ const recognizeDigit: GameDefinition<LevelSpec<RecognizeDigitAnswer>, RecognizeD
   generateLevel,
   validateAnswer(task, answer) {
     const p = task.payload as RecognizeDigitPayload;
-    return { correct: answer === p.correctNumber };
+    return {
+      correct: answer === p.correctNumber,
+      chosenLabel: String(answer),
+      correctLabel: String(p.correctNumber),
+    };
   },
   Renderer,
 };

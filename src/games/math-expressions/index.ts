@@ -142,7 +142,11 @@ const mathExpressions: GameDefinition<LevelSpec<ExprAnswer>, ExprAnswer> = {
   generateLevel,
   validateAnswer(task, answer) {
     const p = task.payload as ExprPayload;
-    return { correct: answer === p.correct };
+    return {
+      correct: answer === p.correct,
+      chosenLabel: String(answer),
+      correctLabel: String(p.correct),
+    };
   },
   Renderer,
 };

@@ -1,7 +1,7 @@
 import type { GameDefinition, LevelSpec, Task } from '../types';
 import type { AgeGroupId } from '../../constants/ageGroups';
 import { Renderer, type SudokuAnswer, type SudokuPayload } from './Renderer';
-import { buildPuzzle, generateSolvedSudoku } from './solver';
+import { buildPuzzle, generateSolvedSudoku, isValidSolution } from './solver';
 
 const TASKS_PER_LEVEL = 1;
 
@@ -48,15 +48,6 @@ function generateLevel(difficulty: number, ageGroupId?: AgeGroupId): LevelSpec<S
   };
 }
 
-function gridsEqual(a: number[][], b: number[][]): boolean {
-  for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 9; c++) {
-      if (a[r][c] !== b[r][c]) return false;
-    }
-  }
-  return true;
-}
-
 const sudoku: GameDefinition<LevelSpec<SudokuAnswer>, SudokuAnswer> = {
   id: 'sudoku',
   islandId: 'logic',
@@ -67,7 +58,8 @@ const sudoku: GameDefinition<LevelSpec<SudokuAnswer>, SudokuAnswer> = {
   generateLevel,
   validateAnswer(task, answer) {
     const p = task.payload as SudokuPayload;
-    return { correct: gridsEqual(answer, p.solution) };
+    // Accept ANY rule-valid completion that preserves givens, not just p.solution.
+    return { correct: isValidSolution(answer, p.puzzle) };
   },
   Renderer,
 };

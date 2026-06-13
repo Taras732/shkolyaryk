@@ -36,10 +36,15 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 // Returns TASKS_PER_LEVEL item keys from a randomly selected round theme.
-// Shuffles the theme pool so item order within round varies each play.
-function pickRoundItems(): ItemKey[] {
+// Pre-readers (preschool) count better when the picture stays the same all
+// round — switching items mid-round distracts from the counting task itself.
+// Older groups still get varied items within the round for visual interest.
+function pickRoundItems(ageGroupId: AgeGroupId | undefined): ItemKey[] {
   const theme = ROUND_THEMES[randInt(0, ROUND_THEMES.length - 1)];
   const shuffled = shuffle(theme);
+  if (ageGroupId === 'preschool') {
+    return new Array(TASKS_PER_LEVEL).fill(shuffled[0]);
+  }
   const result: ItemKey[] = [];
   for (let i = 0; i < TASKS_PER_LEVEL; i++) {
     result.push(shuffled[i % shuffled.length]);
@@ -106,7 +111,7 @@ function paramsFor(difficulty: number, ageGroupId: AgeGroupId | undefined): Leve
 
 function generateLevel(difficulty: number, ageGroupId?: AgeGroupId): LevelSpec<CountAnswer> {
   const { maxCount, timeLimitSec } = paramsFor(difficulty, ageGroupId);
-  const roundItems = pickRoundItems();
+  const roundItems = pickRoundItems(ageGroupId);
   const tasks: Task<CountAnswer>[] = [];
   for (let i = 0; i < TASKS_PER_LEVEL; i++) {
     const correctCount = randInt(1, maxCount);
@@ -134,7 +139,11 @@ const countObjects: GameDefinition<LevelSpec<CountAnswer>, CountAnswer> = {
   generateLevel,
   validateAnswer(task, answer) {
     const p = task.payload as CountPayload;
-    return { correct: answer === p.correctCount };
+    return {
+      correct: answer === p.correctCount,
+      chosenLabel: String(answer),
+      correctLabel: String(p.correctCount),
+    };
   },
   Renderer,
 };

@@ -85,6 +85,8 @@ const lifeScenarios: GameDefinition<LevelSpec<LifeScenarioAnswer>, LifeScenarioA
   name: 'game.lifeScenarios.name',
   icon: '🙋',
   rulesKey: 'game.lifeScenarios.rules',
+  // Heavy reading (situation + actions + consequences) — confident readers only.
+  availableFor: ['grade2', 'grade3', 'grade4'],
   generateLevel,
   validateAnswer(task, answer) {
     const p = task.payload as LifeScenarioPayload;

@@ -29,7 +29,7 @@ export function Renderer({ task, onAnswer, disabled }: RendererProps<SyllableAns
 
   const isDisabled = !!disabled || locked;
   const prompt = t('game.syllableBuild.prompt', {
-    syllable: `${payload.consonant}${payload.targetVowel}`,
+    syllable: `${payload.consonant}_`,
   });
   const [row1, row2] = [payload.options.slice(0, 2), payload.options.slice(2, 4)];
 

@@ -156,7 +156,8 @@ const clockTime: GameDefinition<LevelSpec<ClockTimeAnswer>, ClockTimeAnswer> = {
   name: 'game.clockTime.name',
   icon: '🕐',
   rulesKey: 'game.clockTime.rules',
-  availableFor: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4'],
+  // Clock reading is too abstract for 3-5 y/o pre-readers — starts at grade1.
+  availableFor: ['grade1', 'grade2', 'grade3', 'grade4'],
   generateLevel,
   validateAnswer(task, answer) {
     const p = task.payload as ClockTimePayload;

@@ -68,12 +68,14 @@ function paramsFor(difficulty: number, ageGroupId: AgeGroupId | undefined): Leve
   } else if (group === 'grade3') {
     maxAmountKop = 100000; // 1000 грн
     pileSize = [3, 6];
-    if (difficulty >= 3) timeLimitSec = 12;
+    // change mode here deals with amounts in the thousands of kopecks — no timer,
+    // 7-8 y.o. can't compute change that large mentally under pressure.
+    timeLimitSec = undefined;
   } else {
-    // grade4
+    // grade4: keep a timer on change, but gentler than before (was 10s).
     maxAmountKop = 1000000; // 10000 грн
     pileSize = [4, 7];
-    if (difficulty >= 3) timeLimitSec = 10;
+    if (difficulty >= 3) timeLimitSec = 16;
   }
 
   return { mode, maxAmountKop, denominations, pileSize, timeLimitSec };

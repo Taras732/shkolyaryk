@@ -1,0 +1,3 @@
+secrets/*.env -text
+*.sh text eol=lf
+*.sops.yaml text eol=lf
