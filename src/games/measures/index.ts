@@ -17,6 +17,8 @@ interface LevelConfig {
   mode: MeasuresMode;
   allowedUnitKeys: string[];
   timeLimitSec?: number;
+  /** grade1/grade2: keep compare within the same unit, no ×1000 conversions */
+  sameUnitCompare?: boolean;
 }
 
 function allowedUnitsFor(group: AgeGroupId): string[] {
@@ -35,10 +37,14 @@ function timerForClass(group: AgeGroupId): number | undefined {
 
 function paramsFor(difficulty: number, ageGroupId: AgeGroupId | undefined): LevelConfig {
   const group = ageGroupId ?? 'grade1';
-  const mode: MeasuresMode = difficulty <= 1 ? 'unit' : difficulty === 2 ? 'convert' : 'compare';
+  const isYoung = group === 'grade1' || group === 'grade2';
+  // ×1000 conversions (kg↔g, l↔ml, km↔m) are grade3+ only.
+  // Younger kids: convert level becomes intuitive unit-pick; compare stays same-unit.
+  let mode: MeasuresMode = difficulty <= 1 ? 'unit' : difficulty === 2 ? 'convert' : 'compare';
+  if (isYoung && mode === 'convert') mode = 'unit';
   const allowedUnitKeys = allowedUnitsFor(group);
   const timeLimitSec = difficulty >= 3 ? timerForClass(group) : undefined;
-  return { mode, allowedUnitKeys, timeLimitSec };
+  return { mode, allowedUnitKeys, timeLimitSec, sameUnitCompare: isYoung };
 }
 
 function randInt(min: number, max: number) {
@@ -66,6 +72,17 @@ function generateUnitTask(index: number, cfg: LevelConfig): Task<MeasuresAnswer>
     (u) => u.category === correctUnit.category && u.key !== correctUnit.key && cfg.allowedUnitKeys.includes(u.key),
   );
   const distractors = shuffle(sameCategory).slice(0, 2);
+  // Guarantee >=2 distractors (>=3 buttons). If the same physical axis lacks enough
+  // allowed units, borrow distractors from other axes — still exactly one correct unit.
+  if (distractors.length < 2) {
+    const otherAxes = UNITS.filter(
+      (u) => u.key !== correctUnit.key && cfg.allowedUnitKeys.includes(u.key) && !distractors.includes(u),
+    );
+    for (const u of shuffle(otherAxes)) {
+      if (distractors.length >= 2) break;
+      distractors.push(u);
+    }
+  }
   const choices = shuffle([correctUnit, ...distractors]).map((u) => u.label);
 
   const payload: MeasuresUnitTask = {
@@ -139,7 +156,8 @@ function generateCompareTask(index: number, cfg: LevelConfig): Task<MeasuresAnsw
   const catUnits = UNITS.filter((u) => u.category === cat && cfg.allowedUnitKeys.includes(u.key));
 
   const leftUnit = pick(catUnits);
-  const rightUnit = pick(catUnits);
+  // Young grades compare within the SAME unit (e.g. 3 кг vs 7 кг), no ×1000 mental math.
+  const rightUnit = cfg.sameUnitCompare ? leftUnit : pick(catUnits);
   const leftValue = randInt(1, 10);
   const rightValue = randInt(1, 10);
 

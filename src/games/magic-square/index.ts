@@ -1,7 +1,7 @@
 import type { GameDefinition, LevelSpec, Task } from '../types';
 import type { AgeGroupId } from '../../constants/ageGroups';
 import { Renderer, type MagicAnswer, type MagicPayload } from './Renderer';
-import { buildPuzzle, generateMagicSquare } from './solver';
+import { buildPuzzle, generateMagicSquare, isValidMagicSquare } from './solver';
 
 const TASKS_PER_LEVEL = 3;
 
@@ -38,11 +38,6 @@ function generateLevel(difficulty: number, ageGroupId?: AgeGroupId): LevelSpec<M
   };
 }
 
-function gridsEqual(a: number[][], b: number[][]): boolean {
-  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) if (a[r][c] !== b[r][c]) return false;
-  return true;
-}
-
 const magicSquare: GameDefinition<LevelSpec<MagicAnswer>, MagicAnswer> = {
   id: 'magic-square',
   islandId: 'logic',
@@ -53,7 +48,8 @@ const magicSquare: GameDefinition<LevelSpec<MagicAnswer>, MagicAnswer> = {
   generateLevel,
   validateAnswer(task, answer) {
     const p = task.payload as MagicPayload;
-    return { correct: gridsEqual(answer, p.solution) };
+    // Accept ANY valid magic square that preserves givens, not just p.solution.
+    return { correct: isValidMagicSquare(answer, p.puzzle) };
   },
   Renderer,
 };

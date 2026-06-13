@@ -61,7 +61,7 @@ const FACTS: FactQuiz[] = [
   { prompt: 'На якому материку США і Канада?', correct: 'north_america', topic: 'continent', tier: 1 },
   { prompt: 'Де знаходиться найдовша річка Ніл?', correct: 'africa', topic: 'continent', tier: 2 },
   { prompt: 'Де Гімалаї і найвища гора Еверест?', correct: 'asia', topic: 'continent', tier: 2 },
-  { prompt: 'На якому материку Велика коралова рифу?', correct: 'oceania', topic: 'continent', tier: 3 },
+  { prompt: 'Біля якого материка Великий бар\'єрний риф?', correct: 'oceania', topic: 'continent', tier: 3 },
   { prompt: 'Де знаходиться Великий каньйон?', correct: 'north_america', topic: 'continent', tier: 3 },
 
   // Ocean facts

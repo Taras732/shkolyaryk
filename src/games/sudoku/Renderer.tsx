@@ -4,7 +4,7 @@ import { AppText } from '../../components/AppText';
 import { colors, radius, spacing, fontFamily, shadows } from '../../constants/theme';
 import { t } from '../../i18n';
 import type { RendererProps } from '../types';
-import type { SudokuCell } from './solver';
+import { hasConflict, isValidSolution, type SudokuCell } from './solver';
 
 export interface SudokuPayload {
   puzzle: SudokuCell[][];
@@ -64,23 +64,14 @@ export function Renderer({ task, onAnswer, disabled }: RendererProps<SudokuAnswe
     if (!showErrors) return false;
     const v = grid[r][c];
     if (v === null) return false;
-    return v !== payload.solution[r][c];
+    // Highlight only true rule violations: a duplicate in row/column/block.
+    return hasConflict(grid, r, c);
   };
 
   const handleCheck = () => {
     if (disabled || submitted || !allFilled) return;
-    // Check if all cells correct
-    let allCorrect = true;
-    for (let r = 0; r < 9; r++) {
-      for (let c = 0; c < 9; c++) {
-        if (grid[r][c] !== payload.solution[r][c]) {
-          allCorrect = false;
-          break;
-        }
-      }
-      if (!allCorrect) break;
-    }
-    if (allCorrect) {
+    // Accept ANY rule-valid completion that preserves givens, not just payload.solution.
+    if (isValidSolution(grid, payload.puzzle)) {
       setSubmitted(true);
       onAnswer(grid as number[][]);
     } else {

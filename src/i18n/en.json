@@ -299,6 +299,15 @@
         "gas": "gas"
       }
     },
+    "sinkFloat": {
+      "name": "Sink or Float?",
+      "prompt": "What happens in water?",
+      "rules": "An object will appear on screen.\n\nGuess what it does in water: ⬇️ sinks or ⬆️ floats on top.\n\n🟢 Easy: simple objects (stone, coin, wood, apple, duck)\n🟡 Medium: more objects\n🔴 Hard: all objects + timer (faster for older grades)",
+      "choices": {
+        "sink": "Sinks",
+        "float": "Floats"
+      }
+    },
     "uaSymbols": {
       "name": "Symbols of Ukraine",
       "rules": "Recognize state and cultural symbols of Ukraine.\n\nSometimes you see the symbol — pick the name.\nSometimes you see a name — pick the matching image.\n\nSymbols: flag, trident, sunflower, viburnum, stork, vyshyvanka, pysanka, Kyiv Golden Gate, map."
@@ -459,7 +468,7 @@
       "continentsOceans": "Continents and oceans",
       "plantGrow": "Which plant growth stage?",
       "breathing": "Breathe with the balloon",
-      "safetyBasic": "Learn safety rules",
+      "safetyBasic": "Learn safety rules"
     }
   },
   "parent": {

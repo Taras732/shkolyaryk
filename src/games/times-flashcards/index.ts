@@ -20,7 +20,7 @@ function paramsFor(difficulty: number, ageGroupId: AgeGroupId | undefined): Leve
   let tables: number[];
   let maxMultiplicand: number;
   if (group === 'grade2') {
-    tables = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    tables = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     maxMultiplicand = 10;
   } else if (group === 'grade3') {
     tables = [2, 3, 4, 5, 6, 7, 8, 9];
