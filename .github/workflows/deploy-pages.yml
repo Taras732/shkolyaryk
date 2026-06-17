@@ -40,6 +40,9 @@ jobs:
       - name: Disable Jekyll
         run: touch dist/.nojekyll
 
+      - name: Custom domain (CNAME)
+        run: echo "shkolyaryk.kuznya.studio" > dist/CNAME
+
       - name: SPA fallback for deep links
         run: cp dist/index.html dist/404.html
 

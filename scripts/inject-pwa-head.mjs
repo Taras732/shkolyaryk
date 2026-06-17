@@ -5,9 +5,10 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const FILE = 'dist/index.html';
-// Фіксований GH Pages підшлях (= app.json experiments.baseUrl). Не з env —
+// Власний домен shkolyaryk.kuznya.studio → сайт обслуговується з кореня,
+// тож base порожній (= app.json experiments.baseUrl "/"). Не з env —
 // щоб уникнути MSYS-конвертації шляхів у Git Bash і будь-яких сюрпризів у CI.
-const base = '/shkolyaryk';
+const base = '';
 
 if (!existsSync(FILE)) {
   console.error(`[inject-pwa-head] ${FILE} not found — run \`expo export -p web\` first`);
