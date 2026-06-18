@@ -30,6 +30,15 @@ const tags = `
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Школярик" />
     <link rel="icon" type="image/png" href="${base}/favicon.png" />
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker
+            .register('${base}/sw.js', { scope: '${base}/' })
+            .catch(function () {});
+        });
+      }
+    </script>
 `;
 
 // Заодно гарантуємо viewport-fit=cover (для коректного відображення під notch у standalone)
