@@ -254,7 +254,10 @@ function GameplayContainer({
           durationMs: Date.now() - startedAtRef.current,
           finishedAt: Date.now(),
         });
-        if (hasDifficulty && stars >= 1) {
+        // Easy→Medium needs 2 stars, Medium→Hard needs 3 — a single star is
+        // too easy a gate for a child to "earn" the next level.
+        const starsToUnlock = difficulty === 1 ? 2 : 3;
+        if (hasDifficulty && stars >= starsToUnlock) {
           unlockNextLevel(profileId, gameId, difficulty);
         }
         const state = useProgressStore.getState();

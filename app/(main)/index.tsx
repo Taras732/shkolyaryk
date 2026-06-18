@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/src/components/AppText';
 import { BottomTabBar } from '@/src/components/BottomTabBar';
-import { ISLANDS } from '@/src/constants/islands';
+import { ACTIVE_ISLANDS } from '@/src/constants/islands';
 import { colors, spacing, radius, shadows } from '@/src/constants/theme';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
 import { useProgressStore } from '@/src/stores/progressStore';
@@ -115,7 +115,7 @@ export default function HubScreen() {
         </AppText>
 
         <View style={styles.grid}>
-          {ISLANDS.map((island) => (
+          {ACTIVE_ISLANDS.map((island) => (
             <Pressable
               key={island.id}
               style={{ ...styles.card, backgroundColor: island.color }}

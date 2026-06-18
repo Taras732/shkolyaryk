@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/src/components/AppText';
 import { AppButton } from '@/src/components/AppButton';
-import { getIslandById } from '@/src/constants/islands';
+import { getIslandById, isIslandActive } from '@/src/constants/islands';
 import { listGamesByIsland, listGamesByIslandForGroup } from '@/src/games/registry';
 import { listThemesByIsland } from '@/src/constants/learningThemes';
 import { useChildProfilesStore } from '@/src/stores/childProfilesStore';
@@ -26,10 +26,14 @@ export default function IslandScreen() {
   const islandId = id ?? '';
   const island = getIslandById(islandId);
   const activeProfile = useChildProfilesStore((s) => s.getActiveProfile());
-  const games = activeProfile
-    ? listGamesByIslandForGroup(islandId, activeProfile.ageGroupId)
-    : listGamesByIsland(islandId);
-  const themes = activeProfile
+  // Hidden (non-MVP) islands render empty — they're built but not shipped yet.
+  const active = isIslandActive(islandId);
+  const games = !active
+    ? []
+    : activeProfile
+      ? listGamesByIslandForGroup(islandId, activeProfile.ageGroupId)
+      : listGamesByIsland(islandId);
+  const themes = active && activeProfile
     ? listThemesByIsland(islandId, activeProfile.ageGroupId)
     : [];
 

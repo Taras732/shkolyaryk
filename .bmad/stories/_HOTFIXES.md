@@ -68,6 +68,15 @@
 
 ---
 
+### 2026-06-18 — Math-only MVP scope-cut + Level Gate stars
+- **Скоп:** `src/constants/islands.ts` (MVP_ISLANDS/ACTIVE_ISLANDS/isIslandActive), `app/(main)/index.tsx` (ACTIVE_ISLANDS), `app/(main)/island/[id].tsx` (гард прихованих островів), `app/(main)/game/[id].tsx` (unlock ≥2⭐/3⭐)
+- **Причина:** звузити продукт до робочого зрізу під PWA-реліз + сайт-збирач фідбеку. 8 не-math островів півсирі → ховаємо. + BUG-025/026: 1⭐ відмикала наступний рівень.
+- **BPMN:** навігація хабу, level-gate (cross-cutting)
+- **Ризик:** інші острови ЛИШЕ приховані (флаг `MVP_ISLANDS=['math']`), не видалені — відкат однією строкою. Registry не чіпано → всі ігри ще в бандлі (оптимізація розміру later). Перевірити що deep-link на прихований острів показує "скоро".
+- **Related US:** project_shk_option_a_validation (Option A SLIM)
+
+---
+
 ## Майбутній план переходу на чистий BMAD
 
 1. ✅ Команди `/sm`, `/dev`, `/qa`, `/pm`, `/architect` адаптовано під Школярик

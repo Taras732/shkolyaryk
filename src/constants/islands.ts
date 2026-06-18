@@ -25,5 +25,15 @@ export const ISLANDS: Island[] = [
   { id: 'geography', name: 'Географія', icon: '🌍', color: colors.islandGeography, category: 'intellect', description: 'Україна, континенти, океани' },
 ];
 
+// MVP scope: only these islands ship. The rest are built but hidden until
+// polished. Set to [] to show every island again — full reversible rollback.
+export const MVP_ISLANDS: string[] = ['math'];
+
+export const ACTIVE_ISLANDS: Island[] =
+  MVP_ISLANDS.length === 0 ? ISLANDS : ISLANDS.filter((i) => MVP_ISLANDS.includes(i.id));
+
+export const isIslandActive = (id: string): boolean =>
+  MVP_ISLANDS.length === 0 || MVP_ISLANDS.includes(id);
+
 export const getIslandById = (id: string): Island | undefined =>
   ISLANDS.find((i) => i.id === id);
