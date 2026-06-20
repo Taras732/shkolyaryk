@@ -15,14 +15,12 @@ export default function Auth() {
   const supabaseConfigured = isSupabaseConfigured();
 
   useEffect(() => {
-    // If user is logged in, redirect to profiles onboarding page
     if (user) {
       navigate('/onboarding');
     }
   }, [user, navigate]);
 
   useEffect(() => {
-    // Clear errors on page mount / swap
     clearError();
     setLocalError(null);
   }, [isRegister, clearError]);
@@ -32,12 +30,12 @@ export default function Auth() {
     setLocalError(null);
 
     if (!supabaseConfigured) {
-      setLocalError("Supabase не налаштовано локально. Спробуйте увійти як Гість!");
+      setLocalError("Конфігурацію Supabase не виявлено. Ви можете увійти як Гість!");
       return;
     }
 
     if (password.length < 6) {
-      setLocalError("Пароль має бути не менше 6 символів.");
+      setLocalError("Пароль має містити щонайменше 6 символів.");
       return;
     }
 
@@ -55,7 +53,7 @@ export default function Auth() {
       flexDirection: 'column',
       justifyContent: 'space-between',
       padding: '24px',
-      background: 'radial-gradient(circle at top left, #F7E6FF, #DFE6FF)',
+      background: 'radial-gradient(circle at 50% 30%, #F5F1FF 0%, #E8E2FF 100%)',
       overflowY: 'auto'
     }}>
       {/* Top Header */}
@@ -73,18 +71,17 @@ export default function Auth() {
           >
             ←
           </button>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 'bold', color: 'var(--primary)' }}>
+          <span className="font-display" style={{ fontSize: '12px', color: 'var(--primary-dark)' }}>
             Школярик
           </span>
           <div style={{ width: '24px' }}></div>
         </div>
 
-        {/* Mascot Face */}
+        {/* Mascot Centerpiece */}
         <div style={{ textAlign: 'center', marginTop: '16px' }}>
-          <span style={{ fontSize: '48px' }}>🐼</span>
-          <h2 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '22px',
+          <span style={{ fontSize: '56px', display: 'inline-block', animation: 'float 5s ease-in-out infinite' }}>🐼</span>
+          <h2 className="font-display" style={{
+            fontSize: '20px',
             color: 'var(--text-dark)',
             marginTop: '8px'
           }}>
@@ -94,97 +91,69 @@ export default function Auth() {
             color: 'var(--text-muted)',
             fontSize: '12px',
             marginTop: '4px',
-            padding: '0 16px',
-            lineHeight: '1.4'
+            padding: '0 8px',
+            lineHeight: '1.4',
+            fontWeight: '600'
           }}>
-            Акаунт потрібен для збереження прогресу дитини у хмарі та синхронізації між пристроями.
+            Створіть кабінет, щоб зберігати прогрес дитини та підключати кілька профілів учнів.
           </p>
         </div>
 
-        {/* Credentials Form */}
-        <form onSubmit={handleSubmit} style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* Form Container */}
+        <form onSubmit={handleSubmit} style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div>
-            <label style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-dark)', display: 'block', marginBottom: '6px' }}>
-              Ваша електронна адреса (Email)
+            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)', display: 'block', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
+              ЕЛЕКТРОННА ПОШТА (EMAIL)
             </label>
             <input 
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="parent@example.com"
+              className="input-clay"
               required
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                border: '3px solid var(--text-dark)',
-                borderRadius: 'var(--border-radius-sm)',
-                fontSize: '14px',
-                fontFamily: 'var(--font-body)',
-                outline: 'none'
-              }}
             />
           </div>
 
           <div>
-            <label style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-dark)', display: 'block', marginBottom: '6px' }}>
-              Пароль
+            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)', display: 'block', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
+              ПАРОЛЬ
             </label>
             <input 
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              className="input-clay"
               required
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                border: '3px solid var(--text-dark)',
-                borderRadius: 'var(--border-radius-sm)',
-                fontSize: '14px',
-                fontFamily: 'var(--font-body)',
-                outline: 'none'
-              }}
             />
           </div>
 
-          {/* Error Message */}
+          {/* Errors display */}
           {(error || localError) && (
             <div style={{
-              background: '#FFE5E5',
-              border: '2px solid var(--secondary)',
+              background: '#FFE8EB',
+              border: '3px solid var(--secondary)',
               color: 'var(--secondary-dark)',
-              padding: '10px 14px',
+              padding: '12px',
               borderRadius: 'var(--border-radius-sm)',
               fontSize: '12px',
-              fontWeight: 'bold',
-              lineHeight: '1.4'
+              fontWeight: '800',
+              lineHeight: '1.4',
+              boxShadow: '0 3px 0 var(--border-color)'
             }}>
               ⚠️ {localError || error}
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Sign In Button */}
           <button 
             type="submit"
             disabled={loading}
-            style={{
-              background: 'var(--primary)',
-              color: 'var(--text-light)',
-              border: '3px solid var(--text-dark)',
-              padding: '14px',
-              borderRadius: 'var(--border-radius-sm)',
-              fontFamily: 'var(--font-display)',
-              fontWeight: 'bold',
-              fontSize: '14px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 0 var(--text-dark)',
-              marginTop: '8px',
-              transition: 'transform 0.1s'
-            }}
-            onMouseDown={(e) => !loading && (e.currentTarget.style.transform = 'translateY(4px)')}
-            onMouseUp={(e) => !loading && (e.currentTarget.style.transform = 'translateY(0)')}
+            className="btn-clay"
+            style={{ width: '100%', marginTop: '8px' }}
           >
-            {loading ? 'Завантаження...' : isRegister ? 'Зареєструватися ✨' : 'Увійти 🔑'}
+            {loading ? 'Завантаження...' : isRegister ? 'Зареєструватися ✨' : 'Увійти в акаунт 🔑'}
           </button>
         </form>
 
@@ -195,83 +164,55 @@ export default function Auth() {
           textAlign: 'center',
           color: 'var(--text-muted)',
           fontSize: '11px',
-          margin: '20px 0'
+          margin: '20px 0',
+          fontWeight: '800'
         }}>
-          <div style={{ flex: 1, height: '1px', background: 'var(--text-muted)', opacity: 0.3 }}></div>
-          <span style={{ padding: '0 10px', fontWeight: 'bold' }}>АБО</span>
-          <div style={{ flex: 1, height: '1px', background: 'var(--text-muted)', opacity: 0.3 }}></div>
+          <div style={{ flex: 1, height: '3px', background: 'var(--border-color)', opacity: 0.15 }}></div>
+          <span style={{ padding: '0 12px' }}>АБО</span>
+          <div style={{ flex: 1, height: '3px', background: 'var(--border-color)', opacity: 0.15 }}></div>
         </div>
 
-        {/* Social Login & Guest Option */}
+        {/* Alternates */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {/* Google Sign In */}
+          {/* Google Auth */}
           <button 
             type="button"
             onClick={signInWithGoogle}
             disabled={loading || !supabaseConfigured}
-            style={{
-              background: 'var(--surface-card)',
-              color: 'var(--text-dark)',
-              border: '3px solid var(--text-dark)',
-              padding: '12px',
-              borderRadius: 'var(--border-radius-sm)',
-              fontFamily: 'var(--font-display)',
-              fontWeight: 'bold',
-              fontSize: '13px',
-              cursor: (loading || !supabaseConfigured) ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 0 var(--text-dark)',
-              opacity: !supabaseConfigured ? 0.6 : 1
-            }}
+            className="btn-clay secondary"
+            style={{ width: '100%' }}
           >
-            {/* Google Icon representation */}
             <span style={{ fontSize: '18px' }}>🌐</span> Увійти через Google
           </button>
 
-          {/* Anonymous Guest Button */}
+          {/* Guest Auth */}
           <button 
             type="button"
             onClick={() => navigate('/onboarding')}
-            style={{
-              background: 'var(--surface-soft)',
-              color: 'var(--primary-dark)',
-              border: '3px dashed var(--primary)',
-              padding: '12px',
-              borderRadius: 'var(--border-radius-sm)',
-              fontFamily: 'var(--font-display)',
-              fontWeight: 'bold',
-              fontSize: '13px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: '10px'
-            }}
+            className="btn-clay accent"
+            style={{ width: '100%', marginTop: '8px' }}
           >
-            🐣 Продовжити як Гість (офлайн)
+            🐣 Увійти як Гість (Офлайн)
           </button>
         </div>
       </div>
 
-      {/* Switch auth mode */}
-      <div style={{ textAlign: 'center', marginTop: '24px' }}>
+      {/* Switcher link */}
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
         <button 
           type="button"
           onClick={() => setIsRegister(!isRegister)}
           style={{
             background: 'none',
             border: 'none',
-            color: 'var(--primary)',
-            fontWeight: 'bold',
+            color: 'var(--primary-dark)',
+            fontWeight: '800',
             fontSize: '12px',
             cursor: 'pointer',
             textDecoration: 'underline'
           }}
         >
-          {isRegister ? 'Вже маєте акаунт? Увійти' : 'Немає акаунта? Зареєструватися'}
+          {isRegister ? 'Маєте акаунт? Увійти' : 'Немає акаунта? Зареєструватися'}
         </button>
       </div>
     </div>

@@ -10,43 +10,49 @@ const MASCOTS: Record<string, string> = {
   owl: '🦉'
 };
 
-const GAMES = {
-  under_4: {
-    id: 'count_objects',
-    name: 'Порахуй предмети 🍎',
-    description: 'Вчимося рахувати предмети від 1 до 5 граючись.',
-    emoji: '🍎'
+const TOPICS = [
+  {
+    id: 'math_equations',
+    name: 'Рівняння ❔',
+    description: 'Знайди невідоме число (наприклад, x + 120 = 400).',
+    emoji: '❔',
+    color: '#E8F5E9',
+    borderColor: '#2EC4B6'
   },
-  '5-6': {
-    id: 'number_comparison',
-    name: 'Порівняй числа ⚖️',
-    description: 'Визначаємо, яке число більше, менше чи вони рівні.',
-    emoji: '⚖️'
+  {
+    id: 'ext_multiplication',
+    name: 'Множення & Ділення ✖️',
+    description: 'Обчислення поза табличкою (наприклад, 14 × 6 або 360 ÷ 3).',
+    emoji: '✖️',
+    color: '#FFF9C4',
+    borderColor: '#FFD25A'
   },
-  '6-7': {
-    id: 'math_slalom',
-    name: 'Математичний слалом ⛷️',
-    description: 'Додавання та віднімання в межах 20 на швидкість.',
-    emoji: '⛷️'
+  {
+    id: 'ops_to_1000',
+    name: 'Числа до 1000 ➕',
+    description: 'Додавання та віднімання великих чисел (наприклад, 340 + 270).',
+    emoji: '➕',
+    color: '#FFE0B2',
+    borderColor: '#FF9F43'
   },
-  '7-8': {
-    id: 'multiplication_table',
-    name: 'Таблиця множення ❌',
-    description: 'Тренажер таблиці множення в ігровій формі.',
-    emoji: '❌'
+  {
+    id: 'fractions',
+    name: 'Дроби & Частини 🍕',
+    description: 'Знаходження частини від числа та числа за його частиною.',
+    emoji: '🍕',
+    color: '#F3E5F5',
+    borderColor: '#9C27B0'
   }
-};
+];
 
 export default function Hub() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { activeProfile, progress, loadProfiles } = useProfileStore();
 
-  // If no profiles loaded or active profile null, check auth status and try to load
   useEffect(() => {
     if (!activeProfile) {
       loadProfiles(user?.id).then(() => {
-        // If still null after load, redirect to onboarding
         if (!useProfileStore.getState().activeProfile) {
           navigate('/onboarding');
         }
@@ -62,18 +68,14 @@ export default function Hub() {
         justifyContent: 'center',
         alignItems: 'center',
         fontWeight: 'bold',
-        color: 'var(--primary)'
+        color: 'var(--primary-dark)',
+        fontFamily: 'var(--font-display)',
+        fontSize: '18px'
       }}>
-        Перевірка профілю... 🐼
+        Підготовка... 🐼
       </div>
     );
   }
-
-  const ageGroup = activeProfile.age_group;
-  const game = GAMES[ageGroup] || GAMES['5-6']; // Fallback
-  
-  // Fetch progress for this specific child profile and game
-  const childProgress = progress[activeProfile.id]?.[game.id] || { level: 1, stars: 0 };
 
   return (
     <div style={{
@@ -81,180 +83,174 @@ export default function Hub() {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      padding: '24px',
-      background: 'radial-gradient(circle at top left, #F7E6FF, #DFE6FF)',
+      padding: '20px',
+      background: 'radial-gradient(circle at 50% 30%, #F5F1FF 0%, #E8E2FF 100%)',
       overflowY: 'auto'
     }}>
-      {/* Top Header Profile Panel */}
+      {/* Header Profile Bar */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         background: 'var(--surface-card)',
-        border: '3px solid var(--text-dark)',
+        border: '3px solid var(--border-color)',
         borderRadius: 'var(--border-radius-md)',
-        padding: '12px 16px',
-        boxShadow: '0 4px 0 var(--text-dark)'
+        padding: '10px 14px',
+        boxShadow: '0 4px 0 var(--border-color)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
-            width: '48px',
-            height: '48px',
+            width: '44px',
+            height: '44px',
             borderRadius: '50%',
-            background: 'var(--surface-soft)',
-            border: '2px solid var(--text-dark)',
+            background: '#FFEAA7',
+            border: '2px solid var(--border-color)',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            fontSize: '28px'
+            fontSize: '26px',
+            boxShadow: 'inset 0 -3px 0 rgba(0,0,0,0.1)'
           }}>
             {MASCOTS[activeProfile.avatar_id] || '🐼'}
           </div>
           <div>
-            <div style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-dark)' }}>
+            <div className="font-display" style={{ fontSize: '13px', color: 'var(--text-dark)' }}>
               {activeProfile.nickname}
             </div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold' }}>
-              ⭐ {activeProfile.total_stars} зірочок
+            <div style={{ fontSize: '10px', color: 'var(--primary-dark)', fontWeight: '800' }}>
+              3-й клас · ⭐ {activeProfile.total_stars} зірок
             </div>
           </div>
         </div>
 
         <button 
           onClick={() => navigate('/onboarding')}
+          className="btn-clay"
           style={{
-            background: 'var(--primary-light)',
-            color: '#fff',
-            border: '2px solid var(--text-dark)',
             padding: '6px 12px',
+            fontSize: '10px',
             borderRadius: 'var(--border-radius-sm)',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            fontFamily: 'var(--font-display)',
-            cursor: 'pointer',
-            boxShadow: '0 2px 0 var(--text-dark)'
+            boxShadow: '0 2px 0 var(--border-color)'
           }}
         >
-          Гравці
+          Змінити
         </button>
       </div>
 
-      {/* Main Island Content */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        margin: '32px 0'
-      }}>
-        {/* Title */}
-        <h3 style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '18px',
+      {/* Main Island Selection */}
+      <div style={{ margin: '20px 0' }}>
+        <h3 className="font-display" style={{
+          fontSize: '16px',
           color: 'var(--text-dark)',
+          textAlign: 'center',
           marginBottom: '16px',
-          textShadow: '0 2px 0 #fff'
+          letterSpacing: '-0.5px'
         }}>
           Острів Математики 🏝️
         </h3>
 
-        {/* Playable Game Card */}
-        <div 
-          onClick={() => navigate(`/game/${game.id}`)}
-          style={{
-            width: '100%',
-            maxWidth: '320px',
-            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
-            color: '#fff',
-            border: '4px solid var(--text-dark)',
-            borderRadius: 'var(--border-radius-lg)',
-            boxShadow: '0 8px 0 var(--text-dark)',
-            padding: '32px 24px',
-            textAlign: 'center',
-            cursor: 'pointer',
-            position: 'relative',
-            transform: 'rotate(-1deg)',
-            transition: 'transform 0.1s'
-          }}
-          onMouseDown={(e) => {
-            e.currentTarget.style.transform = 'translateY(4px) rotate(-1deg)';
-            e.currentTarget.style.boxShadow = '0 4px 0 var(--text-dark)';
-          }}
-          onMouseUp={(e) => {
-            e.currentTarget.style.transform = 'translateY(0) rotate(-1deg)';
-            e.currentTarget.style.boxShadow = '0 8px 0 var(--text-dark)';
-          }}
-        >
-          {/* Game Emoji */}
-          <div style={{ fontSize: '64px', marginBottom: '16px' }}>{game.emoji}</div>
-          
-          {/* Game Title */}
-          <h4 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            textShadow: '0 2px 0 var(--primary-dark)'
-          }}>
-            {game.name}
-          </h4>
+        {/* Puzzle Levels / Grid Layout */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: '16px'
+        }}>
+          {TOPICS.map((topic, index) => {
+            const topicProgress = progress[activeProfile.id]?.[topic.id] || { level: 1, stars: 0 };
+            
+            return (
+              <div 
+                key={topic.id}
+                onClick={() => navigate(`/game/${topic.id}`)}
+                className="card-clay"
+                style={{
+                  background: topic.color,
+                  borderWidth: '3px',
+                  borderRadius: 'var(--border-radius-md)',
+                  padding: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '14px',
+                  cursor: 'pointer',
+                  transform: index % 2 === 0 ? 'rotate(-0.5deg)' : 'rotate(0.5deg)'
+                }}
+              >
+                {/* Topic Emoji Box */}
+                <div style={{
+                  width: '54px',
+                  height: '54px',
+                  background: '#fff',
+                  border: '3px solid var(--border-color)',
+                  borderRadius: 'var(--border-radius-sm)',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontSize: '28px',
+                  boxShadow: '0 3px 0 var(--border-color)'
+                }}>
+                  {topic.emoji}
+                </div>
 
-          {/* Description */}
-          <p style={{
-            fontSize: '12px',
-            opacity: 0.9,
-            marginTop: '8px',
-            lineHeight: '1.4'
-          }}>
-            {game.description}
-          </p>
+                {/* Info & Stars */}
+                <div style={{ flex: 1 }}>
+                  <h4 className="font-display" style={{
+                    fontSize: '13px',
+                    color: 'var(--text-dark)'
+                  }}>
+                    {topic.name}
+                  </h4>
+                  <p style={{
+                    fontSize: '11px',
+                    color: 'var(--text-muted)',
+                    marginTop: '2px',
+                    lineHeight: '1.3',
+                    fontWeight: '600'
+                  }}>
+                    {topic.description}
+                  </p>
 
-          {/* Progress Indicators */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '8px',
-            marginTop: '20px',
-            background: 'rgba(31, 27, 58, 0.2)',
-            padding: '8px 12px',
-            borderRadius: 'var(--border-radius-full)'
-          }}>
-            <span style={{ fontSize: '11px', fontWeight: 'bold' }}>
-              Рівень {childProgress.level}
-            </span>
-            <span style={{ opacity: 0.5 }}>|</span>
-            <div style={{ display: 'flex', gap: '2px' }}>
-              {[1, 2, 3].map(starNum => (
-                <span 
-                  key={starNum} 
-                  style={{
-                    fontSize: '14px',
-                    filter: starNum <= childProgress.stars ? 'none' : 'grayscale(100%) opacity(30%)'
-                  }}
-                >
-                  ⭐
-                </span>
-              ))}
-            </div>
-          </div>
+                  {/* Stars list */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-dark)', opacity: 0.8 }}>
+                      Рівень {topicProgress.level}
+                    </span>
+                    <span style={{ opacity: 0.2, fontSize: '10px' }}>|</span>
+                    <div style={{ display: 'flex', gap: '1px' }}>
+                      {[1, 2, 3].map(starNum => (
+                        <span 
+                          key={starNum} 
+                          style={{
+                            fontSize: '12px',
+                            filter: starNum <= topicProgress.stars ? 'none' : 'grayscale(100%) opacity(25%)'
+                          }}
+                        >
+                          ⭐
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Parental gate entry */}
+      {/* Parental Gate Link */}
       <div style={{ textAlign: 'center' }}>
         <button 
           onClick={() => navigate('/parent')}
           style={{
             background: 'none',
             border: 'none',
-            color: 'var(--primary)',
-            fontWeight: 'bold',
+            color: 'var(--primary-dark)',
+            fontWeight: '800',
             fontSize: '12px',
             cursor: 'pointer',
             textDecoration: 'underline'
           }}
         >
-          Кабінет батьків ⚙️
+          Налаштування батьків ⚙️
         </button>
       </div>
     </div>

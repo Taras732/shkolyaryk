@@ -31,11 +31,11 @@ export default function ParentDashboard() {
       flexDirection: 'column',
       justifyContent: 'space-between',
       padding: '24px',
-      background: 'radial-gradient(circle at top left, #F7E6FF, #DFE6FF)',
+      background: 'radial-gradient(circle at 50% 30%, #F5F1FF 0%, #E8E2FF 100%)',
       overflowY: 'auto'
     }}>
       <div>
-        {/* Header Navigation */}
+        {/* Navigation */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <button 
             onClick={() => navigate('/onboarding')}
@@ -49,67 +49,46 @@ export default function ParentDashboard() {
           >
             ←
           </button>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 'bold', color: 'var(--text-dark)' }}>
-            Панель Батьків 📊
+          <span className="font-display" style={{ fontSize: '13px', fontWeight: 'bold', color: 'var(--text-dark)' }}>
+            КАБІНЕТ БАТЬКІВ 📊
           </span>
           <div style={{ width: '24px' }}></div>
         </div>
 
-        {/* Title */}
-        <h3 style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '20px',
-          color: 'var(--text-dark)',
-          marginTop: '24px',
-          textAlign: 'center'
-        }}>
-          Керування профілями
-        </h3>
-
-        {/* Account Info */}
-        <div style={{
-          background: 'var(--surface-card)',
-          borderRadius: 'var(--border-radius-md)',
-          border: '3px solid var(--text-dark)',
-          padding: '16px',
-          marginTop: '16px',
-          boxShadow: '0 4px 0 var(--text-dark)'
-        }}>
-          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase' }}>
-            Поточний акаунт
+        {/* Parent Details Card */}
+        <div className="card-clay" style={{ marginTop: '24px', padding: '16px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '800', fontFamily: 'var(--font-display)' }}>
+            ОБЛІКОВИЙ ЗАПИС
           </div>
-          <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--text-dark)', marginTop: '4px', wordBreak: 'break-all' }}>
+          <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--text-dark)', marginTop: '6px', wordBreak: 'break-all' }}>
             {user ? user.email : 'Гість (Офлайн-режим)'}
           </div>
         </div>
 
-        {/* Child Profiles List */}
-        <div style={{ marginTop: '24px' }}>
-          <div style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-dark)', marginBottom: '10px' }}>
-            Профілі дітей ({profiles.length})
+        {/* Child Profiles Manager */}
+        <div style={{ marginTop: '28px' }}>
+          <div className="font-display" style={{ fontSize: '11px', color: 'var(--text-dark)', marginBottom: '12px' }}>
+            УЧНІ ({profiles.length})
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {profiles.map(p => (
               <div 
                 key={p.id}
+                className="card-clay"
                 style={{
-                  background: 'var(--surface-card)',
-                  border: '3px solid var(--text-dark)',
-                  borderRadius: 'var(--border-radius-md)',
                   padding: '14px 16px',
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
-                  boxShadow: '0 4px 0 var(--text-dark)'
+                  alignItems: 'center'
                 }}
               >
                 <div>
-                  <div style={{ fontWeight: 'bold', fontSize: '15px', color: 'var(--text-dark)' }}>
+                  <div style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-dark)' }}>
                     {p.nickname}
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                    Вік: {p.age_group === 'under_4' ? 'до 4 років' : p.age_group === '5-6' ? '5-6 років' : p.age_group === '6-7' ? '6-7 років' : '7-8 років'} · ⭐ {p.total_stars} зірок
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: '600' }}>
+                    3-й Клас · ⭐ {p.total_stars} зірочок
                   </div>
                 </div>
 
@@ -119,11 +98,17 @@ export default function ParentDashboard() {
                     setConfirmDeleteType('profile');
                   }}
                   style={{
-                    background: 'none',
-                    border: 'none',
-                    fontSize: '18px',
+                    background: 'var(--secondary-light)',
+                    border: '2px solid var(--border-color)',
+                    borderRadius: '50%',
+                    width: '36px',
+                    height: '36px',
+                    fontSize: '16px',
                     cursor: 'pointer',
-                    padding: '8px'
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    boxShadow: '0 2px 0 var(--border-color)'
                   }}
                 >
                   🗑️
@@ -137,55 +122,49 @@ export default function ParentDashboard() {
                 color: 'var(--text-muted)',
                 fontSize: '13px',
                 padding: '24px',
-                border: '2px dashed var(--text-muted)',
+                border: '3px dashed var(--text-muted)',
                 borderRadius: 'var(--border-radius-md)'
               }}>
-                Немає створених профілів дитини.
+                Немає зареєстрованих учнів.
               </div>
             )}
           </div>
         </div>
 
-        {/* GDPR Compliance & Deletion */}
+        {/* GDPR settings */}
         {user && (
           <div style={{
             marginTop: '32px',
-            background: 'rgba(255, 110, 199, 0.1)',
-            border: '3px solid var(--secondary-dark)',
+            background: 'rgba(255, 107, 107, 0.08)',
+            border: '3px solid var(--secondary)',
             borderRadius: 'var(--border-radius-md)',
-            padding: '16px',
-            boxShadow: '0 4px 0 var(--secondary-dark)'
+            padding: '18px',
+            boxShadow: '0 4px 0 var(--border-color)'
           }}>
-            <h4 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '13px',
-              color: 'var(--secondary-dark)',
-              fontWeight: 'bold'
+            <h4 className="font-display" style={{
+              fontSize: '12px',
+              color: 'var(--secondary-dark)'
             }}>
               Конфіденційність (GDPR)
             </h4>
             <p style={{
-              fontSize: '12px',
+              fontSize: '11px',
               color: 'var(--text-dark)',
-              lineHeight: '1.4',
-              marginTop: '6px'
+              lineHeight: '1.5',
+              marginTop: '8px',
+              fontWeight: '600'
             }}>
-              Ви можете видалити свій акаунт. Усі профілі дітей та їхні ігрові результати будуть повністю та назавжди стерті з наших серверів.
+              Ви маєте право безповоротно видалити свій обліковий запис. При видаленні акаунта всі профілі дітей та результати навчання будуть автоматично видалені з наших серверів.
             </p>
 
             <button 
               onClick={() => setConfirmDeleteType('account')}
+              className="btn-clay secondary"
               style={{
-                marginTop: '12px',
-                background: 'var(--secondary)',
-                color: 'var(--text-light)',
-                border: '2px solid var(--text-dark)',
+                marginTop: '14px',
                 padding: '8px 16px',
-                borderRadius: 'var(--border-radius-sm)',
-                fontWeight: 'bold',
-                fontSize: '12px',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-display)'
+                fontSize: '11px',
+                borderRadius: 'var(--border-radius-sm)'
               }}
             >
               Видалити мій акаунт
@@ -194,24 +173,16 @@ export default function ParentDashboard() {
         )}
       </div>
 
-      {/* Footer Exit */}
+      {/* Back button */}
       <button 
         onClick={() => navigate('/onboarding')}
-        style={{
-          background: 'var(--text-dark)',
-          color: '#fff',
-          border: 'none',
-          padding: '14px',
-          borderRadius: 'var(--border-radius-sm)',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          marginTop: '32px'
-        }}
+        className="btn-clay"
+        style={{ width: '100%', marginTop: '32px' }}
       >
-        Повернутись до вибору гравців
+        Повернутися до гравців
       </button>
 
-      {/* Confirmation Dialogs Overlay */}
+      {/* Confirmation Dialogs */}
       {confirmDeleteType !== 'none' && (
         <div style={{
           position: 'absolute',
@@ -227,35 +198,33 @@ export default function ParentDashboard() {
           backdropFilter: 'blur(4px)',
           padding: '24px'
         }}>
-          <div style={{
+          <div className="card-clay" style={{
             background: '#fff',
-            borderRadius: 'var(--border-radius-lg)',
-            border: '4px solid var(--text-dark)',
             padding: '24px 20px',
             width: '100%',
             maxWidth: '320px',
             textAlign: 'center'
           }}>
-            <span style={{ fontSize: '32px' }}>⚠️</span>
+            <span style={{ fontSize: '36px' }}>⚠️</span>
             
-            <h3 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '16px',
+            <h3 className="font-display" style={{
+              fontSize: '15px',
               color: 'var(--text-dark)',
               marginTop: '8px'
             }}>
-              {confirmDeleteType === 'account' ? 'Видалити весь акаунт?' : 'Видалити цей профіль?'}
+              {confirmDeleteType === 'account' ? 'ВИДАЛИТИ АКАУНТ?' : 'ВИДАЛИТИ ПРОФІЛЬ?'}
             </h3>
             
             <p style={{
               fontSize: '12px',
               color: 'var(--text-muted)',
               marginTop: '8px',
-              lineHeight: '1.4'
+              lineHeight: '1.5',
+              fontWeight: '600'
             }}>
               {confirmDeleteType === 'account' 
-                ? 'Ця дія є остаточною. Усі профілі ваших дітей та їхній прогрес буде назавжди стерто!'
-                : 'Прогрес та зірочки цієї дитини будуть безповоротно втрачені.'
+                ? 'Ця дія є остаточною. Усі накопичені зірочки та профілі ваших дітей будуть безповоротно видалені!'
+                : 'Прогрес та ігрова статистика учня будуть назавжди стерті.'
               }
             </p>
 
@@ -265,31 +234,24 @@ export default function ParentDashboard() {
                   setConfirmDeleteType('none');
                   setTargetProfileId(null);
                 }}
+                className="btn-clay"
                 style={{
                   flex: 1,
                   background: 'var(--surface-soft)',
-                  border: '3px solid var(--text-dark)',
-                  padding: '10px',
-                  borderRadius: 'var(--border-radius-sm)',
-                  fontWeight: 'bold',
-                  cursor: 'pointer'
+                  color: 'var(--text-dark)',
+                  padding: '10px'
                 }}
               >
-                Скасувати
+                Ні
               </button>
               
               <button 
                 onClick={confirmDeleteType === 'account' ? handleDeleteAccount : handleDeleteProfile}
                 disabled={authLoading}
+                className="btn-clay secondary"
                 style={{
                   flex: 1,
-                  background: 'var(--secondary)',
-                  color: '#fff',
-                  border: '3px solid var(--text-dark)',
-                  padding: '10px',
-                  borderRadius: 'var(--border-radius-sm)',
-                  fontWeight: 'bold',
-                  cursor: authLoading ? 'not-allowed' : 'pointer'
+                  padding: '10px'
                 }}
               >
                 {authLoading ? 'Видалення...' : 'Так, видалити'}

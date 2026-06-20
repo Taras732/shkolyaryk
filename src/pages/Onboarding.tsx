@@ -1,21 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useProfileStore, ChildProfile } from '@/stores/useProfileStore';
+import { useProfileStore } from '@/stores/useProfileStore';
 import ParentalGate from '@/components/ParentalGate';
 
 const MASCOTS = [
-  { id: 'chicken', emoji: '🐣', label: 'Коко', color: '#FFF2CC' },
   { id: 'panda', emoji: '🐼', label: 'Бамбі', color: '#E4F0EC' },
   { id: 'fox', emoji: '🦊', label: 'Ліса', color: '#FCE4D6' },
-  { id: 'owl', emoji: '🦉', label: 'Софі', color: '#E2EFDA' }
-];
-
-const AGE_GROUPS = [
-  { id: 'under_4', label: '🐣 Малята (до 4 р.)', mascot: 'chicken' },
-  { id: '5-6', label: '🐼 Дошкільнята (5-6 р.)', mascot: 'panda' },
-  { id: '6-7', label: '🦊 1 клас (6-7 р.)', mascot: 'fox' },
-  { id: '7-8', label: '🦉 2 клас (7-8 р.)', mascot: 'owl' }
+  { id: 'owl', emoji: '🦉', label: 'Софі', color: '#E2EFDA' },
+  { id: 'chicken', emoji: '🐣', label: 'Коко', color: '#FFF2CC' }
 ];
 
 export default function Onboarding() {
@@ -25,41 +18,30 @@ export default function Onboarding() {
 
   const [isCreating, setIsCreating] = useState(false);
   const [nickname, setNickname] = useState('');
-  const [selectedAge, setSelectedAge] = useState<ChildProfile['age_group']>('5-6');
   const [selectedMascot, setSelectedMascot] = useState('panda');
   
-  // Parental Gate state
+  // Parental Gate State
   const [isGateOpen, setIsGateOpen] = useState(false);
   const [gateAction, setGateAction] = useState<'parent_panel' | 'logout' | null>(null);
 
-  // Load profiles on mount or when user changes
   useEffect(() => {
     loadProfiles(user?.id);
   }, [user, loadProfiles]);
-
-  // Set default mascot when age group changes
-  const handleAgeChange = (age: ChildProfile['age_group']) => {
-    setSelectedAge(age);
-    const ageGroupObj = AGE_GROUPS.find(a => a.id === age);
-    if (ageGroupObj) {
-      setSelectedMascot(ageGroupObj.mascot);
-    }
-  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nickname.trim()) return;
 
+    // Hardcode age group as '7-8' (equivalent to Grade 3)
     await createProfile(
       nickname.trim(),
-      selectedAge,
+      '7-8',
       selectedMascot,
       user?.id
     );
 
     setIsCreating(false);
     setNickname('');
-    // Redirect to games hub
     navigate('/hub');
   };
 
@@ -89,16 +71,16 @@ export default function Onboarding() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        fontSize: '18px',
+        fontSize: '20px',
+        fontFamily: 'var(--font-display)',
         fontWeight: 'bold',
-        color: 'var(--primary)'
+        color: 'var(--primary-dark)'
       }}>
-        Завантаження профілів... 🐼
+        Завантаження... 🐼
       </div>
     );
   }
 
-  // Show profile list if there are profiles and we aren't explicitly creating
   const showList = profiles.length > 0 && !isCreating;
 
   return (
@@ -108,24 +90,23 @@ export default function Onboarding() {
       flexDirection: 'column',
       justifyContent: 'space-between',
       padding: '24px',
-      background: 'radial-gradient(circle at top left, #F7E6FF, #DFE6FF)',
+      background: 'radial-gradient(circle at 50% 30%, #F5F1FF 0%, #E8E2FF 100%)',
       overflowY: 'auto'
     }}>
-      {/* 1. PROFILE LIST VIEW */}
+      {/* 1. LIST OF PROFILES */}
       {showList && (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '22px',
+            <h2 className="font-display" style={{
+              fontSize: '20px',
               color: 'var(--text-dark)',
               textAlign: 'center',
               marginTop: '16px'
             }}>
-              Хто буде грати? 🎒
+              Хто навчається? 🎓
             </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', marginTop: '6px' }}>
-              Оберіть свій профіль дитини, щоб накопичувати зірочки!
+            <p style={{ color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', marginTop: '6px', fontWeight: '600' }}>
+              Оберіть профіль учня, щоб продовжити заняття!
             </p>
 
             {/* Profile Grid */}
@@ -141,111 +122,108 @@ export default function Onboarding() {
                   <div 
                     key={p.id}
                     onClick={() => handleSelect(p.id)}
+                    className="card-clay"
                     style={{
-                      background: 'var(--surface-card)',
-                      border: '3px solid var(--text-dark)',
-                      borderRadius: 'var(--border-radius-lg)',
-                      padding: '16px',
+                      padding: '20px 16px',
                       textAlign: 'center',
-                      cursor: 'pointer',
-                      boxShadow: '0 6px 0 var(--text-dark)',
-                      transition: 'transform 0.1s, box-shadow 0.1s'
-                    }}
-                    onMouseDown={(e) => {
-                      e.currentTarget.style.transform = 'translateY(4px)';
-                      e.currentTarget.style.boxShadow = '0 2px 0 var(--text-dark)';
-                    }}
-                    onMouseUp={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 6px 0 var(--text-dark)';
+                      cursor: 'pointer'
                     }}
                   >
                     <div style={{
-                      width: '70px',
-                      height: '70px',
+                      width: '74px',
+                      height: '74px',
                       borderRadius: '50%',
                       background: mascot?.color || 'var(--surface-soft)',
-                      border: '2px solid var(--text-dark)',
+                      border: '3px solid var(--border-color)',
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      fontSize: '38px',
-                      margin: '0 auto'
+                      fontSize: '40px',
+                      margin: '0 auto',
+                      boxShadow: 'inset 0 -4px 0 rgba(0,0,0,0.1)'
                     }}>
                       {mascot?.emoji || '🐣'}
                     </div>
-                    <div style={{ fontWeight: 'bold', fontSize: '15px', color: 'var(--text-dark)', marginTop: '10px' }}>
+                    <div className="font-display" style={{ fontSize: '14px', color: 'var(--text-dark)', marginTop: '12px' }}>
                       {p.nickname}
                     </div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--primary-dark)', fontWeight: '800', marginTop: '4px' }}>
+                      3-й Клас 🎒
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: 'bold' }}>
                       ⭐ {p.total_stars} зірочок
                     </div>
                   </div>
                 );
               })}
 
-              {/* Add New Profile Card */}
+              {/* Create Profile Card */}
               <div 
                 onClick={() => setIsCreating(true)}
                 style={{
                   background: 'var(--surface-soft)',
                   border: '3px dashed var(--text-muted)',
-                  borderRadius: 'var(--border-radius-lg)',
+                  borderRadius: 'var(--border-radius-md)',
                   padding: '24px 16px',
                   textAlign: 'center',
                   cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  boxShadow: 'inset 0 4px 0 rgba(0,0,0,0.02)'
                 }}
               >
-                <div style={{ fontSize: '32px', color: 'var(--text-muted)' }}>➕</div>
-                <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-muted)', marginTop: '8px' }}>
-                  Створити
+                <div style={{ fontSize: '36px', color: 'var(--text-muted)' }}>➕</div>
+                <div className="font-display" style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                  НОВИЙ УЧЕНЬ
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Bottom Settings Link */}
+          {/* Footer controls */}
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px' }}>
             <button 
+              type="button"
               onClick={() => handleParentAction('logout')}
               style={{
                 background: 'none',
                 border: 'none',
                 color: 'var(--secondary-dark)',
-                fontWeight: 'bold',
+                fontWeight: '800',
                 cursor: 'pointer',
-                fontSize: '12px'
+                fontSize: '12px',
+                textDecoration: 'underline'
               }}
             >
-              🚪 Вийти {user ? 'з акаунту' : ''}
+              🚪 Вийти з кабінету
             </button>
             
             <button 
+              type="button"
               onClick={() => handleParentAction('parent_panel')}
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--primary)',
-                fontWeight: 'bold',
+                color: 'var(--primary-dark)',
+                fontWeight: '800',
                 cursor: 'pointer',
-                fontSize: '12px'
+                fontSize: '12px',
+                textDecoration: 'underline'
               }}
             >
-              Батьківська панель 📊
+              Батьківська панель ⚙️
             </button>
           </div>
         </div>
       )}
 
-      {/* 2. PROFILE CREATION FORM VIEW */}
+      {/* 2. CREATE NEW PROFILE */}
       {!showList && (
         <form onSubmit={handleCreate} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
-            {/* Header / Back */}
+            {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
               {profiles.length > 0 && (
                 <button 
@@ -256,17 +234,17 @@ export default function Onboarding() {
                   ←
                 </button>
               )}
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', color: 'var(--text-dark)' }}>
-                Створити профіль дитини
+              <h2 className="font-display" style={{ fontSize: '18px', color: 'var(--text-dark)' }}>
+                Створити профіль учня
               </h2>
             </div>
 
-            {/* Avatar Selector */}
+            {/* Mascot Selection */}
             <div style={{ marginTop: '24px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-dark)' }}>
-                Оберіть маскота 🦊
+              <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)', fontFamily: 'var(--font-display)' }}>
+                ОБЕРІТЬ МАСКОТА-ПОМІЧНИКА
               </label>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', marginTop: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', marginTop: '10px' }}>
                 {MASCOTS.map(m => (
                   <button
                     key={m.id}
@@ -274,19 +252,21 @@ export default function Onboarding() {
                     onClick={() => setSelectedMascot(m.id)}
                     style={{
                       flex: 1,
-                      padding: '12px 6px',
+                      padding: '16px 8px',
                       background: m.color,
-                      border: `3px solid ${selectedMascot === m.id ? 'var(--primary)' : 'var(--text-dark)'}`,
+                      border: `3px solid ${selectedMascot === m.id ? 'var(--primary)' : 'var(--border-color)'}`,
                       borderRadius: 'var(--border-radius-md)',
-                      fontSize: '32px',
+                      fontSize: '36px',
                       cursor: 'pointer',
-                      boxShadow: selectedMascot === m.id ? '0 0 10px rgba(108, 92, 231, 0.4)' : 'none',
-                      transform: selectedMascot === m.id ? 'scale(1.05)' : 'none',
+                      boxShadow: selectedMascot === m.id 
+                        ? '0 6px 0 var(--border-color), 0 0 10px rgba(108, 92, 231, 0.3)' 
+                        : '0 4px 0 var(--border-color)',
+                      transform: selectedMascot === m.id ? 'translateY(-2px)' : 'none',
                       transition: 'transform 0.1s, border-color 0.1s'
                     }}
                   >
                     {m.emoji}
-                    <div style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--text-dark)', marginTop: '4px' }}>
+                    <div style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-dark)', marginTop: '4px' }}>
                       {m.label}
                     </div>
                   </button>
@@ -294,83 +274,57 @@ export default function Onboarding() {
               </div>
             </div>
 
-            {/* Name Input */}
-            <div style={{ marginTop: '24px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-dark)' }}>
-                Ім'я дитини (або нікнейм)
+            {/* Nickname input */}
+            <div style={{ marginTop: '28px' }}>
+              <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)', fontFamily: 'var(--font-display)' }}>
+                ІМ'Я УЧНЯ (НІКНЕЙМ)
               </label>
               <input 
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="Наприклад: Данилко"
+                className="input-clay"
                 required
-                maxLength={15}
-                style={{
-                  width: '100%',
-                  padding: '14px 16px',
-                  border: '3px solid var(--text-dark)',
-                  borderRadius: 'var(--border-radius-sm)',
-                  fontSize: '15px',
-                  fontFamily: 'var(--font-body)',
-                  outline: 'none',
-                  marginTop: '8px'
-                }}
+                maxLength={12}
+                style={{ marginTop: '8px' }}
               />
             </div>
 
-            {/* Age Group Selector */}
+            {/* Grade confirmation */}
             <div style={{ marginTop: '24px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-dark)' }}>
-                Вікова група
+              <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)', fontFamily: 'var(--font-display)' }}>
+                НАВЧАЛЬНА ПРОГРАМА
               </label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-                {AGE_GROUPS.map(a => (
-                  <button
-                    key={a.id}
-                    type="button"
-                    onClick={() => handleAgeChange(a.id as ChildProfile['age_group'])}
-                    style={{
-                      textAlign: 'left',
-                      padding: '12px 16px',
-                      background: selectedAge === a.id ? 'var(--primary-light)' : 'var(--surface-card)',
-                      color: selectedAge === a.id ? '#fff' : 'var(--text-dark)',
-                      border: '3px solid var(--text-dark)',
-                      borderRadius: 'var(--border-radius-sm)',
-                      fontWeight: 'bold',
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      boxShadow: '0 3px 0 var(--text-dark)'
-                    }}
-                  >
-                    {a.label}
-                  </button>
-                ))}
+              <div style={{
+                background: 'var(--surface-soft)',
+                border: '3px solid var(--border-color)',
+                borderRadius: 'var(--border-radius-sm)',
+                padding: '16px',
+                fontWeight: 'bold',
+                color: 'var(--text-dark)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                marginTop: '8px',
+                boxShadow: 'inset 0 2px 0 rgba(0,0,0,0.05)'
+              }}>
+                <span style={{ fontSize: '28px' }}>🎒</span>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '800' }}>3-й клас Математика</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>Нова Українська Школа (НУШ)</div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Submit Action */}
+          {/* Submit */}
           <button 
             type="submit"
-            style={{
-              background: 'var(--secondary)',
-              color: 'var(--text-light)',
-              border: '3px solid var(--text-dark)',
-              padding: '16px',
-              borderRadius: 'var(--border-radius-md)',
-              fontFamily: 'var(--font-display)',
-              fontWeight: 'bold',
-              fontSize: '15px',
-              cursor: 'pointer',
-              boxShadow: '0 6px 0 var(--text-dark)',
-              marginTop: '40px',
-              transition: 'transform 0.1s'
-            }}
-            onMouseDown={(e) => e.currentTarget.style.transform = 'translateY(4px)'}
-            onMouseUp={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            className="btn-clay success"
+            style={{ width: '100%', marginTop: '32px', padding: '16px' }}
           >
-            Готово, грати! 🚀
+            Створити та грати! 🚀
           </button>
         </form>
       )}

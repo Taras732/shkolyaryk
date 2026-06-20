@@ -9,110 +9,135 @@ export default function Welcome() {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      padding: '32px 24px',
-      background: 'radial-gradient(circle at top left, #F7E6FF, #DFE6FF)',
+      padding: '36px 24px',
+      background: 'radial-gradient(circle at 50% 30%, #F5F1FF 0%, #E8E2FF 100%)',
       overflowY: 'auto',
       position: 'relative'
     }}>
-      {/* Header Section */}
-      <div style={{ textAlign: 'center', marginTop: '24px' }}>
-        <div style={{
-          fontSize: '14px',
-          fontWeight: 'bold',
-          color: 'var(--primary)',
-          textTransform: 'uppercase',
-          letterSpacing: '1.5px',
-          fontFamily: 'var(--font-display)',
-          marginBottom: '8px'
-        }}>
-          Освітній Простір
-        </div>
-        <h1 style={{
-          fontSize: '32px',
-          fontFamily: 'var(--font-display)',
+      {/* Decorative floating background elements */}
+      <div style={{
+        position: 'absolute',
+        top: '10%',
+        left: '8%',
+        fontSize: '28px',
+        opacity: 0.25,
+        animation: 'float 4s ease-in-out infinite'
+      }}>➕</div>
+      <div style={{
+        position: 'absolute',
+        top: '25%',
+        right: '10%',
+        fontSize: '32px',
+        opacity: 0.25,
+        animation: 'float 5s ease-in-out infinite 1s'
+      }}>➗</div>
+      <div style={{
+        position: 'absolute',
+        bottom: '30%',
+        left: '12%',
+        fontSize: '24px',
+        opacity: 0.25,
+        animation: 'float 4.5s ease-in-out infinite 0.5s'
+      }}>✖️</div>
+
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginTop: '16px', zIndex: 1 }}>
+        <span style={{
+          fontSize: '11px',
           fontWeight: '800',
+          color: 'var(--primary-dark)',
+          textTransform: 'uppercase',
+          letterSpacing: '2px',
+          fontFamily: 'var(--font-display)',
+          background: 'rgba(108, 92, 231, 0.1)',
+          padding: '6px 12px',
+          borderRadius: 'var(--border-radius-full)',
+          border: '2px solid rgba(108, 92, 231, 0.2)'
+        }}>
+          Розвивальний Простір
+        </span>
+        <h1 className="font-display" style={{
+          fontSize: '36px',
           color: 'var(--text-dark)',
           lineHeight: '1.2',
-          textShadow: '0 2px 4px rgba(108, 92, 231, 0.1)'
+          marginTop: '16px',
+          letterSpacing: '-1px'
         }}>
           Школярик
         </h1>
       </div>
 
-      {/* Mascot / Visual Centerpiece */}
+      {/* Mascot Mascot Container */}
       <div style={{
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        margin: '32px 0',
-        position: 'relative'
+        margin: '24px 0',
+        zIndex: 1
       }}>
-        {/* Animated glow background */}
+        {/* Animated 3D Mascot Frame */}
         <div style={{
-          position: 'absolute',
           width: '180px',
           height: '180px',
-          background: 'var(--primary-light)',
-          borderRadius: '50%',
-          filter: 'blur(30px)',
-          opacity: 0.25,
-        }} />
-        
-        <div style={{
-          width: '160px',
-          height: '160px',
-          background: 'var(--surface-card)',
+          background: '#FFEAA7',
           borderRadius: 'var(--border-radius-lg)',
-          boxShadow: 'var(--shadow-lg)',
+          border: 'var(--border-width) solid var(--border-color)',
+          boxShadow: 'var(--shadow-3d-md)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          fontSize: '80px',
+          fontSize: '90px',
           position: 'relative',
-          zIndex: 1,
-          border: '4px solid var(--primary-light)',
-          transform: 'rotate(-3deg)'
+          transform: 'rotate(-4deg)',
+          animation: 'float 6s ease-in-out infinite',
+          cursor: 'pointer'
         }}>
           🐼
-        </div>
-      </div>
-
-      {/* Action Button & Info */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div style={{
-          textAlign: 'center',
-          color: 'var(--text-muted)',
-          fontSize: '14px',
-          lineHeight: '1.5',
-          padding: '0 16px'
-        }}>
-          Вітаємо у новому PWA-застосунку! Тут діти тренують шкільні навички у легкій ігровій формі.
-        </div>
-        
-        <button 
-          style={{
-            background: 'var(--primary)',
-            color: 'var(--text-light)',
-            border: 'none',
-            padding: '16px 32px',
-            borderRadius: 'var(--border-radius-md)',
-            fontFamily: 'var(--font-display)',
-            fontWeight: 'bold',
-            fontSize: '16px',
-            cursor: 'pointer',
-            boxShadow: 'var(--shadow-md)',
-            transition: 'transform 0.2s, box-shadow 0.2s',
-            outline: 'none',
+          <div style={{
+            position: 'absolute',
+            bottom: '-12px',
+            right: '-12px',
+            background: 'var(--secondary)',
+            color: '#fff',
+            border: '3px solid var(--border-color)',
+            borderRadius: '50%',
+            width: '44px',
+            height: '44px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: '8px'
+            fontSize: '22px',
+            boxShadow: '0 3px 0 var(--border-color)'
+          }}>
+            ✏️
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Info & CTA */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', zIndex: 1 }}>
+        <div style={{
+          textAlign: 'center',
+          color: 'var(--text-dark)',
+          fontSize: '15px',
+          lineHeight: '1.6',
+          padding: '0 12px',
+          fontWeight: '600'
+        }}>
+          Граємося та вчимо математику! Прогресивні завдання для учнів <span style={{ color: 'var(--primary-dark)', fontWeight: '800' }}>3-го класу</span> за програмою НУШ.
+        </div>
+        
+        <button 
+          className="btn-clay success"
+          style={{
+            fontSize: '16px',
+            padding: '18px 24px',
+            borderRadius: 'var(--border-radius-md)'
           }}
           onClick={() => navigate('/auth')}
-          onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.98)'}
-          onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
-          Поїхали! 🚀
+          Увійти та грати! 🚀
         </button>
       </div>
     </div>

@@ -4,9 +4,6 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import confetti from 'canvas-confetti';
 
-// ----------------------------------------------------
-// Game Types & Helper Interfaces
-// ----------------------------------------------------
 interface Task {
   questionText: string;
   visualElement?: React.ReactNode;
@@ -14,128 +11,162 @@ interface Task {
   options: (string | number)[];
 }
 
-const ITEMS_POOL = ['🍎', '🐱', '🐦', '🌸', '🎈', '🍊', '🚗', '🚀', '🦕', '🍩'];
-
 // ----------------------------------------------------
-// Procedural Game Generators (with Anti-Monotony System)
+// Grade 3 Math Procedural Task Generators
 // ----------------------------------------------------
 
-// 1. Counting Objects Generator (Age group < 4)
-const generateCountingTasks = (): Task[] => {
+// 1. Equations Generator (Рівняння)
+const generateEquationsTasks = (): Task[] => {
   const tasks: Task[] = [];
-  // Select 5 distinct answers from 1 to 5
-  const numbers = [1, 2, 3, 4, 5];
-  // Shuffle numbers to ensure no repeats
-  const shuffledNumbers = [...numbers].sort(() => Math.random() - 0.5);
-  // Shuffle items pool
-  const items = [...ITEMS_POOL].sort(() => Math.random() - 0.5);
+  const templates = ['x_plus_A_eq_B', 'x_minus_A_eq_B', 'A_minus_x_eq_B', 'x_mult_A_eq_B'];
+  const shuffledTemplates = [...templates, templates[Math.floor(Math.random() * templates.length)]].sort(() => Math.random() - 0.5);
+
+  const usedAnswers = new Set<number>();
 
   for (let i = 0; i < 5; i++) {
-    const target = shuffledNumbers[i];
-    const item = items[i % items.length];
-    
-    // Generate options in range 1-5
-    const options = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
+    const template = shuffledTemplates[i];
+    let numA = 0;
+    let numB = 0;
+    let xValue = 0;
+    let question = '';
+
+    while (true) {
+      if (template === 'x_plus_A_eq_B') {
+        numA = Math.floor(Math.random() * 8) * 10 + 20; // 20, 30, ..., 90
+        xValue = Math.floor(Math.random() * 8) * 10 + 20; // 20, 30, ..., 90
+        numB = xValue + numA;
+        question = `x + ${numA} = ${numB}`;
+      } else if (template === 'x_minus_A_eq_B') {
+        numA = Math.floor(Math.random() * 15) * 10 + 50; // 50-190
+        xValue = Math.floor(Math.random() * 15) * 10 + 50; // 50-190
+        numB = xValue - numA;
+        if (numB <= 10) continue;
+        question = `x − ${numA} = ${numB}`;
+      } else if (template === 'A_minus_x_eq_B') {
+        numA = Math.floor(Math.random() * 20) * 10 + 100; // 100-290
+        xValue = Math.floor(Math.random() * 9) * 10 + 10;  // 10-90
+        numB = numA - xValue;
+        if (numB <= 0) continue;
+        question = `${numA} − x = ${numB}`;
+      } else {
+        // x * A = B
+        numA = Math.floor(Math.random() * 7) + 3; // 3-9
+        xValue = Math.floor(Math.random() * 7) + 3; // 3-9
+        numB = xValue * numA;
+        question = `x × ${numA} = ${numB}`;
+      }
+
+      if (xValue > 0 && !usedAnswers.has(xValue)) {
+        usedAnswers.add(xValue);
+        break;
+      }
+    }
+
+    // Generate decoys
+    const decoys = new Set<number>();
+    const isTens = template !== 'x_mult_A_eq_B';
+
+    while (decoys.size < 3) {
+      const offset = (Math.random() > 0.5 ? 1 : -1) * (isTens ? 10 : 1) * (Math.floor(Math.random() * 3) + 1);
+      const decoy = xValue + offset;
+      if (decoy > 0 && decoy !== xValue) {
+        decoys.add(decoy);
+      }
+    }
+
+    const options = [xValue, ...Array.from(decoys)].sort(() => Math.random() - 0.5);
 
     tasks.push({
-      questionText: `Скільки тут ${item}?`,
+      questionText: 'Знайди значення x:',
       visualElement: (
-        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', fontSize: '42px', minHeight: '60px', margin: '16px 0' }}>
-          {Array.from({ length: target }).map((_, idx) => (
-            <span key={idx} style={{ animation: 'bounce 0.5s ease infinite alternate' }}>{item}</span>
-          ))}
+        <div style={{
+          fontSize: '34px',
+          fontWeight: '800',
+          fontFamily: 'var(--font-display)',
+          color: 'var(--primary-dark)',
+          margin: '20px 0'
+        }}>
+          {question}
         </div>
       ),
-      correctAnswer: target,
+      correctAnswer: xValue,
       options
     });
   }
   return tasks;
 };
 
-// 2. Number Comparison Generator (Age group 5-6)
-const generateComparisonTasks = (): Task[] => {
+// 2. Extra Multiplication & Division (Позатабличне множення та ділення)
+const generateExtArithmeticTasks = (): Task[] => {
   const tasks: Task[] = [];
-  const usedPairs = new Set<string>();
+  const types = ['mult_double', 'div_double', 'mult_round', 'div_round'];
+  const shuffledTypes = [...types, types[Math.floor(Math.random() * types.length)]].sort(() => Math.random() - 0.5);
 
-  while (tasks.length < 5) {
-    const n1 = Math.floor(Math.random() * 9) + 1; // 1-9
-    const n2 = Math.floor(Math.random() * 9) + 1; // 1-9
-    const pairKey = `${n1}_${n2}`;
-
-    if (!usedPairs.has(pairKey)) {
-      usedPairs.add(pairKey);
-      
-      let correct: string;
-      if (n1 > n2) correct = '>';
-      else if (n1 < n2) correct = '<';
-      else correct = '=';
-
-      tasks.push({
-        questionText: `Порівняй числа:`,
-        visualElement: (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', fontSize: '36px', fontWeight: '800', fontFamily: 'var(--font-display)', margin: '20px 0' }}>
-            <span style={{ color: 'var(--primary-dark)', background: 'var(--surface-soft)', padding: '8px 16px', borderRadius: 'var(--border-radius-sm)', border: '2px solid var(--text-dark)' }}>{n1}</span>
-            <span style={{ color: 'var(--secondary)' }}>?</span>
-            <span style={{ color: 'var(--primary-dark)', background: 'var(--surface-soft)', padding: '8px 16px', borderRadius: 'var(--border-radius-sm)', border: '2px solid var(--text-dark)' }}>{n2}</span>
-          </div>
-        ),
-        correctAnswer: correct,
-        options: ['<', '=', '>']
-      });
-    }
-  }
-  return tasks;
-};
-
-// 3. Math Slalom (Addition / Subtraction, Age group 6-7)
-const generateSlalomTasks = (): Task[] => {
-  const tasks: Task[] = [];
   const usedAnswers = new Set<number>();
-  
-  // Guarantee mix: 3 addition, 2 subtraction
-  const ops = ['+', '+', '+', '-', '-'].sort(() => Math.random() - 0.5);
 
   for (let i = 0; i < 5; i++) {
-    const op = ops[i];
+    const type = shuffledTypes[i];
     let num1 = 0;
     let num2 = 0;
     let answer = 0;
+    let question = '';
 
-    // Retry until we get a distinct positive answer <= 20
     while (true) {
-      if (op === '+') {
-        num1 = Math.floor(Math.random() * 12) + 2; // 2-13
-        num2 = Math.floor(Math.random() * 7) + 1;  // 1-7
-        answer = num1 + num2;
+      if (type === 'mult_double') {
+        num1 = Math.floor(Math.random() * 5) + 11; // 11-15
+        num2 = Math.floor(Math.random() * 5) + 3;  // 3-7
+        answer = num1 * num2;
+        question = `${num1} × ${num2} = ?`;
+      } else if (type === 'div_double') {
+        // Find a suitable division like 48 / 3 or 75 / 5
+        const possibleDivisors = [3, 4, 5, 6];
+        num2 = possibleDivisors[Math.floor(Math.random() * possibleDivisors.length)];
+        answer = Math.floor(Math.random() * 6) + 12; // 12-17
+        num1 = answer * num2;
+        question = `${num1} ÷ ${num2} = ?`;
+      } else if (type === 'mult_round') {
+        num1 = (Math.floor(Math.random() * 7) + 2) * 10; // 20, 30, ..., 80
+        num2 = Math.floor(Math.random() * 4) + 2; // 2-5
+        answer = num1 * num2;
+        question = `${num1} × ${num2} = ?`;
       } else {
-        num1 = Math.floor(Math.random() * 12) + 8; // 8-19
-        num2 = Math.floor(Math.random() * 6) + 2;  // 2-7
-        answer = num1 - num2;
+        // div_round: e.g. 480 / 6 or 240 / 4
+        num2 = Math.floor(Math.random() * 6) + 3; // 3-8
+        answer = (Math.floor(Math.random() * 7) + 2) * 10; // 20-80
+        num1 = answer * num2;
+        question = `${num1} ÷ ${num2} = ?`;
       }
 
-      if (answer > 0 && answer <= 20 && !usedAnswers.has(answer)) {
+      if (answer > 0 && !usedAnswers.has(answer)) {
         usedAnswers.add(answer);
         break;
       }
     }
 
-    // Generate decoys close to the correct answer
     const decoys = new Set<number>();
+    const isTens = type === 'mult_round' || type === 'div_round';
+
     while (decoys.size < 3) {
-      const offset = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+      const offset = (Math.random() > 0.5 ? 1 : -1) * (isTens ? 10 : 2) * (Math.floor(Math.random() * 3) + 1);
       const decoy = answer + offset;
       if (decoy > 0 && decoy !== answer) {
         decoys.add(decoy);
       }
     }
+
     const options = [answer, ...Array.from(decoys)].sort(() => Math.random() - 0.5);
 
     tasks.push({
       questionText: 'Розв\'яжи приклад:',
       visualElement: (
-        <div style={{ fontSize: '32px', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-dark)', margin: '20px 0' }}>
-          {num1} {op === '+' ? '+' : '−'} {num2} = ?
+        <div style={{
+          fontSize: '32px',
+          fontWeight: '800',
+          fontFamily: 'var(--font-display)',
+          color: 'var(--text-dark)',
+          margin: '20px 0'
+        }}>
+          {question}
         </div>
       ),
       correctAnswer: answer,
@@ -145,42 +176,168 @@ const generateSlalomTasks = (): Task[] => {
   return tasks;
 };
 
-// 4. Multiplication Table (Age group 7-8)
-const generateMultiplicationTasks = (): Task[] => {
+// 3. Operations to 1000 (Дії в межах 1000)
+const generateOpsTo1000Tasks = (): Task[] => {
   const tasks: Task[] = [];
-  const usedPairs = new Set<string>();
+  const ops = ['+', '+', '-', '-', '+'].sort(() => Math.random() - 0.5);
+  const usedAnswers = new Set<number>();
 
-  while (tasks.length < 5) {
-    const num1 = Math.floor(Math.random() * 8) + 2; // 2-9
-    const num2 = Math.floor(Math.random() * 8) + 2; // 2-9
-    const pairKey = `${num1}_${num2}`;
+  for (let i = 0; i < 5; i++) {
+    const op = ops[i];
+    let num1 = 0;
+    let num2 = 0;
+    let answer = 0;
 
-    if (!usedPairs.has(pairKey)) {
-      usedPairs.add(pairKey);
-      const answer = num1 * num2;
+    while (true) {
+      if (op === '+') {
+        num1 = (Math.floor(Math.random() * 45) + 10) * 10; // 100-540
+        num2 = (Math.floor(Math.random() * 35) + 10) * 10; // 100-440
+        answer = num1 + num2;
+      } else {
+        num1 = (Math.floor(Math.random() * 60) + 30) * 10; // 300-890
+        num2 = (Math.floor(Math.random() * 25) + 5) * 10;  // 50-290
+        answer = num1 - num2;
+      }
 
-      // Generate decoys
-      const decoys = new Set<number>();
-      while (decoys.size < 3) {
-        const offset = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 4) + 1);
-        const decoy = answer + offset;
-        if (decoy > 0 && decoy !== answer) {
-          decoys.add(decoy);
+      if (answer > 100 && answer < 1000 && !usedAnswers.has(answer)) {
+        usedAnswers.add(answer);
+        break;
+      }
+    }
+
+    const decoys = new Set<number>();
+    while (decoys.size < 3) {
+      const offset = (Math.random() > 0.5 ? 1 : -1) * 10 * (Math.floor(Math.random() * 4) + 1);
+      const decoy = answer + offset;
+      if (decoy > 100 && decoy !== answer) {
+        decoys.add(decoy);
+      }
+    }
+    const options = [answer, ...Array.from(decoys)].sort(() => Math.random() - 0.5);
+
+    tasks.push({
+      questionText: 'Розв\'яжи приклад:',
+      visualElement: (
+        <div style={{
+          fontSize: '32px',
+          fontWeight: '800',
+          fontFamily: 'var(--font-display)',
+          color: 'var(--text-dark)',
+          margin: '20px 0'
+        }}>
+          {num1} {op} {num2} = ?
+        </div>
+      ),
+      correctAnswer: answer,
+      options
+    });
+  }
+  return tasks;
+};
+
+// 4. Fractions & Parts (Дроби та частини)
+const generateFractionsTasks = (): Task[] => {
+  const tasks: Task[] = [];
+  const types = ['find_part', 'find_whole', 'find_part', 'find_whole', 'find_part'].sort(() => Math.random() - 0.5);
+  const usedAnswers = new Set<number>();
+
+  for (let i = 0; i < 5; i++) {
+    const type = types[i];
+    let partNum = 0;
+    let divisor = 0;
+    let wholeNum = 0;
+    let question = '';
+    let visual: React.ReactNode = null;
+
+    while (true) {
+      divisor = [2, 3, 4, 5, 6][Math.floor(Math.random() * 5)];
+
+      if (type === 'find_part') {
+        partNum = Math.floor(Math.random() * 7) + 2; // 2-8
+        wholeNum = partNum * divisor;
+        question = `Знайди 1/${divisor} від числа ${wholeNum}:`;
+
+        // Render visual fractions representation (pizza or bars)
+        visual = (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', margin: '20px 0' }}>
+            {Array.from({ length: divisor }).map((_, idx) => (
+              <div 
+                key={idx}
+                style={{
+                  width: '32px',
+                  height: '40px',
+                  background: idx === 0 ? 'var(--primary)' : 'var(--surface-soft)',
+                  border: '3px solid var(--border-color)',
+                  borderRadius: 'var(--border-radius-sm)',
+                  boxShadow: idx === 0 ? 'inset 0 -4px 0 rgba(0,0,0,0.1)' : 'none',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontWeight: 'bold',
+                  fontSize: '11px'
+                }}
+              >
+                {idx === 0 ? '1' : ''}
+              </div>
+            ))}
+          </div>
+        );
+        
+        if (!usedAnswers.has(partNum)) {
+          usedAnswers.add(partNum);
+          break;
+        }
+      } else {
+        // find_whole
+        partNum = Math.floor(Math.random() * 6) + 3; // 3-8
+        wholeNum = partNum * divisor;
+        question = `Знайди число, якщо його 1/${divisor} дорівнює ${partNum}:`;
+
+        visual = (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '14px 0', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <div style={{
+                background: 'var(--accent)',
+                border: '3px solid var(--border-color)',
+                padding: '8px 16px',
+                borderRadius: 'var(--border-radius-sm)',
+                fontWeight: '800',
+                fontSize: '15px'
+              }}>
+                Частина (1/{divisor}) = {partNum}
+              </div>
+            </div>
+            <span style={{ fontSize: '16px' }}>👇</span>
+            <div style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-muted)' }}>Чому дорівнює ВСЕ число?</div>
+          </div>
+        );
+
+        if (!usedAnswers.has(wholeNum)) {
+          usedAnswers.add(wholeNum);
+          break;
         }
       }
-      const options = [answer, ...Array.from(decoys)].sort(() => Math.random() - 0.5);
-
-      tasks.push({
-        questionText: 'Помнож числа:',
-        visualElement: (
-          <div style={{ fontSize: '32px', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-dark)', margin: '20px 0' }}>
-            {num1} × {num2} = ?
-          </div>
-        ),
-        correctAnswer: answer,
-        options
-      });
     }
+
+    const answer = type === 'find_part' ? partNum : wholeNum;
+
+    // Generate decoys
+    const decoys = new Set<number>();
+    while (decoys.size < 3) {
+      const offset = (Math.random() > 0.5 ? 1 : -1) * (divisor === 2 ? 2 : 1) * (Math.floor(Math.random() * 3) + 1);
+      const decoy = answer + offset;
+      if (decoy > 0 && decoy !== answer) {
+        decoys.add(decoy);
+      }
+    }
+    const options = [answer, ...Array.from(decoys)].sort(() => Math.random() - 0.5);
+
+    tasks.push({
+      questionText: question,
+      visualElement: visual,
+      correctAnswer: answer,
+      options
+    });
   }
   return tasks;
 };
@@ -199,19 +356,19 @@ export default function GamePlayer() {
   const [gameFinished, setGameFinished] = useState(false);
   const [earnedStars, setEarnedStars] = useState(0);
 
-  // Initialize tasks
+  // Load specific game generator
   useEffect(() => {
     let generated: Task[] = [];
-    if (gameId === 'count_objects') {
-      generated = generateCountingTasks();
-    } else if (gameId === 'number_comparison') {
-      generated = generateComparisonTasks();
-    } else if (gameId === 'math_slalom') {
-      generated = generateSlalomTasks();
-    } else if (gameId === 'multiplication_table') {
-      generated = generateMultiplicationTasks();
+    if (gameId === 'math_equations') {
+      generated = generateEquationsTasks();
+    } else if (gameId === 'ext_multiplication') {
+      generated = generateExtArithmeticTasks();
+    } else if (gameId === 'ops_to_1000') {
+      generated = generateOpsTo1000Tasks();
+    } else if (gameId === 'fractions') {
+      generated = generateFractionsTasks();
     } else {
-      generated = generateCountingTasks();
+      generated = generateEquationsTasks();
     }
     setTasks(generated);
   }, [gameId]);
@@ -224,9 +381,11 @@ export default function GamePlayer() {
         justifyContent: 'center',
         alignItems: 'center',
         fontWeight: 'bold',
-        color: 'var(--primary)'
+        color: 'var(--primary-dark)',
+        fontFamily: 'var(--font-display)',
+        fontSize: '18px'
       }}>
-        Готуємо гру... 🏝️
+        Завантаження гри... 🎒
       </div>
     );
   }
@@ -234,18 +393,15 @@ export default function GamePlayer() {
   const currentTask = tasks[currentTaskIdx];
 
   const handleAnswerSelect = (option: string | number) => {
-    if (answerState !== 'idle') return; // block multiple fast clicks
+    if (answerState !== 'idle') return;
 
     setSelectedOption(option);
     const isCorrect = option === currentTask.correctAnswer;
 
     if (isCorrect) {
       setAnswerState('correct');
-      // Bouncy animation sound placeholder
-      
-      // Trigger instant task success confetti burst
       confetti({
-        particleCount: 40,
+        particleCount: 50,
         spread: 40,
         origin: { y: 0.6 }
       });
@@ -256,7 +412,6 @@ export default function GamePlayer() {
           setSelectedOption(null);
           setAnswerState('idle');
         } else {
-          // Game Completed!
           handleGameFinish();
         }
       }, 1000);
@@ -264,7 +419,6 @@ export default function GamePlayer() {
       setAnswerState('incorrect');
       setMistakesCount(prev => prev + 1);
       
-      // Reset state after a short shake delay
       setTimeout(() => {
         setSelectedOption(null);
         setAnswerState('idle');
@@ -273,8 +427,6 @@ export default function GamePlayer() {
   };
 
   const handleGameFinish = async () => {
-    // Score Stars:
-    // 0 mistakes = 3 stars, 1 mistake = 2 stars, 2+ mistakes = 1 star
     let stars = 3;
     if (mistakesCount === 1) stars = 2;
     else if (mistakesCount >= 2) stars = 1;
@@ -282,19 +434,17 @@ export default function GamePlayer() {
     setEarnedStars(stars);
     setGameFinished(true);
 
-    // High-energy confetti explosion
     confetti({
       particleCount: 150,
       spread: 80,
       origin: { y: 0.5 }
     });
 
-    // Save Progress in local store
     if (activeProfile && gameId) {
       await updateProgress(
         activeProfile.id,
         gameId,
-        2, // next level
+        2, // Next level
         stars,
         {
           timestamp: new Date().toISOString(),
@@ -305,7 +455,6 @@ export default function GamePlayer() {
     }
   };
 
-  // Render Game Workspace
   return (
     <div style={{
       flex: 1,
@@ -313,13 +462,13 @@ export default function GamePlayer() {
       flexDirection: 'column',
       justifyContent: 'space-between',
       padding: '24px',
-      background: 'radial-gradient(circle at top left, #F7E6FF, #DFE6FF)',
+      background: 'radial-gradient(circle at 50% 30%, #F5F1FF 0%, #E8E2FF 100%)',
       overflowY: 'auto'
     }}>
-      {/* 1. REGULAR GAME WORKSPACE */}
+      {/* 1. PLAY SCREEN */}
       {!gameFinished && (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          {/* Header Bar */}
+          {/* Header */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button 
@@ -335,80 +484,77 @@ export default function GamePlayer() {
                 ❌
               </button>
 
-              {/* Progress Indicator */}
+              {/* Progress Slider */}
               <div style={{
                 flex: 1,
                 margin: '0 16px',
-                height: '16px',
+                height: '18px',
                 background: 'var(--surface-soft)',
-                border: '2px solid var(--text-dark)',
+                border: '3px solid var(--border-color)',
                 borderRadius: 'var(--border-radius-full)',
                 overflow: 'hidden',
-                position: 'relative'
+                position: 'relative',
+                boxShadow: 'inset 0 3px 0 rgba(0,0,0,0.05)'
               }}>
                 <div style={{
                   width: `${(currentTaskIdx / 5) * 100}%`,
                   height: '100%',
                   background: 'var(--primary)',
-                  transition: 'width 0.3s ease'
+                  transition: 'width 0.3s ease',
+                  boxShadow: 'inset 0 -3px 0 rgba(0,0,0,0.15)'
                 }} />
               </div>
 
-              <div style={{ fontSize: '14px', fontWeight: '800', fontFamily: 'var(--font-display)' }}>
+              <div className="font-display" style={{ fontSize: '13px' }}>
                 {currentTaskIdx + 1}/5
               </div>
             </div>
 
-            {/* Hint message / mistakes tracker */}
-            <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '11px', color: 'var(--text-muted)' }}>
-              Помилок: {mistakesCount}
+            {/* mistakes tracker */}
+            <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)' }}>
+              ПОМИЛКИ: {mistakesCount}
             </div>
           </div>
 
-          {/* Game Task Card */}
-          <div style={{
-            background: 'var(--surface-card)',
-            border: '4px solid var(--text-dark)',
-            borderRadius: 'var(--border-radius-lg)',
-            padding: '28px 16px',
-            textAlign: 'center',
-            boxShadow: '0 8px 0 var(--text-dark)',
-            margin: '24px 0',
-            position: 'relative',
-            animation: answerState === 'incorrect' ? 'shake 0.5s' : 'none'
-          }}>
+          {/* Interactive Card */}
+          <div 
+            className="card-clay"
+            style={{
+              padding: '28px 16px',
+              textAlign: 'center',
+              margin: '24px 0',
+              animation: answerState === 'incorrect' ? 'shake 0.5s' : 'none'
+            }}
+          >
             <h3 style={{
-              fontSize: '18px',
+              fontSize: '15px',
               fontFamily: 'var(--font-display)',
               color: 'var(--text-dark)',
-              marginBottom: '12px'
+              marginBottom: '10px'
             }}>
               {currentTask.questionText}
             </h3>
 
-            {/* Dynamic visual element representing tasks */}
+            {/* Visual Math Component */}
             {currentTask.visualElement}
           </div>
 
-          {/* Option Selection Buttons */}
+          {/* Answer Pad */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: currentTask.options.length === 3 ? 'repeat(3, 1fr)' : 'repeat(2, 2fr)',
-            gap: '12px',
+            gap: '14px',
             marginBottom: '16px'
           }}>
             {currentTask.options.map((opt, idx) => {
               const isSelected = selectedOption === opt;
-              let btnBg = 'var(--surface-card)';
-              let btnBorderColor = 'var(--text-dark)';
+              let btnClass = 'btn-clay';
               
               if (isSelected) {
                 if (answerState === 'correct') {
-                  btnBg = '#D5F3E9'; // green success
-                  btnBorderColor = '#2EC4B6';
+                  btnClass = 'btn-clay success';
                 } else if (answerState === 'incorrect') {
-                  btnBg = '#FFE8EB'; // red fail
-                  btnBorderColor = 'var(--secondary)';
+                  btnClass = 'btn-clay secondary';
                 }
               }
 
@@ -417,21 +563,12 @@ export default function GamePlayer() {
                   key={idx}
                   onClick={() => handleAnswerSelect(opt)}
                   disabled={answerState !== 'idle'}
+                  className={btnClass}
                   style={{
-                    background: btnBg,
-                    color: 'var(--text-dark)',
-                    border: `3px solid ${btnBorderColor}`,
-                    borderRadius: 'var(--border-radius-md)',
-                    padding: '20px 10px',
-                    fontSize: '24px',
-                    fontWeight: '800',
-                    fontFamily: 'var(--font-display)',
-                    cursor: answerState !== 'idle' ? 'not-allowed' : 'pointer',
-                    boxShadow: '0 4px 0 var(--text-dark)',
-                    transition: 'transform 0.1s'
+                    padding: '20px 8px',
+                    fontSize: '22px',
+                    borderRadius: 'var(--border-radius-sm)'
                   }}
-                  onMouseDown={(e) => answerState === 'idle' && (e.currentTarget.style.transform = 'translateY(4px)')}
-                  onMouseUp={(e) => answerState === 'idle' && (e.currentTarget.style.transform = 'translateY(0)')}
                 >
                   {opt}
                 </button>
@@ -441,7 +578,7 @@ export default function GamePlayer() {
         </div>
       )}
 
-      {/* 2. REWARD/COMPLETION VIEW */}
+      {/* 2. REWARD SCREEN */}
       {gameFinished && (
         <div style={{
           flex: 1,
@@ -454,24 +591,24 @@ export default function GamePlayer() {
           <div style={{ textAlign: 'center', marginTop: '24px' }}>
             <span style={{ fontSize: '80px', display: 'block', animation: 'bounce 0.5s infinite alternate' }}>🏆</span>
             
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '24px',
+            <h2 className="font-display" style={{
+              fontSize: '22px',
               color: 'var(--text-dark)',
               marginTop: '16px'
             }}>
-              Чудова гра! 🎉
+              Класний результат! 🎉
             </h2>
             
             <p style={{
               fontSize: '13px',
               color: 'var(--text-muted)',
-              marginTop: '8px'
+              marginTop: '6px',
+              fontWeight: '600'
             }}>
-              Ви виконали всі завдання та отримали зірочки!
+              Ви пройшли всі 5 раундів математики!
             </p>
 
-            {/* Stars rendering */}
+            {/* Stars */}
             <div style={{
               display: 'flex',
               justifyContent: 'center',
@@ -492,68 +629,40 @@ export default function GamePlayer() {
               ))}
             </div>
 
-            {/* Mistakes summary */}
-            <div style={{
+            {/* Score Message */}
+            <div className="font-display" style={{
               background: 'var(--surface-soft)',
-              border: '2px solid var(--text-dark)',
+              border: '3px solid var(--border-color)',
               padding: '10px 20px',
               borderRadius: 'var(--border-radius-sm)',
               fontSize: '12px',
-              fontWeight: 'bold',
               color: 'var(--text-dark)',
-              display: 'inline-block'
+              display: 'inline-block',
+              boxShadow: '0 3px 0 var(--border-color)'
             }}>
               {mistakesCount === 0 
-                ? 'Ідеально! Без помилок! 🐼' 
+                ? 'ПЕРФЕКТ! БЕЗ ПОМИЛОК! 🐼' 
                 : mistakesCount === 1 
-                  ? 'Всього 1 помилка! Круто! 🦊' 
-                  : `Зроблено помилок: ${mistakesCount} 🐣`
+                  ? 'ТІЛЬКИ 1 ПОМИЛКА! ЧУДОВО! 🦊' 
+                  : `ПОМИЛОК В РАУНДІ: ${mistakesCount} 🐣`
               }
             </div>
           </div>
 
-          {/* Action button to return */}
           <button
             onClick={() => navigate('/hub')}
+            className="btn-clay success"
             style={{
               width: '100%',
               maxWidth: '300px',
-              background: 'var(--primary)',
-              color: '#fff',
-              border: '3px solid var(--text-dark)',
               padding: '16px',
-              borderRadius: 'var(--border-radius-md)',
-              fontFamily: 'var(--font-display)',
-              fontWeight: 'bold',
-              fontSize: '15px',
-              cursor: 'pointer',
-              boxShadow: '0 6px 0 var(--text-dark)',
-              transition: 'transform 0.1s'
+              fontSize: '15px'
             }}
-            onMouseDown={(e) => e.currentTarget.style.transform = 'translateY(4px)'}
-            onMouseUp={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           >
-            Продовжити 🏝️
+            Продовжити навчання 🏝️
           </button>
         </div>
       )}
-
-      {/* Global CSS for Animations */}
-      <style>{`
-        @keyframes bounce {
-          from { transform: translateY(0); }
-          to { transform: translateY(-8px); }
-        }
-        @keyframes pulse {
-          from { transform: scale(1); }
-          to { transform: scale(1.15); }
-        }
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-6px) rotate(-1deg); }
-          75% { transform: translateX(6px) rotate(1deg); }
-        }
-      `}</style>
     </div>
   );
 }
