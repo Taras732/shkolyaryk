@@ -5,11 +5,23 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import ParentalGate from '@/components/ParentalGate';
 
 const MASCOTS = [
-  { id: 'panda', emoji: '🐼', label: 'Бамбі', color: '#E4F0EC' },
-  { id: 'fox', emoji: '🦊', label: 'Ліса', color: '#FCE4D6' },
-  { id: 'owl', emoji: '🦉', label: 'Софі', color: '#E2EFDA' },
-  { id: 'chicken', emoji: '🐣', label: 'Коко', color: '#FFF2CC' }
+  { id: 'dragon', img: '/creatures/zodiac_dragon_fire.png', label: 'Дракончик', color: '#FFE3D6' },
+  { id: 'tiger', img: '/creatures/zodiac_tiger_metal.png', label: 'Тигреня', color: '#E3EEFF' },
+  { id: 'rabbit', img: '/creatures/zodiac_rabbit_wood.png', label: 'Зайчик', color: '#E6F6E0' },
+  { id: 'horse', img: '/creatures/zodiac_horse_water.png', label: 'Конячка', color: '#E0F2FF' },
+  { id: 'ox', img: '/creatures/zodiac_ox_earth.png', label: 'Бичок', color: '#F3EAD8' },
+  { id: 'monkey', img: '/creatures/zodiac_monkey_fire.png', label: 'Мавпочка', color: '#FFEFD6' }
 ];
+
+// Рівні MVP: дошкільнята + 3 клас (мапляться на схему age_group у БД)
+const LEVELS = [
+  { id: 'preschool', ageGroup: '5-6' as const, emoji: '🧸', title: 'Дошкільнята', sub: 'Лічба, форми, перші числа' },
+  { id: 'grade3', ageGroup: '7-8' as const, emoji: '🎒', title: '3-й клас', sub: 'Математика (НУШ)' }
+];
+
+// Підпис рівня за age_group профілю (для списку учнів)
+const levelLabel = (ageGroup: string) =>
+  ageGroup === '5-6' || ageGroup === 'under_4' ? 'Дошкільнята 🧸' : '3-й клас 🎒';
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -18,7 +30,8 @@ export default function Onboarding() {
 
   const [isCreating, setIsCreating] = useState(false);
   const [nickname, setNickname] = useState('');
-  const [selectedMascot, setSelectedMascot] = useState('panda');
+  const [selectedMascot, setSelectedMascot] = useState('dragon');
+  const [selectedLevel, setSelectedLevel] = useState('grade3');
   
   // Parental Gate State
   const [isGateOpen, setIsGateOpen] = useState(false);
@@ -32,10 +45,10 @@ export default function Onboarding() {
     e.preventDefault();
     if (!nickname.trim()) return;
 
-    // Hardcode age group as '7-8' (equivalent to Grade 3)
+    const level = LEVELS.find(l => l.id === selectedLevel) ?? LEVELS[1];
     await createProfile(
       nickname.trim(),
-      '7-8',
+      level.ageGroup,
       selectedMascot,
       user?.id
     );
@@ -90,7 +103,7 @@ export default function Onboarding() {
       flexDirection: 'column',
       justifyContent: 'space-between',
       padding: '24px',
-      background: 'radial-gradient(circle at 50% 30%, #F5F1FF 0%, #E8E2FF 100%)',
+      background: 'linear-gradient(180deg, #DCE8FF 0%, #ECE6FF 55%, #FCEAF2 100%)',
       overflowY: 'auto'
     }}>
       {/* 1. LIST OF PROFILES */}
@@ -130,25 +143,24 @@ export default function Onboarding() {
                     }}
                   >
                     <div style={{
-                      width: '74px',
-                      height: '74px',
+                      width: '78px',
+                      height: '78px',
                       borderRadius: '50%',
                       background: mascot?.color || 'var(--surface-soft)',
                       border: '3px solid var(--border-color)',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      fontSize: '40px',
                       margin: '0 auto',
+                      overflow: 'hidden',
                       boxShadow: 'inset 0 -4px 0 rgba(0,0,0,0.1)'
                     }}>
-                      {mascot?.emoji || '🐣'}
+                      {mascot?.img
+                        ? <img src={mascot.img} alt={mascot.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        : <div style={{ fontSize: '40px', lineHeight: '78px' }}>🐣</div>}
                     </div>
                     <div className="font-display" style={{ fontSize: '14px', color: 'var(--text-dark)', marginTop: '12px' }}>
                       {p.nickname}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--primary-dark)', fontWeight: '800', marginTop: '4px' }}>
-                      3-й Клас 🎒
+                      {levelLabel(p.age_group)}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: 'bold' }}>
                       ⭐ {p.total_stars} зірочок
@@ -242,31 +254,29 @@ export default function Onboarding() {
             {/* Mascot Selection */}
             <div style={{ marginTop: '24px' }}>
               <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)', fontFamily: 'var(--font-display)' }}>
-                ОБЕРІТЬ МАСКОТА-ПОМІЧНИКА
+                ОБЕРИ ДРУГА-ПОМІЧНИКА
               </label>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', marginTop: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '10px' }}>
                 {MASCOTS.map(m => (
                   <button
                     key={m.id}
                     type="button"
                     onClick={() => setSelectedMascot(m.id)}
                     style={{
-                      flex: 1,
-                      padding: '16px 8px',
+                      padding: '10px 6px',
                       background: m.color,
                       border: `3px solid ${selectedMascot === m.id ? 'var(--primary)' : 'var(--border-color)'}`,
                       borderRadius: 'var(--border-radius-md)',
-                      fontSize: '36px',
                       cursor: 'pointer',
-                      boxShadow: selectedMascot === m.id 
-                        ? '0 6px 0 var(--border-color), 0 0 10px rgba(108, 92, 231, 0.3)' 
+                      boxShadow: selectedMascot === m.id
+                        ? '0 6px 0 var(--border-color), 0 0 12px rgba(108, 92, 231, 0.35)'
                         : '0 4px 0 var(--border-color)',
                       transform: selectedMascot === m.id ? 'translateY(-2px)' : 'none',
                       transition: 'transform 0.1s, border-color 0.1s'
                     }}
                   >
-                    {m.emoji}
-                    <div style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-dark)', marginTop: '4px' }}>
+                    <img src={m.img} alt={m.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'contain', borderRadius: '12px' }} />
+                    <div style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-dark)', marginTop: '2px' }}>
                       {m.label}
                     </div>
                   </button>
@@ -291,29 +301,37 @@ export default function Onboarding() {
               />
             </div>
 
-            {/* Grade confirmation */}
+            {/* Level selection */}
             <div style={{ marginTop: '24px' }}>
               <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)', fontFamily: 'var(--font-display)' }}>
                 НАВЧАЛЬНА ПРОГРАМА
               </label>
-              <div style={{
-                background: 'var(--surface-soft)',
-                border: '3px solid var(--border-color)',
-                borderRadius: 'var(--border-radius-sm)',
-                padding: '16px',
-                fontWeight: 'bold',
-                color: 'var(--text-dark)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                marginTop: '8px',
-                boxShadow: 'inset 0 2px 0 rgba(0,0,0,0.05)'
-              }}>
-                <span style={{ fontSize: '28px' }}>🎒</span>
-                <div>
-                  <div style={{ fontSize: '14px', fontWeight: '800' }}>3-й клас Математика</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>Нова Українська Школа (НУШ)</div>
-                </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                {LEVELS.map(l => (
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => setSelectedLevel(l.id)}
+                    style={{
+                      flex: 1,
+                      textAlign: 'left',
+                      background: 'var(--surface-soft)',
+                      border: `3px solid ${selectedLevel === l.id ? 'var(--primary)' : 'var(--border-color)'}`,
+                      borderRadius: 'var(--border-radius-sm)',
+                      padding: '14px',
+                      cursor: 'pointer',
+                      boxShadow: selectedLevel === l.id
+                        ? '0 5px 0 var(--border-color), 0 0 10px rgba(108, 92, 231, 0.3)'
+                        : '0 4px 0 var(--border-color)',
+                      transform: selectedLevel === l.id ? 'translateY(-2px)' : 'none',
+                      transition: 'transform 0.1s, border-color 0.1s'
+                    }}
+                  >
+                    <span style={{ fontSize: '26px' }}>{l.emoji}</span>
+                    <div style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', marginTop: '4px' }}>{l.title}</div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: '600' }}>{l.sub}</div>
+                  </button>
+                ))}
               </div>
             </div>
           </div>

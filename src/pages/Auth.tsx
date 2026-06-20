@@ -16,7 +16,7 @@ export default function Auth() {
 
   useEffect(() => {
     if (user) {
-      navigate('/onboarding');
+      navigate('/role');
     }
   }, [user, navigate]);
 
@@ -85,7 +85,7 @@ export default function Auth() {
             color: 'var(--text-dark)',
             marginTop: '8px'
           }}>
-            {isRegister ? 'Створити Акаунт' : 'Вхід для Батьків'}
+            {isRegister ? 'Створити акаунт' : 'Вхід у Школярик'}
           </h2>
           <p style={{
             color: 'var(--text-muted)',
@@ -186,9 +186,9 @@ export default function Auth() {
           </button>
 
           {/* Guest Auth */}
-          <button 
+          <button
             type="button"
-            onClick={() => navigate('/onboarding')}
+            onClick={() => navigate('/role')}
             className="btn-clay accent"
             style={{ width: '100%', marginTop: '8px' }}
           >

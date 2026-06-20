@@ -4,13 +4,15 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 
 const MASCOTS: Record<string, string> = {
-  chicken: '🐣',
-  panda: '🐼',
-  fox: '🦊',
-  owl: '🦉'
+  dragon: '/creatures/zodiac_dragon_fire.png',
+  tiger: '/creatures/zodiac_tiger_metal.png',
+  rabbit: '/creatures/zodiac_rabbit_wood.png',
+  horse: '/creatures/zodiac_horse_water.png',
+  ox: '/creatures/zodiac_ox_earth.png',
+  monkey: '/creatures/zodiac_monkey_fire.png'
 };
 
-const TOPICS = [
+const GRADE3_TOPICS = [
   {
     id: 'math_equations',
     name: 'Рівняння ❔',
@@ -45,6 +47,35 @@ const TOPICS = [
   }
 ];
 
+const PRESCHOOL_TOPICS = [
+  {
+    id: 'pre_counting',
+    name: 'Лічба 🔢',
+    description: 'Рахуємо предмети від 1 до 10.',
+    emoji: '🔢',
+    color: '#E3F2FD',
+    borderColor: '#3B9EF0'
+  },
+  {
+    id: 'pre_addition',
+    name: 'Додавання ➕',
+    description: 'Скільки разом? Додаємо маленькі числа.',
+    emoji: '➕',
+    color: '#E8F5E9',
+    borderColor: '#22C55E'
+  },
+  {
+    id: 'pre_compare',
+    name: 'Більше-менше ⚖️',
+    description: 'Де більше предметів? Порівнюємо кількість.',
+    emoji: '⚖️',
+    color: '#FFF3E0',
+    borderColor: '#FF9F43'
+  }
+];
+
+const isPreschoolGroup = (ageGroup: string) => ageGroup === '5-6' || ageGroup === 'under_4';
+
 export default function Hub() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -77,6 +108,9 @@ export default function Hub() {
     );
   }
 
+  const preschool = isPreschoolGroup(activeProfile.age_group);
+  const topics = preschool ? PRESCHOOL_TOPICS : GRADE3_TOPICS;
+
   return (
     <div style={{
       flex: 1,
@@ -84,7 +118,7 @@ export default function Hub() {
       flexDirection: 'column',
       justifyContent: 'space-between',
       padding: '20px',
-      background: 'radial-gradient(circle at 50% 30%, #F5F1FF 0%, #E8E2FF 100%)',
+      background: 'linear-gradient(180deg, #DCE8FF 0%, #ECE6FF 55%, #FCEAF2 100%)',
       overflowY: 'auto'
     }}>
       {/* Header Profile Bar */}
@@ -105,20 +139,18 @@ export default function Hub() {
             borderRadius: '50%',
             background: '#FFEAA7',
             border: '2px solid var(--border-color)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontSize: '26px',
+            overflow: 'hidden',
             boxShadow: 'inset 0 -3px 0 rgba(0,0,0,0.1)'
           }}>
-            {MASCOTS[activeProfile.avatar_id] || '🐼'}
+            {MASCOTS[activeProfile.avatar_id] &&
+              <img src={MASCOTS[activeProfile.avatar_id]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
           </div>
           <div>
             <div className="font-display" style={{ fontSize: '13px', color: 'var(--text-dark)' }}>
               {activeProfile.nickname}
             </div>
             <div style={{ fontSize: '10px', color: 'var(--primary-dark)', fontWeight: '800' }}>
-              3-й клас · ⭐ {activeProfile.total_stars} зірок
+              {preschool ? 'Дошкільнятко' : '3-й клас'} · ⭐ {activeProfile.total_stars} зірок
             </div>
           </div>
         </div>
@@ -146,7 +178,7 @@ export default function Hub() {
           marginBottom: '16px',
           letterSpacing: '-0.5px'
         }}>
-          Острів Математики 🏝️
+          {preschool ? 'Завдання для малят 🧸' : 'Острів Математики 🏝️'}
         </h3>
 
         {/* Puzzle Levels / Grid Layout */}
@@ -155,7 +187,7 @@ export default function Hub() {
           gridTemplateColumns: '1fr',
           gap: '16px'
         }}>
-          {TOPICS.map((topic, index) => {
+          {topics.map((topic, index) => {
             const topicProgress = progress[activeProfile.id]?.[topic.id] || { level: 1, stars: 0 };
             
             return (

@@ -342,6 +342,108 @@ const generateFractionsTasks = (): Task[] => {
   return tasks;
 };
 
+// ----------------------------------------------------
+// Preschool (дошкільнята) Task Generators — візуальні, прості
+// ----------------------------------------------------
+
+const COUNT_EMOJI = ['🍎', '🐤', '⭐', '🎈', '🌸', '🐞', '🍓', '🐢'];
+const CMP_EMOJI = ['🍎', '⭐', '🎈', '🐤'];
+
+// П1. Лічба 1-10 (скільки об'єктів?)
+const generateCountingTasks = (): Task[] => {
+  const tasks: Task[] = [];
+  const used = new Set<number>();
+  for (let i = 0; i < 5; i++) {
+    let n = 0;
+    while (true) { n = Math.floor(Math.random() * 10) + 1; if (!used.has(n)) { used.add(n); break; } }
+    const emoji = COUNT_EMOJI[Math.floor(Math.random() * COUNT_EMOJI.length)];
+    const decoys = new Set<number>();
+    while (decoys.size < 3) {
+      const off = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+      const d = n + off;
+      if (d > 0 && d <= 12 && d !== n) decoys.add(d);
+    }
+    const options = [n, ...Array.from(decoys)].sort(() => Math.random() - 0.5);
+    tasks.push({
+      questionText: 'Скільки тут? 🔢',
+      visualElement: (
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', margin: '16px auto', maxWidth: '280px' }}>
+          {Array.from({ length: n }).map((_, k) => <span key={k} style={{ fontSize: '40px' }}>{emoji}</span>)}
+        </div>
+      ),
+      correctAnswer: n,
+      options
+    });
+  }
+  return tasks;
+};
+
+// П2. Перші додавання (A+B ≤ 10, візуальні групи)
+const generateFirstAdditionTasks = (): Task[] => {
+  const tasks: Task[] = [];
+  const used = new Set<string>();
+  for (let i = 0; i < 5; i++) {
+    let a = 0, b = 0;
+    while (true) {
+      a = Math.floor(Math.random() * 5) + 1;
+      b = Math.floor(Math.random() * 4) + 1;
+      if (a + b <= 10 && !used.has(a + '+' + b)) { used.add(a + '+' + b); break; }
+    }
+    const sum = a + b;
+    const decoys = new Set<number>();
+    while (decoys.size < 3) {
+      const off = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+      const d = sum + off;
+      if (d > 0 && d <= 14 && d !== sum) decoys.add(d);
+    }
+    const options = [sum, ...Array.from(decoys)].sort(() => Math.random() - 0.5);
+    const grp = (n: number, e: string) => (
+      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', maxWidth: '110px', justifyContent: 'center' }}>
+        {Array.from({ length: n }).map((_, k) => <span key={k} style={{ fontSize: '30px' }}>{e}</span>)}
+      </div>
+    );
+    tasks.push({
+      questionText: 'Скільки разом? ➕',
+      visualElement: (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', flexWrap: 'wrap', margin: '16px 0' }}>
+          {grp(a, '🔵')}
+          <span style={{ fontSize: '30px', fontWeight: 800 }}>➕</span>
+          {grp(b, '🟡')}
+        </div>
+      ),
+      correctAnswer: sum,
+      options
+    });
+  }
+  return tasks;
+};
+
+// П3. Більше-менше (де більше об'єктів?)
+const generateCompareTasks = (): Task[] => {
+  const tasks: Task[] = [];
+  for (let i = 0; i < 5; i++) {
+    let l = 0, r = 0;
+    while (true) { l = Math.floor(Math.random() * 8) + 1; r = Math.floor(Math.random() * 8) + 1; if (l !== r) break; }
+    const emoji = CMP_EMOJI[Math.floor(Math.random() * CMP_EMOJI.length)];
+    const grp = (n: number) => (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', justifyContent: 'center', maxWidth: '120px', padding: '10px', border: '3px solid var(--border-color)', borderRadius: '16px', background: 'var(--surface-soft)' }}>
+        {Array.from({ length: n }).map((_, k) => <span key={k} style={{ fontSize: '24px' }}>{emoji}</span>)}
+      </div>
+    );
+    tasks.push({
+      questionText: 'Де більше? Обери більше число ⚖️',
+      visualElement: (
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center', margin: '16px 0' }}>
+          {grp(l)}{grp(r)}
+        </div>
+      ),
+      correctAnswer: Math.max(l, r),
+      options: [l, r].sort(() => Math.random() - 0.5)
+    });
+  }
+  return tasks;
+};
+
 export default function GamePlayer() {
   const navigate = useNavigate();
   const { id: gameId } = useParams<{ id: string }>();
@@ -367,6 +469,12 @@ export default function GamePlayer() {
       generated = generateOpsTo1000Tasks();
     } else if (gameId === 'fractions') {
       generated = generateFractionsTasks();
+    } else if (gameId === 'pre_counting') {
+      generated = generateCountingTasks();
+    } else if (gameId === 'pre_addition') {
+      generated = generateFirstAdditionTasks();
+    } else if (gameId === 'pre_compare') {
+      generated = generateCompareTasks();
     } else {
       generated = generateEquationsTasks();
     }

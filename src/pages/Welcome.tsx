@@ -10,10 +10,23 @@ export default function Welcome() {
       flexDirection: 'column',
       justifyContent: 'space-between',
       padding: '36px 24px',
-      background: 'radial-gradient(circle at 50% 30%, #F5F1FF 0%, #E8E2FF 100%)',
+      background: 'linear-gradient(180deg, #DCE8FF 0%, #ECE6FF 52%, #FCEAF2 100%)',
       overflowY: 'auto',
       position: 'relative'
     }}>
+      {/* фон-світ: м'який пагорб-«земля» */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, height: '200px',
+        background: 'radial-gradient(150% 120% at 50% 145%, #BCEFCF 0%, #CFefdb 48%, transparent 74%)',
+        zIndex: 0, pointerEvents: 'none'
+      }} />
+      {/* м'яке сонячне сяйво за героєм */}
+      <div style={{
+        position: 'absolute', top: '34%', left: '50%', transform: 'translate(-50%,-50%)',
+        width: '320px', height: '320px', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255,213,90,0.35) 0%, rgba(255,213,90,0) 65%)',
+        zIndex: 0, pointerEvents: 'none'
+      }} />
       {/* Decorative floating background elements */}
       <div style={{
         position: 'absolute',
@@ -76,42 +89,15 @@ export default function Welcome() {
         margin: '24px 0',
         zIndex: 1
       }}>
-        {/* Animated 3D Mascot Frame */}
+        {/* Hero creature */}
         <div style={{
-          width: '180px',
-          height: '180px',
-          background: '#FFEAA7',
-          borderRadius: 'var(--border-radius-lg)',
-          border: 'var(--border-width) solid var(--border-color)',
-          boxShadow: 'var(--shadow-3d-md)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: '90px',
+          width: '230px',
+          height: '230px',
           position: 'relative',
-          transform: 'rotate(-4deg)',
           animation: 'float 6s ease-in-out infinite',
-          cursor: 'pointer'
+          filter: 'drop-shadow(0 16px 20px rgba(31,27,58,0.25))'
         }}>
-          🐼
-          <div style={{
-            position: 'absolute',
-            bottom: '-12px',
-            right: '-12px',
-            background: 'var(--secondary)',
-            color: '#fff',
-            border: '3px solid var(--border-color)',
-            borderRadius: '50%',
-            width: '44px',
-            height: '44px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontSize: '22px',
-            boxShadow: '0 3px 0 var(--border-color)'
-          }}>
-            ✏️
-          </div>
+          <img src="/creatures/hero_dragon.png" alt="Друг-помічник" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
       </div>
 
