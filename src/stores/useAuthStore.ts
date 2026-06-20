@@ -44,10 +44,17 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signInWithGoogle: async () => {
     set({ loading: true, error: null });
+    // На localhost лишаємо поточний origin (dev), у проді — завжди канонічний
+    // домен, щоб вхід зі старих/будь-яких URL не падав на 404 після OAuth.
+    const origin = window.location.origin;
+    const isLocalDev = origin.includes('localhost') || origin.includes('127.0.0.1');
+    const redirectTo = isLocalDev
+      ? origin + '/onboarding'
+      : 'https://shkolyaryk.kuznya.studio/onboarding';
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/onboarding'
+        redirectTo
       }
     });
     if (error) {
