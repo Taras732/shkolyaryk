@@ -1,0 +1,101 @@
+:root {
+  /* Cosmic Purple Theme Tokens */
+  --primary: #6C5CE7;
+  --primary-light: #8A7BFF;
+  --primary-dark: #5142B3;
+  --secondary: #FF6EC7;
+  --secondary-light: #FF9BDB;
+  --secondary-dark: #CC4B9C;
+  --accent: #FFD93D;
+  --accent-light: #FFE570;
+  --accent-dark: #CCA50C;
+  
+  --bg-start: #DFE6FF;
+  --bg-end: #F7E6FF;
+  --text-dark: #1F1B3A;
+  --text-light: #FFFFFF;
+  --text-muted: #6B6885;
+  
+  --surface-card: #FFFFFF;
+  --surface-soft: #F4F2FF;
+  --surface-overlay: rgba(255, 255, 255, 0.8);
+  
+  --border-radius-sm: 12px;
+  --border-radius-md: 20px;
+  --border-radius-lg: 32px;
+  --border-radius-full: 9999px;
+  
+  --shadow-sm: 0 4px 6px -1px rgba(108, 92, 231, 0.1), 0 2px 4px -1px rgba(108, 92, 231, 0.06);
+  --shadow-md: 0 10px 15px -3px rgba(108, 92, 231, 0.15), 0 4px 6px -2px rgba(108, 92, 231, 0.1);
+  --shadow-lg: 0 20px 25px -5px rgba(108, 92, 231, 0.2), 0 10px 10px -5px rgba(108, 92, 231, 0.1);
+  --shadow-neon: 0 0 15px rgba(108, 92, 231, 0.4);
+  
+  --font-display: 'Unbounded', system-ui, -apple-system, sans-serif;
+  --font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-dark);
+  background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Ensure nice scrolling on touch screens */
+html {
+  height: -webkit-fill-available;
+  scroll-behavior: smooth;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+/* Responsive Mobile Container Mockup (for Desktop testing) */
+.app-container {
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+  min-height: 800px;
+  max-height: 920px;
+  background: var(--surface-card);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 8px solid var(--text-dark);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 480px) {
+  #root {
+    padding: 0;
+  }
+  .app-container {
+    max-width: 100%;
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
+}
