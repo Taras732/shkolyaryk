@@ -128,7 +128,7 @@ export default function RootLayout() {
     const segs = segments as unknown as string[];
     const first = segs[0] ?? '';
 
-    if (first === 'splash' || first === 'welcome' || first === 'language' || first === 'phone-home') return;
+    if (first === 'splash' || first === 'welcome' || first === 'language' || first === 'phone-home' || first === 'privacy' || first === 'terms') return;
 
     if (isLoading || !onboardingHydrated) return;
 
@@ -174,6 +174,8 @@ export default function RootLayout() {
           <Stack.Screen name="(main)" />
           <Stack.Screen name="(parent)" />
           <Stack.Screen name="phone-home" />
+          <Stack.Screen name="privacy" />
+          <Stack.Screen name="terms" />
         </Stack>
         <StatusBar style="auto" />
       </SafeAreaProvider>
