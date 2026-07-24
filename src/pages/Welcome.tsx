@@ -27,32 +27,6 @@ export default function Welcome() {
         background: 'radial-gradient(circle, rgba(255,213,90,0.35) 0%, rgba(255,213,90,0) 65%)',
         zIndex: 0, pointerEvents: 'none'
       }} />
-      {/* Decorative floating background elements */}
-      <div style={{
-        position: 'absolute',
-        top: '10%',
-        left: '8%',
-        fontSize: '28px',
-        opacity: 0.25,
-        animation: 'float 4s ease-in-out infinite'
-      }}>➕</div>
-      <div style={{
-        position: 'absolute',
-        top: '25%',
-        right: '10%',
-        fontSize: '32px',
-        opacity: 0.25,
-        animation: 'float 5s ease-in-out infinite 1s'
-      }}>➗</div>
-      <div style={{
-        position: 'absolute',
-        bottom: '30%',
-        left: '12%',
-        fontSize: '24px',
-        opacity: 0.25,
-        animation: 'float 4.5s ease-in-out infinite 0.5s'
-      }}>✖️</div>
-
       {/* Header */}
       <div style={{ textAlign: 'center', marginTop: '16px', zIndex: 1 }}>
         <span style={{
@@ -62,10 +36,10 @@ export default function Welcome() {
           textTransform: 'uppercase',
           letterSpacing: '2px',
           fontFamily: 'var(--font-display)',
-          background: 'rgba(108, 92, 231, 0.1)',
+          background: 'rgba(124, 58, 237, 0.1)',
           padding: '6px 12px',
           borderRadius: 'var(--border-radius-full)',
-          border: '2px solid rgba(108, 92, 231, 0.2)'
+          border: '2px solid rgba(124, 58, 237, 0.2)'
         }}>
           Розвивальний Простір
         </span>
@@ -123,7 +97,7 @@ export default function Welcome() {
           }}
           onClick={() => navigate('/auth')}
         >
-          Увійти та грати! 🚀
+          Увійти та грати!
         </button>
       </div>
     </div>

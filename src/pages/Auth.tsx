@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Sparkles, AlertTriangle, Globe, UserRound, KeyRound } from 'lucide-react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { isSupabaseConfigured } from '@/utils/supabase';
 
@@ -65,17 +66,17 @@ export default function Auth() {
       {/* Top Header */}
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button 
+          <button
             onClick={() => navigate('/')}
             style={{
               background: 'none',
               border: 'none',
-              fontSize: '24px',
+              display: 'flex',
               cursor: 'pointer',
               color: 'var(--text-dark)'
             }}
           >
-            ←
+            <ArrowLeft size={22} strokeWidth={2} />
           </button>
           <span className="font-display" style={{ fontSize: '12px', color: 'var(--primary-dark)' }}>
             Школярик
@@ -85,7 +86,9 @@ export default function Auth() {
 
         {/* Mascot Centerpiece */}
         <div style={{ textAlign: 'center', marginTop: '16px' }}>
-          <span style={{ fontSize: '56px', display: 'inline-block', animation: 'float 5s ease-in-out infinite' }}>🐼</span>
+          <span style={{ display: 'inline-flex', animation: 'float 5s ease-in-out infinite', color: 'var(--primary)' }}>
+            <Sparkles size={48} strokeWidth={1.5} />
+          </span>
           <h2 className="font-display" style={{
             fontSize: '20px',
             color: 'var(--text-dark)',
@@ -146,9 +149,13 @@ export default function Auth() {
               fontSize: '12px',
               fontWeight: '800',
               lineHeight: '1.4',
-              boxShadow: '0 3px 0 var(--border-color)'
+              boxShadow: '0 3px 0 var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}>
-              ⚠️ {localError || error}
+              <AlertTriangle size={16} strokeWidth={2} style={{ flexShrink: 0 }} />
+              <span>{localError || error}</span>
             </div>
           )}
 
@@ -156,7 +163,7 @@ export default function Auth() {
           {infoMsg && (
             <div style={{
               background: '#E9FBEF',
-              border: '3px solid #22C55E',
+              border: '3px solid var(--c-green)',
               color: '#15803D',
               padding: '12px',
               borderRadius: 'var(--border-radius-sm)',
@@ -176,7 +183,7 @@ export default function Auth() {
             className="btn-clay"
             style={{ width: '100%', marginTop: '8px' }}
           >
-            {loading ? 'Завантаження...' : isRegister ? 'Зареєструватися ✨' : 'Увійти в акаунт 🔑'}
+            {loading ? 'Завантаження...' : isRegister ? (<><Sparkles size={16} strokeWidth={2} /> Зареєструватися</>) : (<><KeyRound size={16} strokeWidth={2} /> Увійти в акаунт</>)}
           </button>
         </form>
 
@@ -205,7 +212,7 @@ export default function Auth() {
             className="btn-clay secondary"
             style={{ width: '100%' }}
           >
-            <span style={{ fontSize: '18px' }}>🌐</span> Увійти через Google
+            <Globe size={18} strokeWidth={1.75} /> Увійти через Google
           </button>
 
           {/* Guest Auth — явний анонімний вхід (прогрес пишеться в БД без реєстрації) */}
@@ -216,7 +223,7 @@ export default function Auth() {
             className="btn-clay accent"
             style={{ width: '100%', marginTop: '8px' }}
           >
-            🐣 Продовжити як Гість
+            <UserRound size={18} strokeWidth={1.75} /> Продовжити як Гість
           </button>
         </div>
       </div>

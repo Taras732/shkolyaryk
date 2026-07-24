@@ -15,6 +15,24 @@ import { CLASS_META } from '@/games/types';
 import type { WeeklyReport as WeeklyReportData } from '@/school/report-core';
 import WeeklyReportCard from '@/components/WeeklyReport';
 import type { Attempt, DailyPlan, DailyPlanItem, OfflineTask, Skill, SkillMastery, SkillPrerequisite } from '@/school/types';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronRight,
+  User,
+  BarChart3,
+  Calendar,
+  Trash2,
+  Flame,
+  Star,
+  Target,
+  Lightbulb,
+  Hourglass,
+  CheckCircle2,
+  RefreshCw,
+  Gamepad2,
+  AlertTriangle,
+} from 'lucide-react';
 
 export default function ParentDashboard() {
   const navigate = useNavigate();
@@ -158,14 +176,15 @@ export default function ParentDashboard() {
           <div className="pd-topbar">
             <div className="pd-topbar-left">
               <button className="pd-back" onClick={() => navigate('/onboarding')} aria-label="Назад">
-                ←
+                <ArrowLeft size={18} strokeWidth={2} />
               </button>
-              <span className="font-display" style={{ fontSize: '15px', color: 'var(--text-dark)' }}>
-                КАБІНЕТ БАТЬКІВ 📊
+              <span className="font-display" style={{ fontSize: '15px', color: 'var(--text-dark)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <BarChart3 size={18} strokeWidth={2} style={{ color: 'var(--primary)' }} />
+                КАБІНЕТ БАТЬКІВ
               </span>
             </div>
             <div className="pd-account">
-              <span>👤</span>
+              <User size={16} strokeWidth={2} style={{ flexShrink: 0 }} />
               <span className="pd-account-email">{user ? user.email : 'Гість (Офлайн-режим)'}</span>
             </div>
           </div>
@@ -211,14 +230,22 @@ export default function ParentDashboard() {
                     style={{
                       padding: '16px 18px',
                       marginBottom: '12px',
-                      background: insight.kind === 'prerequisite-gap' ? '#FFF7E6' : 'var(--c-primary-soft, #EEEBFF)',
+                      background: insight.kind === 'prerequisite-gap' ? '#FFF7E6' : 'var(--c-primary-soft)',
                       border: `1px solid ${insight.kind === 'prerequisite-gap' ? '#FCEFC7' : '#DAD3FF'}`,
                     }}
                   >
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                      <span style={{ fontSize: '20px', flexShrink: 0, lineHeight: 1.2 }}>
-                        {insight.kind === 'prerequisite-gap' ? '🎯' : insight.kind === 'struggling-skill' ? '💡' : insight.kind === 'not-enough-data' ? '⏳' : '✅'}
-                      </span>
+                      {(() => {
+                        const InsightIcon =
+                          insight.kind === 'prerequisite-gap'
+                            ? Target
+                            : insight.kind === 'struggling-skill'
+                              ? Lightbulb
+                              : insight.kind === 'not-enough-data'
+                                ? Hourglass
+                                : CheckCircle2;
+                        return <InsightIcon size={20} strokeWidth={2} style={{ flexShrink: 0, color: 'var(--primary)' }} />;
+                      })()}
                       <div style={{ minWidth: 0 }}>
                         <div className="font-display" style={{ fontSize: '14px', color: 'var(--text-dark)', marginBottom: '4px' }}>
                           {insight.title}
@@ -233,17 +260,18 @@ export default function ParentDashboard() {
                       <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         {insight.actions.map((a, i) => (
                           <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                            <span style={{ fontSize: '12px', color: 'var(--text-muted)', flexShrink: 0 }}>→</span>
+                            <ArrowRight size={13} strokeWidth={2} style={{ flexShrink: 0, color: 'var(--text-muted)' }} />
                             <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-dark)', flex: 1, minWidth: 0 }}>
                               {a.label}
                             </span>
                             {a.gameId && (
                               <button
                                 className="pd-profile-tab"
-                                style={{ flexShrink: 0, fontSize: '11px', padding: '4px 10px' }}
+                                style={{ flexShrink: 0, fontSize: '11px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                                 onClick={() => navigate(`/game/${a.gameId}`)}
                               >
-                                Відкрити ▶
+                                Відкрити
+                                <ChevronRight size={13} strokeWidth={2} />
                               </button>
                             )}
                           </div>
@@ -259,7 +287,10 @@ export default function ParentDashboard() {
                       className="card-clay"
                       style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                     >
-                      <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-dark)' }}>🔥 Серія днів поспіль</div>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Flame size={16} strokeWidth={2} style={{ color: 'var(--c-orange)' }} />
+                        Серія днів поспіль
+                      </div>
                       <div className="font-display" style={{ fontSize: '18px', color: 'var(--primary)' }}>
                         {streak}
                       </div>
@@ -344,7 +375,10 @@ export default function ParentDashboard() {
                 {!progressLoading && !progressError && weekly && <WeeklyReportCard report={weekly} />}
 
                 <div>
-                  <div className="font-display pd-section-title">ПЛАН НА СЬОГОДНІ 🗓️</div>
+                  <div className="font-display pd-section-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Calendar size={14} strokeWidth={2} />
+                    ПЛАН НА СЬОГОДНІ
+                  </div>
 
                   {!todayPlan ? (
                     <div className="card-clay" style={{ padding: '16px', textAlign: 'center' }}>
@@ -391,12 +425,17 @@ export default function ParentDashboard() {
                                 className="card-clay"
                                 style={{ padding: '12px 16px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}
                               >
-                                <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-dark)', minWidth: 0 }}>
-                                  {it.kind === 'review' ? '🔁 ' : '🎮 '}
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-dark)', minWidth: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  {it.kind === 'review' ? (
+                                    <RefreshCw size={14} strokeWidth={2} style={{ flexShrink: 0, color: 'var(--text-muted)' }} />
+                                  ) : (
+                                    <Gamepad2 size={14} strokeWidth={2} style={{ flexShrink: 0, color: 'var(--text-muted)' }} />
+                                  )}
                                   {game?.title ?? 'Гра'}
                                 </div>
-                                <div style={{ fontSize: '12px', fontWeight: 800, flexShrink: 0, color: done ? 'var(--success-dark)' : 'var(--text-muted)' }}>
-                                  {done ? '✅ зроблено' : 'очікує'}
+                                <div style={{ fontSize: '12px', fontWeight: 800, flexShrink: 0, color: done ? 'var(--success-dark)' : 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  {done && <CheckCircle2 size={14} strokeWidth={2} />}
+                                  {done ? 'зроблено' : 'очікує'}
                                 </div>
                               </div>
                             );
@@ -423,7 +462,10 @@ export default function ParentDashboard() {
                                   )}
                                 </div>
                                 {done ? (
-                                  <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--success-dark)', flexShrink: 0 }}>✅ зроблено</div>
+                                  <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--success-dark)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <CheckCircle2 size={14} strokeWidth={2} />
+                                    зроблено
+                                  </div>
                                 ) : (
                                   <button
                                     className="btn-clay"
@@ -467,8 +509,10 @@ export default function ParentDashboard() {
                     <div style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-dark)', overflowWrap: 'anywhere' }}>
                       {p.nickname}
                     </div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: '600' }}>
-                      {CLASS_META[profileClass(p)].short} · ⭐ {p.total_stars} зірочок
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                      <span>{CLASS_META[profileClass(p)].short} ·</span>
+                      <Star size={12} strokeWidth={2} style={{ color: 'var(--c-gold)', flexShrink: 0 }} fill="var(--c-gold)" />
+                      {p.total_stars} зірочок
                     </div>
                   </div>
 
@@ -491,8 +535,9 @@ export default function ParentDashboard() {
                       alignItems: 'center',
                       boxShadow: '0 2px 0 var(--border-color)',
                     }}
+                    aria-label="Видалити профіль"
                   >
-                    🗑️
+                    <Trash2 size={16} strokeWidth={2} />
                   </button>
                 </div>
               ))}
@@ -580,13 +625,13 @@ export default function ParentDashboard() {
           padding: '24px',
         }}>
           <div className="card-clay" style={{
-            background: '#fff',
+            background: 'var(--surface-card)',
             padding: '24px 20px',
             width: '100%',
             maxWidth: '400px',
             textAlign: 'center',
           }}>
-            <span style={{ fontSize: '36px' }}>⚠️</span>
+            <AlertTriangle size={36} strokeWidth={1.75} style={{ color: 'var(--secondary-dark)' }} />
 
             <h3 className="font-display" style={{
               fontSize: '15px',

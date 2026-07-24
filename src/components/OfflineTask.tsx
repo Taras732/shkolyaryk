@@ -1,3 +1,4 @@
+import { Printer, Clock, Users, AlertTriangle, CheckCircle2, Lightbulb } from 'lucide-react';
 import { describeOfflineTask } from '../school/offline-core';
 import type { DailyPlanItemStatus, OfflineTask } from '../school/types';
 
@@ -34,14 +35,18 @@ export default function OfflineTaskCard({ task, status, onDone }: OfflineTaskPro
             style={{
               flexShrink: 0,
               background: 'var(--c-green)',
-              color: '#fff',
+              color: 'var(--text-light)',
               fontWeight: 800,
               fontSize: 12,
               borderRadius: 999,
               padding: '4px 10px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
             }}
           >
-            Зроблено ✅
+            <CheckCircle2 size={13} strokeWidth={2} />
+            Зроблено
           </span>
         )}
       </div>
@@ -76,18 +81,27 @@ export default function OfflineTaskCard({ task, status, onDone }: OfflineTaskPro
           href={view.printUrl}
           target="_blank"
           rel="noreferrer"
-          style={{ display: 'inline-block', fontSize: 13, fontWeight: 700, color: 'var(--c-primary)', marginBottom: 12 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: 'var(--c-primary)', marginBottom: 12 }}
         >
-          🖨️ Відкрити для друку
+          <Printer size={15} strokeWidth={2} />
+          Відкрити для друку
         </a>
       )}
 
       {(view.estimatedMinutes != null || view.adultHelp) && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
           {view.estimatedMinutes != null && (
-            <span className="g-diffbadge">⏱ ~{view.estimatedMinutes} хв</span>
+            <span className="g-diffbadge" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Clock size={13} strokeWidth={2} />
+              ~{view.estimatedMinutes} хв
+            </span>
           )}
-          {view.adultHelp && <span className="g-diffbadge">👪 {ADULT_HELP_LABEL[view.adultHelp]}</span>}
+          {view.adultHelp && (
+            <span className="g-diffbadge" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Users size={13} strokeWidth={2} />
+              {ADULT_HELP_LABEL[view.adultHelp]}
+            </span>
+          )}
         </div>
       )}
 
@@ -102,9 +116,13 @@ export default function OfflineTaskCard({ task, status, onDone }: OfflineTaskPro
             fontWeight: 600,
             color: '#8A5A00',
             marginBottom: 12,
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 6,
           }}
         >
-          ⚠️ {view.safetyNote}
+          <AlertTriangle size={16} strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
+          {view.safetyNote}
         </div>
       )}
 
@@ -112,12 +130,17 @@ export default function OfflineTaskCard({ task, status, onDone }: OfflineTaskPro
         className={`g-btn ${isDone ? 'soft' : 'primary'}`}
         disabled={isDone}
         onClick={onDone}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
       >
-        {isDone ? 'Зроблено ✅' : 'Зробив офлайн ✅'}
+        <CheckCircle2 size={16} strokeWidth={2} />
+        {isDone ? 'Зроблено' : 'Зробив офлайн'}
       </button>
 
       {view.tip && (
-        <p style={{ marginTop: 10, fontSize: 12.5, color: 'var(--c-mut)', fontWeight: 600 }}>💡 {view.tip}</p>
+        <p style={{ marginTop: 10, fontSize: 12.5, color: 'var(--c-mut)', fontWeight: 600, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+          <Lightbulb size={14} strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
+          {view.tip}
+        </p>
       )}
     </div>
   );

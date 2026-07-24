@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GraduationCap, Home, Trophy, Star, Flame, Target, CalendarDays, Settings, Repeat, Play, Lock } from 'lucide-react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { gamesForClass, getGame, profileClass, SUBJECT_META, SUBJECT_ORDER } from '@/games/registry';
@@ -69,8 +70,18 @@ export default function Hub() {
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const goHome = () => { setView('home'); };
 
-  const StarsPill = () => (<div className="pill gold">⭐ {activeProfile.total_stars}</div>);
-  const FirePill = () => (<div className="pill fire">🔥 {activity.streak}</div>);
+  const StarsPill = () => (
+    <div className="pill gold">
+      <Star size={14} strokeWidth={1.75} fill="currentColor" />
+      <span style={{ fontVariantNumeric: 'tabular-nums' }}>{activeProfile.total_stars}</span>
+    </div>
+  );
+  const FirePill = () => (
+    <div className="pill fire">
+      <Flame size={14} strokeWidth={1.75} />
+      <span style={{ fontVariantNumeric: 'tabular-nums' }}>{activity.streak}</span>
+    </div>
+  );
   const Avatar = ({ size = 46 }: { size?: number }) => (
     <div className="hub-avatar" style={{ width: size, height: size }}>
       {avatarImg && <img src={avatarImg} alt="" />}
@@ -110,7 +121,10 @@ export default function Hub() {
         <div className="bar"><span style={{ width: `${Math.max(6, pct)}%`, background: 'var(--c-primary)' }} /></div>
         <div className="prog">
           <span>{DIFFICULTY_LABEL[unlocked]}</span>
-          <span>{stars}/3 ⭐</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{stars}/3</span>
+            <Star size={12} strokeWidth={1.75} />
+          </span>
         </div>
       </div>
     );
@@ -122,16 +136,16 @@ export default function Hub() {
     <div className="hub">
       {/* Сайдбар */}
       <aside className="hub-side">
-        <div className="hub-logo"><div className="mark">🐲</div><b>Школярик</b></div>
+        <div className="hub-logo"><div className="mark"><GraduationCap size={20} strokeWidth={2} color="#fff" /></div><b>Школярик</b></div>
         <nav className="hub-nav">
-          <button className={view === 'home' ? 'active' : ''} onClick={goHome}><span className="i">🏠</span> Головна</button>
+          <button className={view === 'home' ? 'active' : ''} onClick={goHome}><span className="i"><Home size={18} strokeWidth={1.75} /></span> Головна</button>
           {view === 'home' && subjects.map((s) => (
             <button key={s} onClick={() => scrollTo(`subj-${s}`)}><span className="i">{SUBJECT_META[s].emoji}</span> {SUBJECT_META[s].title}</button>
           ))}
-          <button className={view === 'awards' ? 'active' : ''} onClick={() => setView('awards')}><span className="i">🏆</span> Нагороди</button>
+          <button className={view === 'awards' ? 'active' : ''} onClick={() => setView('awards')}><span className="i"><Trophy size={18} strokeWidth={1.75} /></span> Нагороди</button>
         </nav>
         <div className="hub-spacer" />
-        <button className="hub-parent" onClick={() => navigate('/parent')}>⚙ Кабінет батьків</button>
+        <button className="hub-parent" onClick={() => navigate('/parent')}><Settings size={16} strokeWidth={1.75} /> Кабінет батьків</button>
       </aside>
 
       {/* Основна колонка */}
@@ -156,7 +170,7 @@ export default function Hub() {
             </div>
             <div className="hub-topright">
               <FirePill /><StarsPill /><Avatar />
-              <button onClick={() => navigate('/onboarding')} className="g-iconbtn" title="Змінити профіль" aria-label="Змінити профіль">⇄</button>
+              <button onClick={() => navigate('/onboarding')} className="g-iconbtn" title="Змінити профіль" aria-label="Змінити профіль"><Repeat size={16} strokeWidth={1.75} /></button>
             </div>
           </div>
 
@@ -167,7 +181,7 @@ export default function Hub() {
                 <div className="badges">
                   {badges.map((b) => (
                     <div key={b.label} className={`badge${b.ok ? '' : ' lock'}`}>
-                      <span>{b.ok ? b.emo : '🔒'}</span>
+                      <span>{b.ok ? b.emo : <Lock size={22} strokeWidth={1.75} />}</span>
                       <small>{b.label}</small>
                     </div>
                   ))}
@@ -184,7 +198,7 @@ export default function Hub() {
                     <div className="tag">Продовжити навчання</div>
                     <h2>{lastGame.title}</h2>
                     <p>{lastGame.description}</p>
-                    <button className="btn" onClick={() => navigate(`/game/${lastGame.id}`)}>▶ Продовжити</button>
+                    <button className="btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={() => navigate(`/game/${lastGame.id}`)}><Play size={16} strokeWidth={2} fill="currentColor" /> Продовжити</button>
                   </div>
                   <div className="heroimg"><img src={avatarImg || HERO_IMG} alt="" /></div>
                 </div>
@@ -207,8 +221,8 @@ export default function Hub() {
 
                 {/* права колонка */}
                 <div className="rcol">
-                  <div className="panel" style={{ background: 'var(--c-primary-soft)', border: '1px solid #D9D2FF' }}>
-                    <h3 style={{ color: 'var(--c-primary)' }}>🗓️ Мій день</h3>
+                  <div className="panel" style={{ background: 'var(--c-primary-soft)', border: '1px solid var(--c-line)' }}>
+                    <h3 style={{ color: 'var(--c-primary)', display: 'flex', alignItems: 'center', gap: 8 }}><CalendarDays size={18} strokeWidth={1.75} /> Мій день</h3>
                     <p style={{ color: 'var(--c-mut)', fontWeight: 600, fontSize: 13, margin: '0 0 14px' }}>
                       План завдань на сьогодні — ігри й повторення.
                     </p>
@@ -218,8 +232,8 @@ export default function Hub() {
                   </div>
 
                   {!placementDone && (
-                    <div className="panel" style={{ background: 'var(--c-primary-soft)', border: '1px solid #D9D2FF' }}>
-                      <h3 style={{ color: 'var(--c-primary)' }}>🎯 Визначити рівень</h3>
+                    <div className="panel" style={{ background: 'var(--c-primary-soft)', border: '1px solid var(--c-line)' }}>
+                      <h3 style={{ color: 'var(--c-primary)', display: 'flex', alignItems: 'center', gap: 8 }}><Target size={18} strokeWidth={1.75} /> Визначити рівень</h3>
                       <p style={{ color: 'var(--c-mut)', fontWeight: 600, fontSize: 13, margin: '0 0 14px' }}>
                         Коротка діагностика (5–8 хв) підбере завдання саме під тебе.
                       </p>
@@ -232,8 +246,8 @@ export default function Hub() {
                   <div className="panel">
                     <h3>Ціль на сьогодні</h3>
                     <div className="goal">
-                      <div className="ring" style={{ background: `conic-gradient(var(--c-green) ${goalPct}%, #EEF0F7 ${goalPct}%)` }}>
-                        <b>{activity.todayCount}/{DAILY_GOAL}</b>
+                      <div className="ring" style={{ background: `conic-gradient(var(--c-green) ${goalPct}%, var(--c-line) ${goalPct}%)` }}>
+                        <b style={{ fontVariantNumeric: 'tabular-nums' }}>{activity.todayCount}/{DAILY_GOAL}</b>
                       </div>
                       <div className="gt">
                         <b>{activity.todayCount >= DAILY_GOAL ? 'Ціль виконана! 🎉' : 'Уперед!'}</b>
@@ -259,7 +273,7 @@ export default function Hub() {
                     <div className="badges">
                       {badges.slice(0, 4).map((b) => (
                         <div key={b.label} className={`badge${b.ok ? '' : ' lock'}`}>
-                          <span>{b.ok ? b.emo : '🔒'}</span>
+                          <span>{b.ok ? b.emo : <Lock size={22} strokeWidth={1.75} />}</span>
                         </div>
                       ))}
                     </div>

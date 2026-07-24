@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { X, Lock } from 'lucide-react';
 
 interface ParentalGateProps {
   isOpen: boolean;
@@ -79,24 +80,27 @@ export default function ParentalGate({ isOpen, onClose, onSuccess }: ParentalGat
         position: 'relative'
       }}>
         {/* Close Button */}
-        <button 
+        <button
           onClick={onClose}
+          aria-label="Закрити"
           style={{
             position: 'absolute',
             top: '12px',
             right: '12px',
             background: 'none',
             border: 'none',
-            fontSize: '20px',
             cursor: 'pointer',
-            color: 'var(--text-muted)'
+            color: 'var(--text-muted)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
-          ❌
+          <X size={20} strokeWidth={2} />
         </button>
 
-        <span style={{ fontSize: '32px' }}>🔒</span>
-        
+        <Lock size={32} strokeWidth={1.75} style={{ color: 'var(--primary)' }} />
+
         <h3 style={{
           fontFamily: 'var(--font-display)',
           fontSize: '18px',
@@ -162,7 +166,7 @@ export default function ParentalGate({ isOpen, onClose, onSuccess }: ParentalGat
               fontWeight: 'bold',
               marginBottom: '12px'
             }}>
-              Неправильно! Спробуйте ще раз 🐣
+              Неправильно! Спробуйте ще раз.
             </p>
           )}
 

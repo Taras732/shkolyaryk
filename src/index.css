@@ -1,8 +1,8 @@
 :root {
-  /* Premium Cartoon / Claymorphism Design System */
-  --primary: #6C5CE7;
-  --primary-light: #A29BFE;
-  --primary-dark: #4834D4;
+  /* Design OS soft — Violet accent, tactile depth (Ф0: clay-харш похований) */
+  --primary: #7c3aed;
+  --primary-light: #a78bfa;
+  --primary-dark: #6d28d9;
   --secondary: #FF6B6B;
   --secondary-light: #FF8787;
   --secondary-dark: #E84118;
@@ -12,45 +12,54 @@
   --success: #2EC4B6;
   --success-light: #8FE9E0;
   --success-dark: #0F9F90;
-  
+
+  /* accent tints — фон hover/active (НЕ заливка) + м'який focus-glow */
+  --accent-tint: color-mix(in srgb, var(--primary) 10%, white);
+  --accent-tint-strong: color-mix(in srgb, var(--primary) 18%, white);
+  --focus-ring: color-mix(in srgb, var(--primary) 45%, transparent);
+  --accent-grad: linear-gradient(135deg, var(--primary), var(--primary-light));
+
   --bg-gradient: radial-gradient(circle at 10% 20%, rgba(223, 230, 255, 1) 0%, rgba(247, 230, 255, 1) 90.1%);
   --text-dark: #1F1B3A;
   --text-light: #FFFFFF;
   --text-muted: #7E7C9C;
-  
+
   --surface-card: #FFFFFF;
   --surface-soft: #F4F2FF;
-  
-  --border-width: 4px;
-  --border-color: #1F1B3A;
+
+  /* Ф0: товста чорна clay-рамка → тонка м'яка лінія */
+  --border-width: 1.5px;
+  --border-color: #e7e3f5;
   --border-radius-sm: 16px;
   --border-radius-md: 24px;
   --border-radius-lg: 32px;
-  
-  /* Satisfying 3D Shadows */
-  --shadow-3d-sm: 0 4px 0 var(--border-color);
-  --shadow-3d-md: 0 8px 0 var(--border-color);
-  --shadow-3d-lg: 0 12px 0 var(--border-color);
-  --shadow-inset: inset 0 -6px 0 rgba(0, 0, 0, 0.1);
-  --shadow-inset-light: inset 0 4px 0 rgba(255, 255, 255, 0.3);
 
-  /* ---- Canon design system (student-cabinet) — used by the games framework ---- */
+  /* Ф0: 3D hard-offset тіні (0 Npx 0 чорний) → м'які шаруваті Design OS тіні */
+  --shadow-3d-sm: 0 4px 12px -4px rgba(31, 33, 56, 0.14), 0 1px 3px rgba(31, 33, 56, 0.08);
+  --shadow-3d-md: 0 8px 22px -8px rgba(31, 33, 56, 0.16), 0 2px 6px rgba(31, 33, 56, 0.09);
+  --shadow-3d-lg: 0 14px 32px -10px rgba(31, 33, 56, 0.20), 0 4px 10px rgba(31, 33, 56, 0.10);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --shadow-inset-light: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  /* ---- Canon design system (student-cabinet) — used by the games framework ----
+     Узгоджено з clay-стороною тими самими значеннями (--border-color/--shadow-3d-*),
+     щоб обидві мови виглядали як ОДНА soft-система. */
   --c-bg: #F6F7FB;
   --c-card: #FFFFFF;
   --c-ink: #1F2138;
   --c-mut: #8A8FA8;
-  --c-primary: #6C5CE7;
-  --c-primary-soft: #EEEBFF;
+  --c-primary: #7c3aed;
+  --c-primary-soft: var(--accent-tint-strong);
   --c-pink: #FF6EC7;
   --c-gold: #FFC53D;
   --c-green: #22C55E;
   --c-blue: #3B9EF0;
   --c-orange: #FF9F43;
-  --c-line: #ECEDF5;
+  --c-line: var(--border-color);
   --c-r: 20px;
   --c-r-sm: 14px;
-  --c-shadow: 0 6px 24px rgba(31, 33, 56, 0.06);
-  --c-shadow-lg: 0 14px 30px rgba(108, 92, 231, 0.28);
+  --c-shadow: var(--shadow-3d-sm);
+  --c-shadow-lg: var(--shadow-3d-lg);
   --font-round: 'Nunito', 'Manrope', system-ui, sans-serif;
 }
 
@@ -137,7 +146,7 @@ body {
   background: var(--surface-card);
   border-radius: var(--border-radius-lg);
   border: var(--border-width) solid var(--border-color);
-  box-shadow: 0 16px 0 var(--border-color), 0 30px 40px rgba(31, 27, 58, 0.25);
+  box-shadow: 0 24px 48px -16px rgba(31, 27, 58, 0.30), 0 8px 20px rgba(31, 27, 58, 0.14);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -185,12 +194,12 @@ body {
 .btn-clay:hover {
   background: var(--primary-light);
   transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--border-color), var(--shadow-inset), var(--shadow-inset-light);
+  box-shadow: var(--shadow-3d-md), var(--shadow-inset), var(--shadow-inset-light);
 }
 
 .btn-clay:active {
-  transform: translateY(4px);
-  box-shadow: 0 0px 0 var(--border-color), var(--shadow-inset), var(--shadow-inset-light);
+  transform: translateY(2px);
+  box-shadow: 0 1px 3px rgba(31, 33, 56, 0.12), var(--shadow-inset), var(--shadow-inset-light);
 }
 
 .btn-clay.secondary {
@@ -220,7 +229,7 @@ body {
   color: #7F8C8D !important;
   cursor: not-allowed !important;
   transform: none !important;
-  box-shadow: 0 4px 0 var(--border-color) !important;
+  box-shadow: 0 2px 6px rgba(31, 33, 56, 0.10) !important;
 }
 
 /* Cartoonish Cards */
@@ -250,13 +259,14 @@ body {
   border: var(--border-width) solid var(--border-color);
   border-radius: var(--border-radius-sm);
   outline: none;
-  transition: border-color 0.2s, background-color 0.2s;
-  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 1px 2px rgba(31, 33, 56, 0.06);
 }
 
 .input-clay:focus {
   background: #FFFFFF;
   border-color: var(--primary);
+  box-shadow: inset 0 1px 2px rgba(31, 33, 56, 0.06), 0 0 0 3px var(--focus-ring);
 }
 
 /* Headings */
@@ -296,11 +306,11 @@ body {
   cursor: pointer;
   transition: background .15s, color .15s;
 }
-.g-iconbtn:hover { background: #F3F4FA; color: var(--c-ink); }
+.g-iconbtn:hover { background: var(--accent-tint); color: var(--c-primary); }
 
 .g-progress {
   flex: 1; height: 10px;
-  background: #EEF0F7;
+  background: var(--c-line);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -375,12 +385,12 @@ body {
 .g-choice:active:not(:disabled) { transform: translateY(0); }
 /* рамка фокуса — лише для клавіатури, не після тапу пальцем */
 .g-choice:focus { outline: none; }
-.g-choice:focus-visible { outline: 3px solid var(--c-primary); outline-offset: 2px; }
+.g-choice:focus-visible { outline: none; box-shadow: var(--c-shadow), 0 0 0 4px var(--focus-ring); }
 .g-choice:disabled { cursor: default; }
 
 /* вибір дитини */
 .g-choice.correct { background: var(--c-green); border-color: var(--c-green); color: #fff; }
-.g-choice.wrong { background: #FFE2E2; border-color: #FF6B6B; color: #C0392B; }
+.g-choice.wrong { background: #FFE2E2; border-color: var(--secondary); color: #C0392B; }
 /* підказка «ось правильна відповідь» — контурна, НЕ залита:
    візуально не читається як вибір дитини */
 .g-choice.reveal {
@@ -411,9 +421,11 @@ body {
   transition: transform .1s, filter .15s;
 }
 .g-btn:active { transform: translateY(2px); }
-.g-btn.primary { background: var(--c-primary); color: #fff; box-shadow: 0 6px 0 rgba(76,60,175,.35); }
+.g-btn.primary { background: var(--c-primary); color: #fff; box-shadow: 0 8px 20px -8px rgba(124,58,237,.45), 0 2px 6px rgba(124,58,237,.25); }
 .g-btn.primary:hover { filter: brightness(1.05); }
+.g-btn.primary:active { box-shadow: 0 2px 8px rgba(124,58,237,.30); }
 .g-btn.soft { background: var(--c-primary-soft); color: var(--c-primary); }
+.g-btn.soft:hover { background: var(--accent-tint-strong); }
 .g-btn.ghost { background: var(--c-card); color: var(--c-mut); border: 1px solid var(--c-line); box-shadow: var(--c-shadow); }
 
 .g-title { font-family: var(--font-round); font-weight: 900; letter-spacing: -.3px; }
@@ -477,9 +489,9 @@ body {
 .hub-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 0 6px; }
 .hub-logo .mark {
   width: 40px; height: 40px; border-radius: 12px;
-  background: linear-gradient(135deg, #6C5CE7, #A29BFE);
+  background: var(--accent-grad);
   display: flex; align-items: center; justify-content: center; font-size: 21px;
-  box-shadow: 0 4px 10px rgba(108,92,231,.35);
+  box-shadow: 0 4px 10px rgba(124,58,237,.35);
 }
 .hub-logo b { font-size: 20px; font-weight: 900; letter-spacing: -.5px; }
 .hub-nav { display: flex; flex-direction: column; gap: 4px; }
@@ -492,7 +504,7 @@ body {
 }
 .hub-nav button .i { font-size: 18px; width: 22px; text-align: center; }
 .hub-nav button.active { background: var(--c-primary-soft); color: var(--c-primary); }
-.hub-nav button:hover:not(.active) { background: #F3F4FA; color: var(--c-ink); }
+.hub-nav button:hover:not(.active) { background: var(--accent-tint); color: var(--c-primary); }
 .hub-spacer { flex: 1; }
 .hub-parent {
   display: flex; align-items: center; gap: 10px;
@@ -530,10 +542,10 @@ body {
 
 /* HERO «продовжити навчання» */
 .hero {
-  background: linear-gradient(120deg, #6C5CE7 0%, #8B7BF0 60%, #A29BFE 100%);
+  background: linear-gradient(120deg, #7c3aed 0%, #8b5cf6 60%, #a78bfa 100%);
   border-radius: 24px; padding: 26px 28px; color: #fff;
   display: flex; align-items: center; gap: 18px; position: relative; overflow: hidden;
-  box-shadow: 0 14px 30px rgba(108,92,231,.3); margin-bottom: 26px;
+  box-shadow: 0 14px 30px rgba(124,58,237,.3); margin-bottom: 26px;
 }
 .hero .glow { position: absolute; right: -40px; top: -50px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.18), transparent 70%); }
 .hero .txt { flex: 1; z-index: 1; }
@@ -543,9 +555,11 @@ body {
 .hero .btn {
   background: #fff; color: var(--c-primary); border: none; padding: 12px 22px;
   border-radius: 14px; font-weight: 900; font-size: 15px; cursor: pointer;
-  box-shadow: 0 6px 0 rgba(0,0,0,.12); font-family: var(--font-round);
+  box-shadow: 0 6px 16px -6px rgba(31,27,58,.35), 0 2px 6px rgba(31,27,58,.18);
+  font-family: var(--font-round);
+  transition: transform .1s, box-shadow .1s;
 }
-.hero .btn:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,.12); }
+.hero .btn:active { transform: translateY(2px); box-shadow: 0 2px 6px rgba(31,27,58,.20); }
 .hero .heroimg { width: 132px; height: 132px; flex-shrink: 0; z-index: 1; filter: drop-shadow(0 12px 16px rgba(0,0,0,.25)); }
 .hero .heroimg img { width: 100%; height: 100%; object-fit: contain; }
 
@@ -568,7 +582,7 @@ body {
 .subj-card .ico img { width: 100%; height: 100%; object-fit: cover; }
 .subj-card h4 { font-size: 15.5px; font-weight: 900; }
 .subj-card .desc { color: var(--c-mut); font-weight: 600; font-size: 12.5px; margin-top: 2px; line-height: 1.3; }
-.bar { height: 8px; background: #EEF0F7; border-radius: 99px; margin-top: 14px; overflow: hidden; }
+.bar { height: 8px; background: var(--c-line); border-radius: 99px; margin-top: 14px; overflow: hidden; }
 .bar > span { display: block; height: 100%; border-radius: 99px; }
 .prog { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--c-mut); margin-top: 8px; }
 
@@ -583,7 +597,7 @@ body {
 .goal .gt p { color: var(--c-mut); font-weight: 600; font-size: 13px; margin-top: 2px; }
 .week { display: flex; gap: 6px; justify-content: space-between; }
 .week .day { flex: 1; text-align: center; }
-.week .day .d { width: 30px; height: 30px; border-radius: 9px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; background: #EEF0F7; color: var(--c-mut); }
+.week .day .d { width: 30px; height: 30px; border-radius: 9px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; background: var(--c-line); color: var(--c-mut); }
 .week .day.on .d { background: var(--c-green); color: #fff; }
 .week .day.today .d { outline: 2px solid var(--c-primary); outline-offset: 1px; }
 .week .day small { color: var(--c-mut); font-weight: 700; font-size: 11px; }

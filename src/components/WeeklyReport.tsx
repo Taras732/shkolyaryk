@@ -1,3 +1,4 @@
+import { TrendingUp } from 'lucide-react';
 import type { WeeklyReport as WeeklyReportType } from '@/school/report-core';
 
 interface Props {
@@ -10,8 +11,9 @@ export default function WeeklyReport({ report }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       {/* Заголовок */}
-      <div className="font-display" style={{ fontSize: '11px', color: 'var(--text-dark)', marginBottom: '2px' }}>
-        ПРОГРЕС ЗА ТИЖДЕНЬ 📈
+      <div className="font-display" style={{ fontSize: '11px', color: 'var(--text-dark)', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <TrendingUp size={14} strokeWidth={2} />
+        ПРОГРЕС ЗА ТИЖДЕНЬ
       </div>
 
       {/* Активні дні */}

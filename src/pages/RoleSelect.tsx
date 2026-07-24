@@ -6,8 +6,6 @@ const ROLES = [
     emoji: '🧒',
     title: 'Я учень',
     sub: 'Грати, вчитися й рости разом із другом-помічником!',
-    color: '#EAF6FF',
-    border: '#3B9EF0',
     to: '/onboarding',
     disabled: false
   },
@@ -16,8 +14,6 @@ const ROLES = [
     emoji: '👨‍👩‍👧',
     title: 'Батьки',
     sub: 'Бачити прогрес дитини й керувати профілями.',
-    color: '#EAFBF0',
-    border: '#22C55E',
     to: '/parent',
     disabled: false
   },
@@ -26,8 +22,6 @@ const ROLES = [
     emoji: '👩‍🏫',
     title: 'Вчитель',
     sub: 'Клас, завдання та успіхи учнів — скоро!',
-    color: '#F3EEFF',
-    border: '#6C5CE7',
     to: '/parent',
     disabled: true
   }
@@ -69,9 +63,6 @@ export default function RoleSelect() {
             disabled={r.disabled}
             className="card-clay"
             style={{
-              background: r.color,
-              borderColor: r.border,
-              borderWidth: '3px',
               textAlign: 'left',
               display: 'flex',
               alignItems: 'center',
@@ -85,14 +76,13 @@ export default function RoleSelect() {
               width: '64px',
               height: '64px',
               borderRadius: '18px',
-              background: '#fff',
-              border: `3px solid ${r.border}`,
+              background: 'var(--c-primary-soft)',
+              border: '2px solid var(--c-line)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '34px',
-              flexShrink: 0,
-              boxShadow: '0 4px 0 rgba(0,0,0,0.12)'
+              flexShrink: 0
             }}>
               {r.emoji}
             </div>
