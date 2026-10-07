@@ -15,6 +15,8 @@ import { LETTERS } from '@/games/uk-letters/letters';
 import { isKnown as letterKnown, type LetterProgress } from '@/games/uk-letters/core';
 import { HOMEWORK_API, loadFamilyCode, saveFamilyCode } from '@/school/homework';
 import { fetchTodayReport, linkTelegram } from '@/school/report-sync';
+import { loadReading } from '@/games/uk-reading';
+import { readingSummary } from '@/games/uk-reading/core';
 import { claimGoal, goalProgress, loadRewards, saveRewards, setGoal, streak, type Rewards } from '@/school/rewards';
 
 const DOW = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -41,6 +43,7 @@ function Week({ child }: { child: ChildProfile }) {
   const letters = loadLetters(child.id);
   const knownLetters = LETTERS.filter((l) => letterKnown(letters[l.ch])).length;
   const hard = w.byGame.filter((g) => g.mistakes > 0).slice(0, 3);
+  const reading = readingSummary(loadReading(child.id), now - 7 * 24 * 60 * 60 * 1000);
 
   return (
     <>
@@ -90,6 +93,12 @@ function Week({ child }: { child: ChildProfile }) {
           </div>
         )}
         {knownLetters > 0 && <div>🅰️ Букви: знає {knownLetters} з {LETTERS.length}</div>}
+        {reading.texts > 0 && (
+          <div>
+            📗 Читання: текстів {reading.texts}, відповідей правильно {reading.correct} з {reading.total}
+            {reading.avgWpm !== null && <span style={{ color: 'var(--c-mut)' }}> · швидкість ~{reading.avgWpm} слів/хв</span>}
+          </div>
+        )}
         {w.games === 0 && <div style={small}>Цього тижня занять ще не було.</div>}
       </div>
     </>
