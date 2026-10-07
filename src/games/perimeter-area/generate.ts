@@ -1,4 +1,4 @@
-import type { Difficulty, GradeBand, LevelData, ProfileLevel, Round } from '../types';
+import type { ClassLevel, Difficulty, GradeBand, LevelData, ProfileLevel, Round } from '../types';
 import { gradeBandFor } from '../types';
 import { randInt, shuffle } from '../shared/ui';
 
@@ -128,8 +128,33 @@ function buildModeSequence(pool: Mode[]): Mode[] {
   return shuffle(seq);
 }
 
-export function generate(difficulty: Difficulty, level: ProfileLevel = 'L3'): LevelData<Payload, number> {
-  const { modes, shapeKind, minDim, maxDim } = BAND_CONFIG[gradeBandFor(level, difficulty)];
+/**
+ * Клас × складність (аудит 07.10): без класу другокласниця на «Середньо»
+ * отримувала площу, хоча за власним коментарем вище це тема 3 класу.
+ * 2 клас — лише периметр прямокутника; 3 — периметр → площа → обидва;
+ * 4 — складені фігури.
+ */
+export const CLASS_CONFIG: Partial<Record<ClassLevel, Record<Difficulty, BandConfig>>> = {
+  grade2: {
+    1: { modes: ['perimeter'], shapeKind: 'rectangle', minDim: 2, maxDim: 5 },
+    2: { modes: ['perimeter'], shapeKind: 'rectangle', minDim: 2, maxDim: 7 },
+    3: { modes: ['perimeter'], shapeKind: 'rectangle', minDim: 3, maxDim: 9 },
+  },
+  grade3: {
+    1: { modes: ['perimeter'], shapeKind: 'rectangle', minDim: 2, maxDim: 8 },
+    2: { modes: ['area'], shapeKind: 'rectangle', minDim: 3, maxDim: 8 },
+    3: { modes: ['perimeter', 'area'], shapeKind: 'rectangle', minDim: 3, maxDim: 9 },
+  },
+  grade4: {
+    1: { modes: ['perimeter', 'area'], shapeKind: 'rectangle', minDim: 3, maxDim: 9 },
+    2: { modes: ['perimeter', 'area'], shapeKind: 'lshape', minDim: 4, maxDim: 8 },
+    3: { modes: ['perimeter', 'area'], shapeKind: 'lshape', minDim: 5, maxDim: 10 },
+  },
+};
+
+export function generate(difficulty: Difficulty, level: ProfileLevel = 'L3', classLevel?: ClassLevel): LevelData<Payload, number> {
+  const { modes, shapeKind, minDim, maxDim } =
+    (classLevel && CLASS_CONFIG[classLevel]?.[difficulty]) || BAND_CONFIG[gradeBandFor(level, difficulty)];
   const sequence = buildModeSequence(modes);
   const rounds: Round<Payload, number>[] = sequence.map((mode, i) => {
     const { cells, width, height } = genFigure(shapeKind, minDim, maxDim);

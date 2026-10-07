@@ -59,6 +59,13 @@ interface ClassBandConfig extends BandConfig {
   min: number;
   /** Верхня межа множників для ×/÷ (множник завжди від MULT_MIN_FACTOR, див. нижче). */
   tableMax: number;
+  /**
+   * Крок округлення для +/− (аудит 07.10): тризначні «742 − 389» усно через
+   * клавіатуру — це задача на стовпчик, а не на усний рахунок; третьокласницю
+   * така гра зрізала на першому ж рівні. Усно в 3 класі — круглі сотні й десятки,
+   * повні тризначні лишаються грі «Стовпчик». Відсутнє = 1 (будь-які числа).
+   */
+  roundTo?: number;
 }
 
 /**
@@ -106,13 +113,13 @@ const CLASS_BAND: Record<ClassLevel, Record<Difficulty, ClassBandConfig>> = {
     3: { ops: ['×', '÷', '+', '−'], min: 10, max: 100, tableMax: 10 },
   },
   grade3: {
-    1: { ops: ['×', '+', '−'], min: 100, max: 1000, tableMax: 9 },
-    2: { ops: ['×', '÷', '+', '−'], min: 100, max: 1000, tableMax: 10 },
-    3: { ops: ['×', '÷', '+', '−'], min: 100, max: 1000, tableMax: 11 },
+    1: { ops: ['×', '+', '−'], min: 100, max: 1000, tableMax: 9, roundTo: 100 },
+    2: { ops: ['×', '÷', '+', '−'], min: 100, max: 1000, tableMax: 10, roundTo: 10 },
+    3: { ops: ['×', '÷', '+', '−'], min: 100, max: 1000, tableMax: 11, roundTo: 10 },
   },
   grade4: {
-    1: { ops: ['×', '÷', '+', '−'], min: 100, max: 1000, tableMax: 9 },
-    2: { ops: ['×', '÷', '+', '−'], min: 100, max: 1000, tableMax: 12 },
+    1: { ops: ['×', '÷', '+', '−'], min: 100, max: 1000, tableMax: 9, roundTo: 10 },
+    2: { ops: ['×', '÷', '+', '−'], min: 100, max: 1000, tableMax: 12, roundTo: 10 },
     3: { ops: ['×', '÷', '+', '−'], min: 100, max: 1000, tableMax: 12 },
   },
 };
@@ -131,16 +138,16 @@ export function classBandConfigFor(classLevel: ClassLevel, difficulty: Difficult
 const MULT_MIN_FACTOR = 2;
 
 /** Додавання в межах [min, max], обидва операнди >= min (без тривіальних "0 + x" і без "дрібних" чисел поза розрядом класу). */
-function genAddition(min: number, max: number): { a: number; b: number } {
-  const a = randInt(min, max - min);
-  const b = randInt(min, max - a);
+function genAddition(min: number, max: number, r = 1): { a: number; b: number } {
+  const a = r * randInt(Math.ceil(min / r), Math.floor((max - min) / r));
+  const b = r * randInt(Math.ceil(min / r), Math.floor((max - a) / r));
   return { a, b };
 }
 
 /** Віднімання в межах [min, max], результат завжди >= 1 (без "x - 0" / "x - x", без чисел поза розрядом класу). */
-function genSubtraction(min: number, max: number): { a: number; b: number } {
-  const a = randInt(min + 1, max);
-  const b = randInt(min, a - 1);
+function genSubtraction(min: number, max: number, r = 1): { a: number; b: number } {
+  const a = r * randInt(Math.ceil((min + r) / r), Math.floor(max / r));
+  const b = r * randInt(Math.ceil(min / r), Math.floor((a - r) / r));
   return { a, b };
 }
 
@@ -169,7 +176,7 @@ function buildOpSequence(pool: Op[]): Op[] {
   return shuffle(seq);
 }
 
-function genPair(op: Op, min: number, max: number, tableMax: number): { a: number; b: number; correct: number } {
+function genPair(op: Op, min: number, max: number, tableMax: number, r = 1): { a: number; b: number; correct: number } {
   if (op === '×') {
     const { a, b } = genMultiplication(tableMax);
     return { a, b, correct: a * b };
@@ -179,10 +186,10 @@ function genPair(op: Op, min: number, max: number, tableMax: number): { a: numbe
     return { a, b, correct: a / b };
   }
   if (op === '+') {
-    const { a, b } = genAddition(min, max);
+    const { a, b } = genAddition(min, max, r);
     return { a, b, correct: a + b };
   }
-  const { a, b } = genSubtraction(min, max);
+  const { a, b } = genSubtraction(min, max, r);
   return { a, b, correct: a - b };
 }
 
@@ -194,12 +201,12 @@ export function generate(
   // Fallback (без classLevel, G2b): min=1 зберігає стару поведінку профільного
   // TRACK_BY_LEVEL один-в-один — цей шлях мертвий у проді (GameShell завжди
   // передає classLevel), тримається лише заради зворотної сумісності API/тестів.
-  const { ops: pool, min, max, tableMax } = classLevel
+  const { ops: pool, min, max, tableMax, roundTo } = classLevel
     ? classBandConfigFor(classLevel, difficulty)
-    : { ...bandConfigFor(level, difficulty), min: 1, tableMax: 10 };
+    : { ...bandConfigFor(level, difficulty), min: 1, tableMax: 10, roundTo: 1 };
   const sequence = buildOpSequence(pool);
   const rounds: Round<Payload, number>[] = sequence.map((op, i) => {
-    const { a, b, correct } = genPair(op, min, max, tableMax);
+    const { a, b, correct } = genPair(op, min, max, tableMax, roundTo ?? 1);
     return { id: `r${i}`, payload: { a, b, op, correct }, answer: correct };
   });
   return { difficulty, rounds };

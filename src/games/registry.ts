@@ -133,6 +133,8 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'magic-square': ['grade3', 'grade4'],
   // розгортки куба — просторова тема 3–4 класу
   'cube-net': ['grade3', 'grade4'],
+  // пари «однакові / сума 10» — рахунок першого десятка; для 3–4 класу запросто (аудит 07.10)
+  'number-tiles': ['grade1', 'grade2'],
   // мова/світ для старших
   'reading-speed': ['grade2', 'grade3', 'grade4'],
   'grammar-parts': ['grade2', 'grade3', 'grade4'],

@@ -321,3 +321,19 @@ describe('math-examples: generate — класовий масштаб (G2b, clas
     }
   });
 });
+
+describe('math-examples: усно в 3 класі — круглі числа (аудит 07.10)', () => {
+  it('grade3 diff1: +/− лише круглі сотні; diff2-3 — круглі десятки', () => {
+    for (const [d, r] of [[1, 100], [2, 10], [3, 10]] as const) {
+      for (let i = 0; i < 50; i++) {
+        for (const { payload } of generate(d, 'L3', 'grade3').rounds) {
+          if (payload.op === '+' || payload.op === '−') {
+            expect(payload.a % r).toBe(0);
+            expect(payload.b % r).toBe(0);
+            expect(payload.correct).toBeGreaterThan(0);
+          }
+        }
+      }
+    }
+  });
+});

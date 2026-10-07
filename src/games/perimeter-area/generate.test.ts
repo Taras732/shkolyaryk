@@ -260,3 +260,13 @@ describe('perimeter-area: граничні розміри (maxDim=8 для BAND_
     expect(tested.length).toBeGreaterThan(100);
   });
 });
+
+describe('perimeter-area: клас (аудит 07.10)', () => {
+  it('2 клас ніколи не отримує площу', () => {
+    for (const d of [1, 2, 3] as const) {
+      for (let i = 0; i < 30; i++) {
+        for (const r of generate(d, 'L3', 'grade2').rounds) expect(r.payload.mode).toBe('perimeter');
+      }
+    }
+  });
+});
