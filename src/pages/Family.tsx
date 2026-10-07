@@ -6,6 +6,7 @@ import ParentalGate from '@/components/ParentalGate';
 import { gamesForClass, getGame, profileClass } from '@/games/registry';
 import { CLASS_META } from '@/games/types';
 import { smartPlanFor } from '@/school/plan-resolve';
+import { AREA_TITLE, loadChecks, type Area } from '@/school/monthly-check';
 import { MAX_STEPS, defaultPlan, loadPlan, moveStep, savePlan, type FamilyPlan } from '@/school/family-plan';
 import { readLog, weekSummary } from '@/school/game-log';
 import { loadStats } from '@/games/times-tables/storage';
@@ -45,6 +46,7 @@ function Week({ child }: { child: ChildProfile }) {
   const letters = loadLetters(child.id);
   const knownLetters = LETTERS.filter((l) => letterKnown(letters[l.ch])).length;
   const hard = w.byGame.filter((g) => g.mistakes > 0).slice(0, 3);
+  const checks = loadChecks(child.id);
   const reading = readingSummary(loadReading(child.id), now - 7 * 24 * 60 * 60 * 1000);
 
   return (
@@ -102,6 +104,19 @@ function Week({ child }: { child: ChildProfile }) {
           </div>
         )}
         {w.games === 0 && <div style={small}>Цього тижня занять ще не було.</div>}
+        {checks.length > 0 && (
+          <div>
+            🧭 Перевірка місяця ({checks[checks.length - 1].month}):{' '}
+            {(Object.entries(checks[checks.length - 1].scores) as [Area, { c: number; t: number }][])
+              .map(([a, v]) => {
+                const pct = Math.round((v.c / v.t) * 100);
+                const was = checks.length > 1 ? checks[checks.length - 2].scores[a] : undefined;
+                const d = was ? pct - Math.round((was.c / was.t) * 100) : null;
+                return `${AREA_TITLE[a]} ${pct}%${d ? (d > 0 ? ` ▲${d}` : ` ▼${-d}`) : ''}`;
+              })
+              .join(' · ')}
+          </div>
+        )}
       </div>
     </>
   );

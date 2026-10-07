@@ -19,6 +19,7 @@ export const BLOCKS: Record<string, string> = {
   rewards: 'shk.rewards.v1.',
   log: 'shk.log.v1.',
   activity: 'shk_activity_',
+  check: 'shk.check.v1.',
 };
 
 const GUEST_PROFILES = 'shk_guest_profiles';

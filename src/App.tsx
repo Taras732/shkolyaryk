@@ -14,6 +14,7 @@ import AfterSchool from './pages/AfterSchool';
 import Homework from './pages/Homework';
 import Family from './pages/Family';
 import Sheet from './pages/Sheet';
+import Check from './pages/Check';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { runFamilySync } from '@/school/family-sync-run';
 
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="/homework" element={<WebShell><Homework /></WebShell>} />
         <Route path="/family" element={<WebShell><Family /></WebShell>} />
         <Route path="/sheet/:id" element={<WebShell><Sheet /></WebShell>} />
+        <Route path="/check" element={<WebShell><Check /></WebShell>} />
         <Route path="/game/:id" element={<WebShell><GamePlayer /></WebShell>} />
         {/* RL1 — движок «Правило» (Direct Instruction). Крок «Правило дня» у /day прийде окремо (Фаза 2). */}
         <Route path="/rule/:id" element={<WebShell><RuleLessonPlayer /></WebShell>} />

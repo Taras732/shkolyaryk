@@ -9,6 +9,7 @@ import { loadDict } from '@/games/english-words/storage';
 import { dueWords } from '@/games/english-words/core';
 import { LETTERS } from '@/games/uk-letters/letters';
 import { isKnown as letterKnown, type LetterProgress } from '@/games/uk-letters/core';
+import { AREA_GAME, weakAreas } from './monthly-check';
 
 function lettersInProgress(id: string): number {
   try {
@@ -29,7 +30,7 @@ export function smartPlanFor(child: Pick<ChildProfile, 'id' | 'age_group' | 'cla
         cl,
         new Set(gamesForClass(cl).map((g) => g.id)),
         readLog(child.id),
-        { weakFacts: weakFacts(loadStats(child.id)).length, dueWords: dueWords(loadDict(child.id), now).length, lettersInProgress: lettersInProgress(child.id) },
+        { weakFacts: weakFacts(loadStats(child.id)).length, dueWords: dueWords(loadDict(child.id), now).length, lettersInProgress: lettersInProgress(child.id), checkWeak: weakAreas(child.id).map((a) => AREA_GAME[a]) },
         now,
       ),
     now,

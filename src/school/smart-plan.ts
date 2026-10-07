@@ -50,6 +50,8 @@ export interface Signals {
   dueWords: number;
   /** Букви, відкриті, але ще не вивчені (дошкілля). */
   lettersInProgress: number;
+  /** Ігри слабких областей з перевірки місяця. */
+  checkWeak?: string[];
 }
 
 export interface PlannedStep {
@@ -86,6 +88,10 @@ export function scoreGame(id: string, log: LogEntry[], signals: Signals, now: nu
   } else if (id === 'uk-letters' && signals.lettersInProgress > 0) {
     bonus = 0.4;
     reason = 'закріпити нові букви';
+  }
+  if (!reason && signals.checkWeak?.includes(id)) {
+    bonus = 0.35;
+    reason = 'перевірка місяця показала: варто підтягнути';
   }
   if (!reason) {
     if (recent.length && errRate >= 0.5) reason = 'тут останнім часом було найбільше помилок';
