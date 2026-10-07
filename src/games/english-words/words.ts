@@ -23,6 +23,8 @@ export const TOPICS: { id: TopicId; title: string; emoji: string }[] = [
   { id: 'numbers', title: 'Числа', emoji: '🔢' },
   { id: 'actions', title: 'Дії', emoji: '🏃' },
   { id: 'body', title: 'Тіло', emoji: '✋' },
+  // слова, які дитина додала зі сторінки підручника («Що в завданні?»)
+  { id: 'mine', title: 'Зі сторінок', emoji: '📷' },
 ];
 
 const w = (topic: TopicId, rows: [string, string, string][]): Word[] => rows.map(([en, ua, emoji]) => ({ en, ua, emoji, topic }));

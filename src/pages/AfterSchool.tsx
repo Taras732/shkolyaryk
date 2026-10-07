@@ -109,6 +109,10 @@ export default function AfterSchool() {
             );
           })}
 
+          <button className="g-btn soft" onClick={() => navigate('/homework')} style={{ marginTop: 6 }}>
+            📷 Є домашка? Що в завданні?
+          </button>
+
           <div className="g-card" style={{ marginTop: 18, textAlign: 'left' }}>
             <div style={{ fontWeight: 900, fontSize: 13, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--c-mut)', marginBottom: 10 }}>
               Що зроблено сьогодні · для батьків

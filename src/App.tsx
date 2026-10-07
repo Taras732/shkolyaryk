@@ -11,6 +11,7 @@ import RuleLessonPlayer from '@/pages/RuleLessonPlayer';
 import Placement from '@/pages/Placement';
 import DayPlan from '@/pages/DayPlan';
 import AfterSchool from './pages/AfterSchool';
+import Homework from './pages/Homework';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 // Легасі-сторінки (Welcome/Auth/Onboarding/...) поки в телефонній рамці.
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="/placement" element={<WebShell><Placement /></WebShell>} />
         <Route path="/day" element={<WebShell><DayPlan /></WebShell>} />
         <Route path="/after-school" element={<WebShell><AfterSchool /></WebShell>} />
+        <Route path="/homework" element={<WebShell><Homework /></WebShell>} />
         <Route path="/game/:id" element={<WebShell><GamePlayer /></WebShell>} />
         {/* RL1 — движок «Правило» (Direct Instruction). Крок «Правило дня» у /day прийде окремо (Фаза 2). */}
         <Route path="/rule/:id" element={<WebShell><RuleLessonPlayer /></WebShell>} />

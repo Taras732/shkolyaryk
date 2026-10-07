@@ -90,7 +90,7 @@ function Home({
 
       <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--c-ink)', margin: '4px 0 8px' }}>Вчити нові слова</div>
       <div className="g-choices" style={{ ['--g-cols' as string]: 2, marginTop: 0 }}>
-        {TOPICS.map((t) => {
+        {TOPICS.filter((t) => t.id !== 'mine' || words.some((w) => w.topic === 'mine')).map((t) => {
           const left = words.filter((w) => w.topic === t.id && !dict.words[w.en]).length;
           return (
             <button key={t.id} className="g-choice" disabled={left === 0} onClick={() => onLearn(t.id)} style={{ fontSize: 15, padding: '12px 8px', opacity: left === 0 ? 0.5 : 1 }}>
