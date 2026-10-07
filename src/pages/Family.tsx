@@ -5,6 +5,7 @@ import { useProfileStore, type ChildProfile } from '@/stores/useProfileStore';
 import ParentalGate from '@/components/ParentalGate';
 import { gamesForClass, getGame, profileClass } from '@/games/registry';
 import { CLASS_META } from '@/games/types';
+import { smartPlanFor } from '@/school/plan-resolve';
 import { MAX_STEPS, defaultPlan, loadPlan, moveStep, savePlan, type FamilyPlan } from '@/school/family-plan';
 import { readLog, weekSummary } from '@/school/game-log';
 import { loadStats } from '@/games/times-tables/storage';
@@ -120,6 +121,36 @@ function PlanEditor({ child }: { child: ChildProfile }) {
   return (
     <>
       <div style={h}>Кроки «Після школи»</div>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+        {(['auto', 'manual'] as const).map((m) => (
+          <button
+            key={m}
+            className={`g-btn ${plan.mode === m ? 'primary' : 'ghost'}`}
+            style={{ padding: 8, fontSize: 13 }}
+            onClick={() =>
+              // у ручний режим переходимо з сьогоднішнього розумного плану — є від чого відштовхнутись
+              update(m === 'manual' && plan.mode === 'auto' ? { ...plan, mode: m, steps: smartPlanFor(child).map((x) => x.gameId) } : { ...plan, mode: m })
+            }
+          >
+            {m === 'auto' ? '🧠 Розумний' : '✋ Вручну'}
+          </button>
+        ))}
+      </div>
+      {plan.mode === 'auto' ? (
+        <>
+          <div style={{ ...small, marginBottom: 6 }}>Щодня сам обирає по кроку з кожного предмета: де найбільше помилок, що давно не повторювали, що «назріло».</div>
+          {smartPlanFor(child).map((st, i) => (
+            <div key={st.gameId} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderTop: i ? '1px solid var(--c-line)' : 'none' }}>
+              <span style={{ fontSize: 20 }}>{getGame(st.gameId)?.icon}</span>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: 'block', fontWeight: 800, color: 'var(--c-ink)' }}>{getGame(st.gameId)?.title ?? st.gameId}</span>
+                <span style={small}>💡 {st.reason}</span>
+              </span>
+            </div>
+          ))}
+        </>
+      ) : (
+        <>
       {plan.steps.map((id, i) => (
         <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderTop: i ? '1px solid var(--c-line)' : 'none' }}>
           <span style={{ width: 20, ...small }}>{i + 1}</span>
@@ -166,7 +197,10 @@ function PlanEditor({ child }: { child: ChildProfile }) {
         </div>
       )}
 
-      {plan.steps.includes('times-tables') && (
+        </>
+      )}
+
+      {(plan.mode === 'auto' ? cl !== 'preschool' && cl !== 'grade1' : plan.steps.includes('times-tables')) && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
           <span style={{ flex: 1, fontWeight: 700, color: 'var(--c-ink)', fontSize: 14 }}>✖️ Таблиця на цей тиждень</span>
           <select

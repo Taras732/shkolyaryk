@@ -17,10 +17,16 @@ describe('family-plan', () => {
   });
 
   it('збережений план і таблиця читаються назад; зайві кроки обрізаються', () => {
-    savePlan('p1', { steps: ['times-tables', 'english-words'], ttTable: 7 });
-    expect(loadPlan('p1', 'grade3')).toEqual({ steps: ['times-tables', 'english-words'], ttTable: 7 });
-    savePlan('p2', { steps: ['a', 'b', 'c', 'd', 'e', 'f', 'g'], ttTable: null });
+    savePlan('p1', { mode: 'manual', steps: ['times-tables', 'english-words'], ttTable: 7 });
+    expect(loadPlan('p1', 'grade3')).toEqual({ mode: 'manual', steps: ['times-tables', 'english-words'], ttTable: 7 });
+    savePlan('p2', { mode: 'manual', steps: ['a', 'b', 'c', 'd', 'e', 'f', 'g'], ttTable: null });
     expect(loadPlan('p2', 'grade3').steps).toHaveLength(MAX_STEPS);
+  });
+
+  it('без налаштування — розумний режим; старий збережений план без режиму — ручний', () => {
+    expect(loadPlan('new', 'grade2').mode).toBe('auto');
+    mem.set('shk.plan.v1.old', JSON.stringify({ steps: ['times-tables'], ttTable: null }));
+    expect(loadPlan('old', 'grade3').mode).toBe('manual');
   });
 
   it('биті дані — типовий план, не падіння', () => {

@@ -6,7 +6,7 @@ import { getGame, profileClass, profileLevel } from '@/games/registry';
 import { DIFFICULTY_LABEL, type Difficulty } from '@/games/types';
 import GameShell from '@/games/GameShell';
 import { buildDayReport, isSameDay, type LastAttempt } from '@/school/after-school';
-import { loadPlan } from '@/school/family-plan';
+import { resolvePlan } from '@/school/plan-resolve';
 import { completeDay, goalProgress, loadRewards, saveRewards, streak, type Rewards } from '@/school/rewards';
 import { loadDict } from '@/games/english-words/storage';
 import { loadStats } from '@/games/times-tables/storage';
@@ -31,7 +31,10 @@ export default function AfterSchool() {
   const now = Date.now();
   const profileId = activeProfile?.id ?? 'guest';
   // план, налаштований батьками (/family); без налаштування — типовий для класу
-  const plan = activeProfile ? loadPlan(activeProfile.id, profileClass(activeProfile)).steps : [];
+  // розумний план (або обраний батьками) з поясненням «чому» до кожного кроку
+  const planned = useMemo(() => (activeProfile ? resolvePlan(activeProfile) : []), [activeProfile]);
+  const plan = planned.map((p) => p.gameId);
+  const reasonOf = (id: string) => planned.find((p) => p.gameId === id)?.reason;
   const attempts: Record<string, LastAttempt | undefined> = useMemo(() => {
     const p = progress[profileId] ?? {};
     return Object.fromEntries(Object.entries(p).map(([id, g]) => [id, g.history as LastAttempt]));
@@ -172,6 +175,9 @@ export default function AfterSchool() {
                 <span style={{ flex: 1 }}>
                   <span style={{ display: 'block', fontSize: 12, fontWeight: 800, color: 'var(--c-mut)' }}>Крок {i + 1}</span>
                   <span style={{ fontSize: 17, fontWeight: 900, color: 'var(--c-ink)' }}>{g.title}</span>
+                  {reasonOf(id) && !done && (
+                    <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--c-mut)', marginTop: 2 }}>💡 {reasonOf(id)}</span>
+                  )}
                 </span>
                 <span style={{ fontSize: 13, fontWeight: 800, color: done ? '#15803D' : 'var(--c-primary)' }}>
                   {done ? 'Зроблено' : 'Почати →'}
