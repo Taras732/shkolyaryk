@@ -26,7 +26,7 @@ function Scales({ t, sides, setSide }: { t: ScaleTask; sides: Side[]; setSide: (
       </div>
       <div style={{ width: 6, height: 60, background: '#64748B' }} />
       <div style={{ width: 90, height: 10, borderRadius: 5, background: '#64748B' }} />
-      <div style={{ marginTop: 8, fontWeight: 900, color: diff === 0 ? '#15803D' : 'var(--c-mut)' }}>
+      <div style={{ marginTop: 8, fontWeight: 900, color: diff === 0 ? 'var(--c-ok-ink)' : 'var(--c-mut)' }}>
         {diff === 0 ? '⚖️ Рівно!' : diff > 0 ? 'Гирі важчі' : `${t.item.name[0].toUpperCase()}${t.item.name.slice(1)} важчий`}
       </div>
     </div>

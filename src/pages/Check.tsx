@@ -74,7 +74,7 @@ export default function Check() {
                       <span>
                         {v.c} з {v.t}
                         {wasPct !== null && (
-                          <span style={{ color: pct >= wasPct ? '#15803D' : '#B45309', marginLeft: 6 }}>
+                          <span style={{ color: pct >= wasPct ? 'var(--c-ok-ink)' : 'var(--c-warn-ink)', marginLeft: 6 }}>
                             {pct > wasPct ? `▲ ${pct - wasPct}%` : pct < wasPct ? `▼ ${wasPct - pct}%` : '='}
                           </span>
                         )}

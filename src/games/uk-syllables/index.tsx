@@ -10,7 +10,7 @@ interface BoardPayload {
 type Answer = typeof BOARD_DONE;
 
 const CORRECT_MS = 1000;
-const GREEN = '#15803D';
+const GREEN = 'var(--c-ok-ink)';
 
 const saySyl = (s: string) => sayUk(`s_${s}`, s.toLowerCase());
 
@@ -151,7 +151,7 @@ function Game({ quiz: initial, onMistake, onDone }: { quiz: Question[]; onMistak
       </div>
       {picked && !correct && (
         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ background: '#F0FBF4', border: '1px solid #C6EFD4', borderRadius: 'var(--c-r-sm)', padding: '12px 14px', textAlign: 'center', color: GREEN, fontWeight: 900, fontSize: 24 }}>
+          <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '12px 14px', textAlign: 'center', color: GREEN, fontWeight: 900, fontSize: 24 }}>
             {q.mode === 'word' ? `${q.item.syl} + ${q.item.end} = ${q.item.word} ${q.item.emoji}` : `${q.c} + ${q.v} = ${q.answer}`}
           </div>
           <button className="g-btn primary" onClick={next}>

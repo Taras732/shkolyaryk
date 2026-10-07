@@ -62,7 +62,7 @@ function Component({ round, onAnswer }: GameComponentProps<{ n: number }, Answer
           </button>
         ))}
       </div>
-      {warn && <div style={{ textAlign: 'center', marginTop: 10, fontWeight: 800, color: '#B45309' }}>Велике кільце на мале класти не можна</div>}
+      {warn && <div style={{ textAlign: 'center', marginTop: 10, fontWeight: 800, color: 'var(--c-warn-ink)' }}>Велике кільце на мале класти не можна</div>}
       <button className="g-btn ghost" style={{ marginTop: 16, padding: 10, fontSize: 14 }} onClick={() => { setP(start(n)); setMoves(0); setSel(null); }}>
         ↺ Почати спочатку
       </button>

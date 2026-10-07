@@ -19,7 +19,7 @@ import {
 } from '@/school/homework';
 
 const STATUS_LABEL: Record<Status, string> = { new: 'нове', learning: 'вчу', known: 'знаю' };
-const STATUS_COLOR: Record<Status, string> = { new: '#B45309', learning: 'var(--c-primary)', known: '#15803D' };
+const STATUS_COLOR: Record<Status, string> = { new: 'var(--c-warn-ink)', learning: 'var(--c-primary)', known: 'var(--c-ok-ink)' };
 
 /** «Що в завданні?» — фото сторінки → що треба зробити, з чого почати, які слова нові. */
 export default function Homework() {
@@ -116,7 +116,7 @@ export default function Homework() {
         </button>
 
         {error && (
-          <div className="g-card" style={{ color: '#B45309', fontWeight: 700, marginBottom: 14 }}>
+          <div className="g-card" style={{ color: 'var(--c-warn-ink)', fontWeight: 700, marginBottom: 14 }}>
             {ERROR_TEXT[error]}
           </div>
         )}
@@ -129,10 +129,10 @@ export default function Homework() {
             </div>
 
             {result.readable && result.steps.length > 0 && (
-              <div className="g-card" style={{ textAlign: 'left', marginBottom: 12, background: '#F0FBF4', borderColor: '#C6EFD4' }}>
-                <div className="g-question" style={{ textAlign: 'left', color: '#15803D' }}>З чого почати</div>
+              <div className="g-card" style={{ textAlign: 'left', marginBottom: 12, background: 'var(--c-ok-bg)', borderColor: 'var(--c-ok-line)' }}>
+                <div className="g-question" style={{ textAlign: 'left', color: 'var(--c-ok-ink)' }}>З чого почати</div>
                 {result.steps.map((s, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 9, fontWeight: 700, fontSize: 15, color: '#15803D', marginTop: i ? 7 : 0 }}>
+                  <div key={i} style={{ display: 'flex', gap: 9, fontWeight: 700, fontSize: 15, color: 'var(--c-ok-ink)', marginTop: i ? 7 : 0 }}>
                     <span>{i + 1}.</span>
                     <span>{s}</span>
                   </div>

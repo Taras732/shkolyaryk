@@ -26,7 +26,7 @@ export function useFinish(done: boolean, onAnswer: (a: Answer) => void, delay = 
 export function Task({ text, sub, done, doneText }: { text: ReactNode; sub?: ReactNode; done?: boolean; doneText?: string }) {
   return (
     <div className="g-card" style={{ marginBottom: 12 }}>
-      <div style={{ fontSize: 17, fontWeight: 900, color: done ? '#15803D' : 'var(--c-ink)' }}>{done ? doneText ?? 'Готово! 🎉' : text}</div>
+      <div style={{ fontSize: 17, fontWeight: 900, color: done ? 'var(--c-ok-ink)' : 'var(--c-ink)' }}>{done ? doneText ?? 'Готово! 🎉' : text}</div>
       {sub && <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-mut)', marginTop: 4 }}>{sub}</div>}
     </div>
   );

@@ -62,7 +62,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<{ tasks: S
           </div>
         ))}
       </div>
-      {msg && <div style={{ textAlign: 'center', marginTop: 10, fontWeight: 800, color: msg.startsWith('Так') ? '#15803D' : '#B45309' }}>{msg}</div>}
+      {msg && <div style={{ textAlign: 'center', marginTop: 10, fontWeight: 800, color: msg.startsWith('Так') ? 'var(--c-ok-ink)' : 'var(--c-warn-ink)' }}>{msg}</div>}
       <button className="g-btn primary" style={{ marginTop: 12 }} onClick={check} disabled={allDone}>
         Готово, порівну!
       </button>

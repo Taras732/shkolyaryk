@@ -11,7 +11,7 @@ interface BoardPayload {
 }
 type Answer = typeof BOARD_DONE;
 
-const GREEN = '#15803D';
+const GREEN = 'var(--c-ok-ink)';
 export const readingKey = (id: string) => `shk.ukr.v1.${id}`;
 
 export function loadReading(id: string): ReadingLog {
@@ -142,7 +142,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPaylo
       </div>
       {picked !== null && picked !== q.answer && (
         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ background: '#F0FBF4', border: '1px solid #C6EFD4', borderRadius: 'var(--c-r-sm)', padding: '12px 14px', color: GREEN, fontWeight: 800 }}>
+          <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '12px 14px', color: GREEN, fontWeight: 800 }}>
             Правильно: {q.options[q.answer]}
           </div>
           <button className="g-btn primary" onClick={next}>

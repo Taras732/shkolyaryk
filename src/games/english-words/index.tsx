@@ -25,7 +25,7 @@ interface BoardPayload {
 type Answer = typeof BOARD_DONE;
 
 const CORRECT_MS = 900;
-const GREEN = '#15803D';
+const GREEN = 'var(--c-ok-ink)';
 
 /** Board-based, як таблиця множення: уся сесія всередині компонента, оболонка рахує помилки й зірки. */
 function generate(difficulty: Difficulty): LevelData<BoardPayload, Answer> {
@@ -261,7 +261,7 @@ function QuizRun({
       </div>
       {picked && !correct && (
         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ background: '#F0FBF4', border: '1px solid #C6EFD4', borderRadius: 'var(--c-r-sm)', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 34 }}>{q.word.emoji}</span>
             <span style={{ flex: 1, color: GREEN, fontWeight: 800 }}>
               <span style={{ fontSize: 20, display: 'block' }}>{q.word.en}</span>

@@ -103,8 +103,8 @@ function CommandList({ commands }: { commands: Command[] }) {
 function TraceView({ start, commands }: { start: State; commands: Command[] }) {
   const steps = trace(start, commands);
   return (
-    <div style={{ marginTop: 10, background: '#F0FBF4', border: '1px solid #C6EFD4', borderRadius: 'var(--c-r-sm)', padding: '12px 14px' }}>
-      <div style={{ fontWeight: 900, fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.04em', color: '#15803D', marginBottom: 8 }}>
+    <div style={{ marginTop: 10, background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '12px 14px' }}>
+      <div style={{ fontWeight: 900, fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--c-ok-ink)', marginBottom: 8 }}>
         Крок за кроком
       </div>
       {steps.map((s, i) => (

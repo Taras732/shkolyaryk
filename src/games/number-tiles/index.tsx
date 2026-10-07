@@ -51,7 +51,7 @@ function ExampleTile({ num, blocked }: { num: number | null; blocked?: boolean }
         fontFamily: 'var(--font-round)',
         fontWeight: 800,
         fontSize: 14,
-        color: blocked ? '#C0392B' : 'var(--c-ink)',
+        color: blocked ? 'var(--c-err-ink)' : 'var(--c-ink)',
       }}
     >
       {num ?? ''}
@@ -72,7 +72,7 @@ function ExampleRow({ cells, ok, label }: { cells: (number | null)[]; ok: boolea
           {ok ? '✅' : '❌'}
         </span>
       </div>
-      <div style={{ fontSize: 11.5, fontWeight: 700, color: ok ? 'var(--c-mut)' : '#C0392B', marginTop: 3 }}>{label}</div>
+      <div style={{ fontSize: 11.5, fontWeight: 700, color: ok ? 'var(--c-mut)' : 'var(--c-err-ink)', marginTop: 3 }}>{label}</div>
     </div>
   );
 }
@@ -265,7 +265,7 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
                   }`,
                   borderRadius: 'var(--c-r-sm)',
                   background: isWrong ? '#FFE2E2' : isSelected ? 'var(--c-primary-soft)' : 'var(--c-card)',
-                  color: isWrong ? '#C0392B' : 'var(--c-ink)',
+                  color: isWrong ? 'var(--c-err-ink)' : 'var(--c-ink)',
                   fontFamily: 'var(--font-round)',
                   fontWeight: 800,
                   fontSize: fontPx,

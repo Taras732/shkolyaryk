@@ -118,14 +118,14 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
     answerState === 'correct'
       ? 'var(--c-green)'
       : answerState === 'incorrect'
-        ? '#C0392B'
+        ? 'var(--c-err-ink)'
         : entered
           ? 'var(--c-primary)'
           : 'var(--c-mut)';
 
   // Підказка «Правильно: X» показується лише при помилці. Це допомога, а не докір,
   // тому зелена — як .reveal у ChoiceGrid. Червоним лишається тільки ввід дитини.
-  const revealColor = '#15803D';
+  const revealColor = 'var(--c-ok-ink)';
 
   return (
     <>

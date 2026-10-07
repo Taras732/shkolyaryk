@@ -278,13 +278,13 @@ export default function GameShell({ game, level, classLevel, profileId, onExit }
                 {encouragementFor(state.mistakes)}
               </div>
 
-              <div style={{ background: '#F0FBF4', border: '1px solid #C6EFD4', borderRadius: 'var(--c-r-sm)', padding: '14px 16px' }}>
-                <div style={{ fontWeight: 900, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: '#15803D', marginBottom: 8 }}>
+              <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '14px 16px' }}>
+                <div style={{ fontWeight: 900, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--c-ok-ink)', marginBottom: 8 }}>
                   Ось як правильно 👇
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
                   {explain.steps.map((s, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 9, fontWeight: 800, fontSize: 15, color: '#15803D' }}>
+                    <div key={i} style={{ display: 'flex', gap: 9, fontWeight: 800, fontSize: 15, color: 'var(--c-ok-ink)' }}>
                       <span style={{ flexShrink: 0 }}>✓</span>
                       <span>{s}</span>
                     </div>

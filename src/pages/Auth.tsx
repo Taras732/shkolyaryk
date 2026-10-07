@@ -164,7 +164,7 @@ export default function Auth() {
             <div style={{
               background: '#E9FBEF',
               border: '3px solid var(--c-green)',
-              color: '#15803D',
+              color: 'var(--c-ok-ink)',
               padding: '12px',
               borderRadius: 'var(--border-radius-sm)',
               fontSize: '12px',

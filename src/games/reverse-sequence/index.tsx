@@ -145,7 +145,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
     answerState === 'correct'
       ? 'var(--c-green)'
       : answerState === 'incorrect'
-        ? '#C0392B'
+        ? 'var(--c-err-ink)'
         : entered
           ? 'var(--c-primary)'
           : 'var(--c-mut)';

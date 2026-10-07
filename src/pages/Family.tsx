@@ -88,7 +88,7 @@ function Week({ child }: { child: ChildProfile }) {
         {knownFacts > 0 || shaky.length > 0 ? (
           <div>
             ✖️ Таблиця множення: вивчено {knownFacts} з 36
-            {shaky.length > 0 && <span style={{ color: '#B45309' }}> · плутає: {shaky.join(', ')}</span>}
+            {shaky.length > 0 && <span style={{ color: 'var(--c-warn-ink)' }}> · плутає: {shaky.join(', ')}</span>}
           </div>
         ) : null}
         {words.learning + words.known > 0 && (
@@ -259,7 +259,7 @@ function RewardEditor({ child }: { child: ChildProfile }) {
         Наліпок: <b style={{ color: 'var(--c-ink)' }}>{r.stickers.length}</b> · серія: <b style={{ color: 'var(--c-ink)' }}>{fire}</b> · нагород видано: <b style={{ color: 'var(--c-ink)' }}>{r.claimed}</b>
       </div>
       {p && r.goal && (
-        <div style={{ fontSize: 14, fontWeight: 800, color: p.reached ? '#15803D' : 'var(--c-ink)', marginBottom: 8 }}>
+        <div style={{ fontSize: 14, fontWeight: 800, color: p.reached ? 'var(--c-ok-ink)' : 'var(--c-ink)', marginBottom: 8 }}>
           {p.reached ? `🎉 Заслужено: ${r.goal.text}` : `🎁 ${r.goal.text}: ${p.done} з ${p.need} днів`}
           {p.reached && (
             <button className="g-btn primary" style={{ marginTop: 8 }} onClick={() => update(claimGoal(r, Date.now()))}>

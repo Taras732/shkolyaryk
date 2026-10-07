@@ -95,7 +95,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   };
 
   const displayColor =
-    answerState === 'correct' ? 'var(--c-green)' : answerState === 'incorrect' ? '#C0392B' : entered ? 'var(--c-primary)' : 'var(--c-mut)';
+    answerState === 'correct' ? 'var(--c-green)' : answerState === 'incorrect' ? 'var(--c-err-ink)' : entered ? 'var(--c-primary)' : 'var(--c-mut)';
 
   return (
     <>
@@ -137,7 +137,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
       ) : (
         <>
           {op && (
-            <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 800, color: '#15803D', marginBottom: 4 }}>
+            <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 800, color: 'var(--c-ok-ink)', marginBottom: 4 }}>
               ✓ Дія: {op} {OP_LABEL[op]}
             </div>
           )}

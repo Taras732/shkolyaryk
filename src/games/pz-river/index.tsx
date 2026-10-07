@@ -76,7 +76,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<RiverTask,
         </div>
         {bank(true)}
       </div>
-      {msg && <div style={{ textAlign: 'center', marginTop: 10, fontWeight: 800, color: '#B45309' }}>{msg}</div>}
+      {msg && <div style={{ textAlign: 'center', marginTop: 10, fontWeight: 800, color: 'var(--c-warn-ink)' }}>{msg}</div>}
       <button className="g-btn primary" style={{ marginTop: 12 }} onClick={sail} disabled={done}>
         {s.farmer ? '⬅️ Пливти назад' : 'Пливти ➡️'} {boat.length ? `з ${boat.map((b) => byId[b].emoji).join(' ')}` : '(сам)'}
       </button>

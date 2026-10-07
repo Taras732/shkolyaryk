@@ -37,7 +37,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<PathTask, 
         done={done}
         doneText={`${path.map((i) => grid[i]).join(' + ')} = ${target} 🎉`}
       />
-      <div style={{ textAlign: 'center', fontSize: 28, fontWeight: 900, marginBottom: 10, color: over ? '#C0392B' : done ? '#15803D' : 'var(--c-ink)', fontFamily: 'var(--font-round)' }}>
+      <div style={{ textAlign: 'center', fontSize: 28, fontWeight: 900, marginBottom: 10, color: over ? 'var(--c-err-ink)' : done ? 'var(--c-ok-ink)' : 'var(--c-ink)', fontFamily: 'var(--font-round)' }}>
         {path.length ? `${path.map((i) => grid[i]).join(' + ')} = ${sum}` : '…'}
         {over && ' — забагато!'}
       </div>

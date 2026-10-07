@@ -38,7 +38,7 @@ type Answer = typeof BOARD_DONE;
 
 const MAX_INPUT_LEN = 3;
 const CORRECT_MS = 700;
-const GREEN = '#15803D';
+const GREEN = 'var(--c-ok-ink)';
 
 /**
  * Board-based: уся сесія живе всередині компонента (вибір таблиці → 10 питань →
@@ -165,7 +165,7 @@ function Drill({
     setPhase('idle');
   };
 
-  const color = phase === 'correct' ? 'var(--c-green)' : phase === 'wrong' ? '#C0392B' : entered ? 'var(--c-primary)' : 'var(--c-mut)';
+  const color = phase === 'correct' ? 'var(--c-green)' : phase === 'wrong' ? 'var(--c-err-ink)' : entered ? 'var(--c-primary)' : 'var(--c-mut)';
 
   return (
     <>
@@ -180,7 +180,7 @@ function Drill({
 
       {explain ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeInUp .3s ease both' }}>
-          <div style={{ background: '#F0FBF4', border: '1px solid #C6EFD4', borderRadius: 'var(--c-r-sm)', padding: '14px 16px' }}>
+          <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '14px 16px' }}>
             <div style={{ fontWeight: 900, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: GREEN, marginBottom: 8 }}>
               Ось як правильно 👇
             </div>

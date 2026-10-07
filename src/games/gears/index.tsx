@@ -155,7 +155,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
       <PromptCard question="Перша крутиться так. Куди крутиться остання?" answerState={answerState}>
         <ChainView chain={chain} reveal={reveal} />
         {reveal && (
-          <div style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 800, color: '#15803D', marginTop: 4 }}>
+          <div style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 800, color: 'var(--c-ok-ink)', marginTop: 4 }}>
             Простеж ланцюг: кожна наступна — навпаки
           </div>
         )}

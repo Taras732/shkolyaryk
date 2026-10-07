@@ -97,7 +97,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
 
   // Підказка «Правильно: X» показується лише при помилці. Це допомога, а не докір,
   // тому зелена — як .reveal у ChoiceGrid. Червоним лишається тільки ввід дитини.
-  const revealColor = '#15803D';
+  const revealColor = 'var(--c-ok-ink)';
 
   return (
     <>

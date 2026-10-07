@@ -190,7 +190,7 @@ export default function AfterSchool() {
                     <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--c-mut)', marginTop: 2 }}>💡 {reasonOf(id)}</span>
                   )}
                 </span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: done ? '#15803D' : 'var(--c-primary)' }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: done ? 'var(--c-ok-ink)' : 'var(--c-primary)' }}>
                   {done ? 'Зроблено' : 'Почати →'}
                 </span>
               </button>
@@ -235,7 +235,7 @@ export default function AfterSchool() {
                   </div>
                 )}
                 {report.tables.shaky.length > 0 && (
-                  <div style={{ color: '#B45309' }}>⚠️ Ще плутає: {report.tables.shaky.join(', ')}</div>
+                  <div style={{ color: 'var(--c-warn-ink)' }}>⚠️ Ще плутає: {report.tables.shaky.join(', ')}</div>
                 )}
               </div>
             )}

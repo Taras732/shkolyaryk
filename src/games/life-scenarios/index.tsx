@@ -70,8 +70,8 @@ function ConsequenceView({ action, onNext }: { action: ScenarioAction; onNext: (
     <div style={{ animation: 'fadeInUp .3s ease both' }}>
       <div
         style={{
-          background: action.isBest ? '#F0FBF4' : 'var(--c-primary-soft)',
-          border: `1px solid ${action.isBest ? '#C6EFD4' : '#DAD3FF'}`,
+          background: action.isBest ? 'var(--c-ok-bg)' : 'var(--c-primary-soft)',
+          border: `1px solid ${action.isBest ? 'var(--c-ok-line)' : '#DAD3FF'}`,
           borderRadius: 'var(--c-r-sm)',
           padding: '16px 18px',
           marginTop: 16,

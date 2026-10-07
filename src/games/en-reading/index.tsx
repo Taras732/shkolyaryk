@@ -12,7 +12,7 @@ interface BoardPayload {
 type Answer = typeof BOARD_DONE;
 
 const CORRECT_MS = 1000;
-const GREEN = '#15803D';
+const GREEN = 'var(--c-ok-ink)';
 const keyFor = (id: string) => `shk.enr.v1.${id}`;
 
 function load(id: string): ReadingProgress {
@@ -131,7 +131,7 @@ function Session({ quiz: initial, onRecord, onMistake, onDone }: { quiz: Questio
       </div>
       {picked && !correct && (
         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ background: '#F0FBF4', border: '1px solid #C6EFD4', borderRadius: 'var(--c-r-sm)', padding: '12px 14px', textAlign: 'center', color: GREEN, fontWeight: 900, fontSize: 22 }}>
+          <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '12px 14px', textAlign: 'center', color: GREEN, fontWeight: 900, fontSize: 22 }}>
             {q.mode === 'sound' ? `${q.prompt} — ${q.say} ${q.answer}` : q.mode === 'listen' ? q.answer : `${q.prompt} — ${q.answer}`}
           </div>
           <button className="g-btn primary" onClick={next}>

@@ -75,7 +75,7 @@ function ExplainView({ explain, encouragement, misconception }: {
     howTo = (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {explain.correctTail.map((s, i) => (
-          <div key={i} style={{ display: 'flex', gap: 10, fontWeight: 800, fontSize: 16, color: '#15803D' }}>
+          <div key={i} style={{ display: 'flex', gap: 10, fontWeight: 800, fontSize: 16, color: 'var(--c-ok-ink)' }}>
             <span style={{ flexShrink: 0 }}>✓</span>
             <span>{s}</span>
           </div>
@@ -98,8 +98,8 @@ function ExplainView({ explain, encouragement, misconception }: {
       {/* тепла фраза — не докір */}
       <div style={{ textAlign: 'center', fontWeight: 800, fontSize: 15, color: 'var(--c-primary)' }}>{encouragement}</div>
       {/* головне — зелене «як правильно» */}
-      <div style={{ background: '#F0FBF4', border: '1px solid #C6EFD4', borderRadius: 'var(--c-r-sm)', padding: '16px 18px' }}>
-        <div style={{ ...panelTitle('#15803D'), fontSize: 13 }}>Ось як правильно 👇</div>
+      <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '16px 18px' }}>
+        <div style={{ ...panelTitle('var(--c-ok-ink)'), fontSize: 13 }}>Ось як правильно 👇</div>
         {howTo}
       </div>
       {/* причина — дрібно, нейтрально, без червоного */}
@@ -271,7 +271,7 @@ export default function RuleLesson({ def, band, mastery = 0, seed, onExit, onDon
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 16, textAlign: 'center', fontSize: 22, fontWeight: 900, color: '#15803D' }}>= {w.answer}</div>
+          <div style={{ marginTop: 16, textAlign: 'center', fontSize: 22, fontWeight: 900, color: 'var(--c-ok-ink)' }}>= {w.answer}</div>
         </div>
         <button className="g-btn primary" style={{ marginTop: 18 }} onClick={() => dispatch({ type: 'NEXT' })}>Зрозуміло, спробую →</button>
       </Screen>

@@ -178,7 +178,7 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
                       : isSel
                         ? 'var(--c-primary-soft)'
                         : 'var(--c-card)',
-                  color: isWrong ? '#C0392B' : given ? 'var(--c-ink)' : 'var(--c-primary)',
+                  color: isWrong ? 'var(--c-err-ink)' : given ? 'var(--c-ink)' : 'var(--c-primary)',
                   fontFamily: 'var(--font-round)',
                   fontSize: size === 4 ? 26 : 20,
                   fontWeight: 800,
