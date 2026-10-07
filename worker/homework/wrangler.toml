@@ -1,7 +1,7 @@
 # «Що в завданні?» — проксі до Claude для сторінки /homework застосунку Школярик.
 # Секрети (не в цьому файлі!):
-#   wrangler secret put SHKOLYARYK_ANTHROPIC_KEY   — ключ Anthropic, окремий workspace під Школярик з лімітом
-#   wrangler secret put FAMILY_CODE                — сімейний код, який батьки один раз вводять у застосунку
+#   wrangler secret put DEEPSEEK_API_KEY   — ⚠️ ТИМЧАСОВО ключ Штурмана (07.10.2026); перед продажем — власний ключ Школярика
+#   wrangler secret put FAMILY_CODE        — сімейний код, який батьки один раз вводять у застосунку
 name = "shkolyaryk-homework"
 main = "src/index.ts"
 compatibility_date = "2026-09-01"
