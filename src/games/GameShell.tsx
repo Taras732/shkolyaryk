@@ -5,6 +5,7 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import { recordActivity } from '@/utils/activity';
 import { logGame } from '@/school/game-log';
 import { sendGameEvent } from '@/school/report-sync';
+import { scheduleFamilySync } from '@/school/family-sync-run';
 import { recordGameResult } from '@/school/mastery';
 import { fetchPrereqHint, type PrereqHint } from '@/school/hint';
 import { isWeakResult, buildPrereqHintMessage } from '@/school/hint-core';
@@ -181,6 +182,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit }
     logGame(profileId, { at: Date.now(), gameId: game.id, difficulty: state.difficulty, mistakes: state.mistakes, stars: state.stars });
     const kid = profiles.find((p) => p.id === profileId);
     if (kid) sendGameEvent(kid, game, state.difficulty, state.mistakes);
+    scheduleFamilySync();
     updateProgress(
       profileId,
       game.id,

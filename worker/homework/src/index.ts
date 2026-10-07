@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SyncBody, sync } from './sync';
 import { Event, buildReport, linkTelegram, scheduledReport, sendTelegram, storeEvent, type ReportEnv } from './report';
 
 /**
@@ -124,6 +125,12 @@ export default {
       if (!parsed.success) return json({ error: 'bad_request' }, 400, headers);
       await storeEvent(parsed.data, env);
       return json({ ok: true }, 200, headers);
+    }
+    // синхронізація прогресу між пристроями сім'ї: надіслати змінене — отримати документ сім'ї
+    if (path === '/sync' && req.method === 'POST') {
+      const parsed = SyncBody.safeParse(await req.json().catch(() => null));
+      if (!parsed.success) return json({ error: 'bad_request' }, 400, headers);
+      return json(await sync(env, parsed.data), 200, headers);
     }
     // перегляд сьогоднішнього звіту (для батьків і для перевірки без Telegram)
     if (path === '/report' && req.method === 'GET') {

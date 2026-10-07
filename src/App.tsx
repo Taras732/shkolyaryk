@@ -14,6 +14,7 @@ import AfterSchool from './pages/AfterSchool';
 import Homework from './pages/Homework';
 import Family from './pages/Family';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { runFamilySync } from '@/school/family-sync-run';
 
 // Легасі-сторінки (Welcome/Auth/Onboarding/...) поки в телефонній рамці.
 function PhoneFrame({ children }: { children: ReactNode }) {
@@ -27,6 +28,14 @@ function WebShell({ children }: { children: ReactNode }) {
 
 export default function App() {
   const initializeAuth = useAuthStore((state) => state.initialize);
+
+  // прогрес дітей між пристроями сім'ї: на старті і коли застосунок знову стає видимим
+  useEffect(() => {
+    void runFamilySync();
+    const onVisible = () => document.visibilityState === 'visible' && void runFamilySync();
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, []);
 
   useEffect(() => {
     const unsubscribe = initializeAuth();

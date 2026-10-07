@@ -15,6 +15,7 @@ import { LETTERS } from '@/games/uk-letters/letters';
 import { isKnown as letterKnown, type LetterProgress } from '@/games/uk-letters/core';
 import { HOMEWORK_API, loadFamilyCode, saveFamilyCode } from '@/school/homework';
 import { fetchTodayReport, linkTelegram } from '@/school/report-sync';
+import { runFamilySync } from '@/school/family-sync-run';
 import { loadReading } from '@/games/uk-reading';
 import { readingSummary } from '@/games/uk-reading/core';
 import { claimGoal, goalProgress, loadRewards, saveRewards, setGoal, streak, type Rewards } from '@/school/rewards';
@@ -261,7 +262,7 @@ function ReportPanel() {
       <div style={{ ...h, marginTop: 0 }}>Вечірній звіт у Telegram</div>
       {code ? (
         <>
-          <div style={small}>✅ Цей пристрій надсилає події для звіту. Звіт приходить о 20:00.</div>
+          <div style={small}>✅ Цей пристрій у сім'ї: прогрес дітей спільний з іншими пристроями, події йдуть у вечірній звіт о 20:00.</div>
           <button
             className="g-btn soft"
             style={{ marginTop: 10, padding: 10, fontSize: 14 }}
@@ -285,10 +286,13 @@ function ReportPanel() {
         </>
       ) : (
         <>
-          <div style={{ ...small, marginBottom: 8 }}>Введіть сімейний код на цьому пристрої — тоді ігри дитини потраплять у вечірній звіт.</div>
+          <div style={{ ...small, marginBottom: 8 }}>
+            Введіть сімейний код на цьому пристрої — тоді прогрес дітей стане спільним з іншими пристроями сім'ї, а ігри потраплять у вечірній звіт.
+            Дітей створюйте на одному пристрої: на інших вони з'являться самі після введення коду.
+          </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <input type="password" inputMode="numeric" value={draft} onChange={(e) => setDraft(e.target.value)} style={{ flex: 1, minWidth: 0, padding: 10, borderRadius: 'var(--c-r-sm)', border: '1.5px solid var(--c-line)', fontSize: 18, textAlign: 'center' }} />
-            <button className="g-btn primary" style={{ width: 'auto', padding: '10px 16px' }} disabled={!draft.trim()} onClick={() => { saveFamilyCode(draft.trim()); setCode(draft.trim()); setDraft(''); }}>
+            <button className="g-btn primary" style={{ width: 'auto', padding: '10px 16px' }} disabled={!draft.trim()} onClick={() => { saveFamilyCode(draft.trim()); setCode(draft.trim()); setDraft(''); void runFamilySync(); }}>
               Зберегти
             </button>
           </div>
