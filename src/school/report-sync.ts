@@ -53,3 +53,17 @@ export async function fetchTodayReport(): Promise<string | null> {
     return null;
   }
 }
+
+/** Прив'язати Telegram: батько вже написав боту /start — воркер запам'ятовує чат і шле пробний звіт. */
+export async function linkTelegram(): Promise<'ok' | 'no_start' | 'no_token' | 'error'> {
+  const code = loadFamilyCode();
+  if (!HOMEWORK_API || !code) return 'error';
+  try {
+    const res = await fetch(`${HOMEWORK_API.replace(/\/$/, '')}/telegram/link`, { method: 'POST', headers: { 'X-Family-Code': code } });
+    if (res.ok) return 'ok';
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    return body.error === 'no_start' || body.error === 'no_token' ? body.error : 'error';
+  } catch {
+    return 'error';
+  }
+}

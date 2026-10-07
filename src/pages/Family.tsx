@@ -14,7 +14,7 @@ import { counts as wordCounts } from '@/games/english-words/core';
 import { LETTERS } from '@/games/uk-letters/letters';
 import { isKnown as letterKnown, type LetterProgress } from '@/games/uk-letters/core';
 import { HOMEWORK_API, loadFamilyCode, saveFamilyCode } from '@/school/homework';
-import { fetchTodayReport } from '@/school/report-sync';
+import { fetchTodayReport, linkTelegram } from '@/school/report-sync';
 import { claimGoal, goalProgress, loadRewards, saveRewards, setGoal, streak, type Rewards } from '@/school/rewards';
 
 const DOW = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -239,7 +239,14 @@ function ReportPanel() {
   const [code, setCode] = useState(loadFamilyCode);
   const [draft, setDraft] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
+  const [link, setLink] = useState<string | null>(null);
   if (!HOMEWORK_API) return null;
+  const LINK_TEXT = {
+    ok: '✅ Telegram під'єднано — пробний звіт уже в чаті.',
+    no_start: 'Спершу напишіть боту /start у Telegram, потім натисніть ще раз.',
+    no_token: 'Бот ще не налаштований на сервері.',
+    error: 'Не вдалося. Спробуйте пізніше.',
+  } as const;
   return (
     <div className="g-card" style={{ textAlign: 'left', marginBottom: 14 }}>
       <div style={{ ...h, marginTop: 0 }}>Вечірній звіт у Telegram</div>
@@ -259,6 +266,10 @@ function ReportPanel() {
               {preview.replace(/<\/?b>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')}
             </div>
           )}
+          <button className="g-btn soft" style={{ marginTop: 8, padding: 10, fontSize: 14 }} onClick={async () => setLink(LINK_TEXT[await linkTelegram()])}>
+            Під'єднати Telegram
+          </button>
+          {link && <div style={{ ...small, marginTop: 6, color: 'var(--c-ink)' }}>{link}</div>}
           <button className="g-btn ghost" style={{ marginTop: 8, padding: 8, fontSize: 12 }} onClick={() => { saveFamilyCode(''); setCode(''); }}>
             Забути код на цьому пристрої
           </button>

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Event, buildReport, scheduledReport, storeEvent, type ReportEnv } from './report';
+import { Event, buildReport, linkTelegram, scheduledReport, sendTelegram, storeEvent, type ReportEnv } from './report';
 
 /**
  * «Що в завданні?» — дитина фотографує сторінку підручника чи зошита,
@@ -129,6 +129,14 @@ export default {
     if (path === '/report' && req.method === 'GET') {
       const { text } = await buildReport(env, new Date());
       return json({ text }, 200, headers);
+    }
+    // прив'язати Telegram (після /start боту) і одразу надіслати сьогоднішній звіт як перевірку
+    if (path === '/telegram/link' && req.method === 'POST') {
+      const who = await linkTelegram(env);
+      if (!who) return json({ error: env.TG_BOT_TOKEN ? 'no_start' : 'no_token' }, 409, headers);
+      const { text } = await buildReport(env, new Date());
+      const sent = await sendTelegram(env, text);
+      return json({ ok: true, who, sent }, 200, headers);
     }
     if (req.method !== 'POST' || (path !== '/' && path !== '/explain')) return json({ error: 'not_found' }, 404, headers);
 

@@ -109,12 +109,31 @@ export async function buildReport(env: ReportEnv, now: Date): Promise<{ text: st
   return { text: composeReport(label, kids, days), kids: Object.keys(kids).length };
 }
 
+const TG_CHAT = 'tg_chat';
+
+/**
+ * Прив'язати чат: батько пише боту /start, а тут ми беремо з getUpdates останній
+ * приватний чат і запам'ятовуємо. Так не треба шукати chat_id вручну.
+ */
+export async function linkTelegram(env: ReportEnv): Promise<string | null> {
+  if (!env.TG_BOT_TOKEN) return null;
+  const res = await fetch(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/getUpdates`);
+  if (!res.ok) return null;
+  const data = (await res.json()) as { result?: { message?: { chat?: { id: number; type: string; first_name?: string } } }[] };
+  const chats = (data.result ?? []).map((u) => u.message?.chat).filter((c) => c && c.type === 'private');
+  const chat = chats[chats.length - 1];
+  if (!chat) return null;
+  await env.REPORTS.put(TG_CHAT, String(chat.id));
+  return chat.first_name ?? 'чат';
+}
+
 export async function sendTelegram(env: ReportEnv, text: string): Promise<boolean> {
-  if (!env.TG_BOT_TOKEN || !env.TG_CHAT_ID) return false;
+  const chatId = env.TG_CHAT_ID || (await env.REPORTS.get(TG_CHAT));
+  if (!env.TG_BOT_TOKEN || !chatId) return false;
   const res = await fetch(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: env.TG_CHAT_ID, text, parse_mode: 'HTML', disable_web_page_preview: true }),
+    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true }),
   });
   return res.ok;
 }
