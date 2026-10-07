@@ -88,7 +88,7 @@ function Component({ round, onAnswer }: GameComponentProps<P, Answer>) {
 const pzMaze: GameDefinition<P, Answer> = {
   id: 'pz-maze',
   title: 'Лабіринт',
-  subject: 'logic',
+  subject: 'puzzles',
   levels: ['L0', 'L3'],
   icon: '🌀',
   description: 'Проведи звірятко через лабіринт до смаколика.',

@@ -60,7 +60,7 @@ function Component({ round, onAnswer }: GameComponentProps<P, Answer>) {
 const pzLights: GameDefinition<P, Answer> = {
   id: 'pz-lights',
   title: 'Вимкни всі лампи',
-  subject: 'logic',
+  subject: 'puzzles',
   levels: ['L3'],
   icon: '💡',
   description: 'Кожне натискання перемикає лампу і сусідні. Вимкни всі!',

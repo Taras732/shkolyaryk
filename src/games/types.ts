@@ -7,6 +7,7 @@ export type Subject =
   | 'english'
   | 'science'
   | 'logic'
+  | 'puzzles'
   | 'memory'
   | 'world'
   | 'life'

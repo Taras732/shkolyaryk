@@ -90,7 +90,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<RiverTask,
 const pzRiver: GameDefinition<RiverTask, Answer> = {
   id: 'pz-river',
   title: 'Переправа',
-  subject: 'logic',
+  subject: 'puzzles',
   levels: ['L3'],
   icon: '⛵',
   description: 'Перевези вовка, козу й капусту через річку — так, щоб ніхто нікого не з’їв.',

@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Home, Trophy, Star, Flame, Target, CalendarDays, Settings, Repeat, Play, Lock } from 'lucide-react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
-import { gamesForClass, getGame, profileClass, SUBJECT_META, SUBJECT_ORDER } from '@/games/registry';
+import { gamesForClass, getGame, profileClass, SUBJECT_META, SUBJECT_ORDER, HUB_HIDDEN } from '@/games/registry';
+import { resolvePlan } from '@/school/plan-resolve';
+import { POOLS } from '@/school/smart-plan';
 import { DIFFICULTY_LABEL, type Difficulty, type GameDefinition } from '@/games/types';
 import { getActivitySummary } from '@/utils/activity';
 import { storage } from '@/utils/storage';
@@ -26,6 +28,8 @@ export default function Hub() {
   const { user, loading: authLoading } = useAuthStore();
   const { activeProfile, progress, loadProfiles } = useProfileStore();
   const [view, setView] = useState<'home' | 'awards'>('home');
+  // предмети, розгорнуті повністю (решта показує перші ігри)
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (authLoading) return;
@@ -51,7 +55,7 @@ export default function Hub() {
     );
   }
 
-  const games = gamesForClass(profileClass(activeProfile));
+  const games = gamesForClass(profileClass(activeProfile)).filter((g) => !HUB_HIDDEN.has(g.id));
   const subjects = SUBJECT_ORDER.filter((s) => games.some((g) => g.subject === s));
   const prog = progress[activeProfile.id] ?? {};
   const avatarImg = MASCOTS[activeProfile.avatar_id];
@@ -66,6 +70,19 @@ export default function Hub() {
     }
     return (bestId && getGame(bestId)) || games[0];
   })();
+
+  // навігація серед 80+ ігор: спершу те, що в плані на сьогодні й що вже грали, решта — під «Показати всі»
+  const planIds = new Set(resolvePlan(activeProfile).map((p) => p.gameId));
+  const playedAt = (id: string) => prog[id]?.updated_at ?? '';
+  // основні ігри програми класу (пули розумного плану) — перед додатковими
+  const core = new Set(Object.values(POOLS[profileClass(activeProfile)]).flat());
+  const rank = (g: GameDefinition) => (planIds.has(g.id) ? 4 : 0) + (playedAt(g.id) ? 2 : 0) + (core.has(g.id) ? 1 : 0);
+  const SHOW = 4;
+  const recent = Object.keys(prog)
+    .filter((id) => getGame(id) && !HUB_HIDDEN.has(id))
+    .sort((a, b) => playedAt(b).localeCompare(playedAt(a)))
+    .slice(0, 4)
+    .map((id) => getGame(id)!);
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const goHome = () => { setView('home'); };
@@ -145,7 +162,8 @@ export default function Hub() {
           <button className={view === 'awards' ? 'active' : ''} onClick={() => setView('awards')}><span className="i"><Trophy size={18} strokeWidth={1.75} /></span> Нагороди</button>
         </nav>
         <div className="hub-spacer" />
-        <button className="hub-parent" onClick={() => navigate('/parent')}><Settings size={16} strokeWidth={1.75} /> Кабінет батьків</button>
+        <button className="hub-parent" onClick={() => navigate('/family')}><Settings size={16} strokeWidth={1.75} /> Для батьків</button>
+        <button className="hub-parent" style={{ marginTop: 6 }} onClick={() => navigate('/parent')}><Settings size={16} strokeWidth={1.75} /> Кабінет батьків (акаунт)</button>
       </aside>
 
       {/* Основна колонка */}
@@ -166,7 +184,7 @@ export default function Hub() {
           <div className="hub-top">
             <div>
               <h1>Привіт, {activeProfile.nickname}! 👋</h1>
-              <p className="sub">{view === 'awards' ? 'Твої нагороди' : 'Готовий продовжити навчання сьогодні?'}</p>
+              <p className="sub">{view === 'awards' ? 'Твої нагороди' : 'Продовжимо навчання сьогодні?'}</p>
             </div>
             <div className="hub-topright">
               <FirePill /><StarsPill /><Avatar />
@@ -213,7 +231,7 @@ export default function Hub() {
                 <span style={{ fontSize: 34 }}>🎒</span>
                 <span style={{ flex: 1 }}>
                   <span style={{ display: 'block', fontWeight: 900, fontSize: 17, color: 'var(--c-primary)' }}>Після школи · 15 хв</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-mut)' }}>Три кроки: математика, задачі, англійські слова</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-mut)' }}>Твій план на сьогодні: {planIds.size} {planIds.size < 5 ? 'кроки' : 'кроків'} під тебе</span>
                 </span>
                 <Play size={20} strokeWidth={2} color="var(--c-primary)" />
               </button>
@@ -221,13 +239,30 @@ export default function Hub() {
               <div className="hub-cols">
                 {/* ліва: предмети */}
                 <div>
+                  {recent.length > 0 && (
+                    <section>
+                      <div className="section-h"><span className="emo">🕘</span><h3>Нещодавно</h3></div>
+                      <div className="hub-grid">{recent.map((g) => <GameCard key={g.id} game={g} />)}</div>
+                    </section>
+                  )}
                   {subjects.map((subject) => {
                     const meta = SUBJECT_META[subject];
-                    const list = games.filter((g) => g.subject === subject);
+                    const all = games.filter((g) => g.subject === subject).sort((a, b) => rank(b) - rank(a));
+                    const open = expanded.has(subject);
+                    const list = open ? all : all.slice(0, SHOW);
                     return (
                       <section key={subject} id={`subj-${subject}`} style={{ scrollMarginTop: 12 }}>
                         <div className="section-h"><span className="emo">{meta.emoji}</span><h3>{meta.title}</h3></div>
                         <div className="hub-grid">{list.map((g) => <GameCard key={g.id} game={g} />)}</div>
+                        {all.length > SHOW && (
+                          <button
+                            className="g-btn ghost"
+                            style={{ marginTop: 10, padding: 10, fontSize: 14 }}
+                            onClick={() => setExpanded((prev) => { const n = new Set(prev); if (open) n.delete(subject); else n.add(subject); return n; })}
+                          >
+                            {open ? 'Згорнути' : `Показати всі (${all.length})`}
+                          </button>
+                        )}
                       </section>
                     );
                   })}
@@ -235,6 +270,8 @@ export default function Hub() {
 
                 {/* права колонка */}
                 <div className="rcol">
+                  {/* «Мій день» і діагностика працюють через акаунт (Supabase); гостю — «Після школи» і перевірка місяця */}
+                  {user && (
                   <div className="panel" style={{ background: 'var(--c-primary-soft)', border: '1px solid var(--c-line)' }}>
                     <h3 style={{ color: 'var(--c-primary)', display: 'flex', alignItems: 'center', gap: 8 }}><CalendarDays size={18} strokeWidth={1.75} /> Мій день</h3>
                     <p style={{ color: 'var(--c-mut)', fontWeight: 600, fontSize: 13, margin: '0 0 14px' }}>
@@ -245,7 +282,9 @@ export default function Hub() {
                     </button>
                   </div>
 
-                  {!placementDone && (
+                  )}
+
+                  {user && !placementDone && (
                     <div className="panel" style={{ background: 'var(--c-primary-soft)', border: '1px solid var(--c-line)' }}>
                       <h3 style={{ color: 'var(--c-primary)', display: 'flex', alignItems: 'center', gap: 8 }}><Target size={18} strokeWidth={1.75} /> Визначити рівень</h3>
                       <p style={{ color: 'var(--c-mut)', fontWeight: 600, fontSize: 13, margin: '0 0 14px' }}>

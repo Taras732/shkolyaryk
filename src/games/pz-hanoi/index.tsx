@@ -73,7 +73,7 @@ function Component({ round, onAnswer }: GameComponentProps<{ n: number }, Answer
 const pzHanoi: GameDefinition<{ n: number }, Answer> = {
   id: 'pz-hanoi',
   title: 'Ханойська вежа',
-  subject: 'logic',
+  subject: 'puzzles',
   levels: ['L3'],
   icon: '🗼',
   description: 'Переклади всі кільця на іншу паличку. Велике на мале — не можна!',

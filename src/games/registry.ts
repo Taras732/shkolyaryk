@@ -180,7 +180,8 @@ export const SUBJECT_META: Record<Subject, { title: string; emoji: string }> = {
   language: { title: 'Мова', emoji: '📖' },
   english: { title: 'Англійська', emoji: '📗' },
   science: { title: 'Наука', emoji: '🔬' },
-  logic: { title: 'Логіка', emoji: '🧩' },
+  logic: { title: 'Логіка', emoji: '🧠' },
+  puzzles: { title: 'Головоломки', emoji: '🧩' },
   memory: { title: "Пам'ять", emoji: '🧠' },
   world: { title: 'Світ', emoji: '🌍' },
   life: { title: 'Життя', emoji: '💛' },
@@ -188,5 +189,12 @@ export const SUBJECT_META: Record<Subject, { title: string; emoji: string }> = {
 };
 
 export const SUBJECT_ORDER: Subject[] = [
-  'math', 'language', 'english', 'science', 'logic', 'memory', 'world', 'life', 'attention',
+  'math', 'language', 'english', 'puzzles', 'science', 'logic', 'memory', 'world', 'life', 'attention',
 ];
+
+/**
+ * Ігри, які на головному екрані не показуємо: їх замінили повніші
+ * (english-word-picture — 12 слів → «Мої слова» на 89 слів з повтором).
+ * У реєстрі лишаються — для старих посилань і історії прогресу.
+ */
+export const HUB_HIDDEN = new Set(['english-word-picture']);

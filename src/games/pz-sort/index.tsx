@@ -65,7 +65,7 @@ function Component({ round, onAnswer }: GameComponentProps<{ tubes: Tubes }, Ans
 const pzSort: GameDefinition<{ tubes: Tubes }, Answer> = {
   id: 'pz-sort',
   title: 'Сортуй кольори',
-  subject: 'logic',
+  subject: 'puzzles',
   levels: ['L0', 'L3'],
   icon: '🧪',
   description: 'Переливай кольори між пробірками, щоб у кожній був один колір.',

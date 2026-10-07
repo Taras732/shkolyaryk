@@ -79,7 +79,7 @@ function Component({ round, onAnswer }: GameComponentProps<Payload, Answer>) {
 const slidePuzzle: GameDefinition<Payload, Answer> = {
   id: 'slide-puzzle',
   title: "П'ятнашки",
-  subject: 'logic',
+  subject: 'puzzles',
   levels: ['L0', 'L3'],
   icon: '🔲',
   description: 'Пересувай шматочки на порожнє місце, щоб скласти картинку.',

@@ -79,7 +79,7 @@ function Component({ round, onAnswer }: GameComponentProps<Payload, Answer>) {
 const picPuzzle: GameDefinition<Payload, Answer> = {
   id: 'pic-puzzle',
   title: 'Склади картинку',
-  subject: 'logic',
+  subject: 'puzzles',
   levels: ['L0', 'L3'],
   icon: '🧩',
   description: 'Пазл: поміняй шматочки місцями й склади картинку.',

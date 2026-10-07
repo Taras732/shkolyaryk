@@ -73,7 +73,7 @@ function Component({ round, onAnswer }: GameComponentProps<JugTask, Answer>) {
 const pzJugs: GameDefinition<JugTask, Answer> = {
   id: 'pz-jugs',
   title: 'Переливайка',
-  subject: 'logic',
+  subject: 'puzzles',
   levels: ['L3'],
   icon: '🫙',
   description: 'Відміряй рівно стільки літрів, скільки треба, переливаючи між банками.',
