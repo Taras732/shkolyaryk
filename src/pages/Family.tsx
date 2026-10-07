@@ -384,6 +384,9 @@ export default function Family() {
                   <span style={{ display: 'block', fontWeight: 900, fontSize: 18, color: 'var(--c-ink)' }}>{child.nickname}</span>
                   <span style={small}>{CLASS_META[profileClass(child)].title}</span>
                 </span>
+                <button className="g-btn ghost" style={{ width: 'auto', padding: '8px 12px', fontSize: 13 }} onClick={() => navigate(`/sheet/${child.id}`)}>
+                  🖨️ Аркуш
+                </button>
                 <button className="g-btn soft" style={{ width: 'auto', padding: '8px 14px', fontSize: 13 }} onClick={() => setOpen(open === child.id ? null : child.id)}>
                   {open === child.id ? 'Згорнути' : '⚙️ План'}
                 </button>
