@@ -21,6 +21,7 @@ import {
   type Question,
 } from './core';
 import { loadStats, saveStats } from './storage';
+import { loadParentTable } from '@/school/family-plan';
 
 /**
  * EP1 — чому саме так (контракт збережено для тестів і сумісності).
@@ -64,14 +65,15 @@ function Dots({ known, total }: { known: number; total: number }) {
   );
 }
 
-function Picker({ stats, onPick }: { stats: FactStats; onPick: (m: Mode) => void }) {
-  const rec = recommendedTable(stats);
+function Picker({ stats, onPick, parentTable }: { stats: FactStats; onPick: (m: Mode) => void; parentTable: number | null }) {
+  // таблиця, яку обрали батьки, важливіша за автоматичну рекомендацію
+  const rec = parentTable ?? recommendedTable(stats);
   const weakCount = weakFacts(stats).length;
   return (
     <>
       <PromptCard question="Яку таблицю тренуємо?" answerState="idle">
         <div style={{ fontSize: 14, color: 'var(--c-mut)', fontWeight: 600 }}>
-          {rec ? `Радимо: ×${rec}` : 'Уся таблиця вивчена! Тренуй «Мікс»'}
+          {parentTable ? `Сьогодні тренуємо: ×${rec}` : rec ? `Радимо: ×${rec}` : 'Уся таблиця вивчена! Тренуй «Мікс»'}
         </div>
       </PromptCard>
       <div className="g-choices" style={{ ['--g-cols' as string]: 4, marginTop: 0 }}>
@@ -212,6 +214,7 @@ function Drill({
 function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPayload, Answer>) {
   const profileId = useProfileStore((s) => s.activeProfile?.id) ?? 'guest';
   const [stats, setStats] = useState<FactStats>(() => loadStats(profileId));
+  const [parentTable] = useState(() => loadParentTable(profileId));
   const [mode, setMode] = useState<Mode | null>(null);
   const difficulty = round.payload.difficulty;
 
@@ -228,7 +231,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPaylo
   // стабільний колбек: інакше таймер переходу в Drill перезапускається з кожним ре-рендером
   const handleDone = useCallback(() => onAnswer(BOARD_DONE), [onAnswer]);
 
-  if (!mode || queue.length === 0) return <Picker stats={stats} onPick={setMode} />;
+  if (!mode || queue.length === 0) return <Picker stats={stats} onPick={setMode} parentTable={parentTable} />;
   return <Drill queue={queue} onFact={handleFact} onMistake={onMistake} onDone={handleDone} />;
 }
 

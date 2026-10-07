@@ -5,7 +5,8 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import { getGame, profileClass, profileLevel } from '@/games/registry';
 import { DIFFICULTY_LABEL, type Difficulty } from '@/games/types';
 import GameShell from '@/games/GameShell';
-import { AFTER_SCHOOL_PLAN, buildDayReport, isSameDay, type LastAttempt } from '@/school/after-school';
+import { buildDayReport, isSameDay, type LastAttempt } from '@/school/after-school';
+import { loadPlan } from '@/school/family-plan';
 import { loadDict } from '@/games/english-words/storage';
 import { loadStats } from '@/games/times-tables/storage';
 
@@ -26,7 +27,8 @@ export default function AfterSchool() {
 
   const now = Date.now();
   const profileId = activeProfile?.id ?? 'guest';
-  const plan = activeProfile ? AFTER_SCHOOL_PLAN[profileClass(activeProfile)] : [];
+  // план, налаштований батьками (/family); без налаштування — типовий для класу
+  const plan = activeProfile ? loadPlan(activeProfile.id, profileClass(activeProfile)).steps : [];
   const attempts: Record<string, LastAttempt | undefined> = useMemo(() => {
     const p = progress[profileId] ?? {};
     return Object.fromEntries(Object.entries(p).map(([id, g]) => [id, g.history as LastAttempt]));
@@ -72,7 +74,7 @@ export default function AfterSchool() {
           <div className="g-card" style={{ marginBottom: 14 }}>
             <div style={{ fontSize: 40 }}>{allDone ? '🎉' : '🎒'}</div>
             <div style={{ fontWeight: 900, fontSize: 18, color: 'var(--c-ink)', marginTop: 4 }}>
-              {allDone ? 'Готово на сьогодні!' : `Привіт, ${activeProfile.nickname}! Три кроки — і на сьогодні все`}
+              {allDone ? 'Готово на сьогодні!' : `Привіт, ${activeProfile.nickname}! ${plan.length} ${plan.length === 1 ? 'крок' : plan.length < 5 ? 'кроки' : 'кроків'} — і на сьогодні все`}
             </div>
           </div>
 
@@ -111,6 +113,9 @@ export default function AfterSchool() {
 
           <button className="g-btn soft" onClick={() => navigate('/homework')} style={{ marginTop: 6 }}>
             📷 Є домашка? Що в завданні?
+          </button>
+          <button className="g-btn ghost" onClick={() => navigate('/family')} style={{ marginTop: 10 }}>
+            ⚙️ Для батьків: план і тиждень
           </button>
 
           <div className="g-card" style={{ marginTop: 18, textAlign: 'left' }}>

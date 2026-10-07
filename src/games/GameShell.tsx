@@ -3,6 +3,7 @@ import confetti from 'canvas-confetti';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { recordActivity } from '@/utils/activity';
+import { logGame } from '@/school/game-log';
 import { recordGameResult } from '@/school/mastery';
 import { fetchPrereqHint, type PrereqHint } from '@/school/hint';
 import { isWeakResult, buildPrereqHintMessage } from '@/school/hint-core';
@@ -176,6 +177,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit }
     const newUnlocked = unlockedAfter(state.difficulty, state.stars, prevUnlocked);
     confetti({ particleCount: 140, spread: 80, origin: { y: 0.5 }, disableForReducedMotion: true });
     recordActivity(profileId);
+    logGame(profileId, { at: Date.now(), gameId: game.id, difficulty: state.difficulty, mistakes: state.mistakes, stars: state.stars });
     updateProgress(
       profileId,
       game.id,
