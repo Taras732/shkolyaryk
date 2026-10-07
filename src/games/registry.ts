@@ -29,6 +29,7 @@ import grammarParts from './grammar-parts';
 import ukLetters from './uk-letters';
 import ukSyllables from './uk-syllables';
 import ukReading from './uk-reading';
+import ukSpelling from './uk-spelling';
 // --- Англійська ---
 import lettersFindEn from './letters-find-en';
 import englishWordPicture from './english-word-picture';
@@ -69,7 +70,7 @@ export const GAMES: GameDefinition[] = [
   counting, addition, compare, mathExamples, timesTables, mathCompare,
   columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
-  ukLetters, ukSyllables, ukReading, lettersFind, syllableBuild, readingSpeed, grammarParts,
+  ukLetters, ukSyllables, ukReading, ukSpelling, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
   englishWords, enReading, lettersFindEn, englishWordPicture,
   // Наука
@@ -143,6 +144,7 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   // мова/світ для старших
   'reading-speed': ['grade2', 'grade3', 'grade4'],
   'grammar-parts': ['grade2', 'grade3', 'grade4'],
+  'uk-spelling': ['grade2', 'grade3', 'grade4'],
   'continents-oceans': ['grade3', 'grade4'],
   'world-flags': ['grade2', 'grade3', 'grade4'],
   // переважно для найменших
