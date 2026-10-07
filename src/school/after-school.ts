@@ -16,7 +16,8 @@ export const AFTER_SCHOOL_PLAN: Record<ClassLevel, string[]> = {
   // дошкілля: буквар (Марія — букви з нуля) і злиття складів (Дарина), потім лічба
   preschool: ['uk-letters', 'uk-syllables', 'counting'],
   grade1: ['math-examples', 'word-problems', 'english-words'],
-  grade2: ['column-arithmetic', 'word-problems', 'english-words'],
+  // 2 клас: англійське ЧИТАННЯ (кейс Соломії: прочитала лише sun, run); 3 клас — словник (кейс Емілії)
+  grade2: ['column-arithmetic', 'word-problems', 'en-reading'],
   grade3: ['times-tables', 'word-problems', 'english-words'],
   grade4: ['times-tables', 'word-problems', 'english-words'],
 };
