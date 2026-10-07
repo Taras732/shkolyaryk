@@ -68,10 +68,21 @@ import findShadow from './find-shadow';
 import findSame from './find-same';
 import picPuzzle from './pic-puzzle';
 import slidePuzzle from './slide-puzzle';
+// --- Головоломки (переливання, зважування, логіка) ---
+import pzJugs from './pz-jugs';
+import pzSort from './pz-sort';
+import pzScales from './pz-scales';
+import pzShare from './pz-share';
+import pzHanoi from './pz-hanoi';
+import pzLights from './pz-lights';
+import pzMaze from './pz-maze';
+import pzHeavier from './pz-heavier';
+import pzPath from './pz-path';
+import pzRiver from './pz-river';
 
 export const GAMES: GameDefinition[] = [
   // Математика
-  counting, addition, compare, mathExamples, timesTables, mathCompare,
+  counting, addition, compare, pzShare, pzScales, pzPath, mathExamples, timesTables, mathCompare,
   columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
   ukLetters, ukSyllables, ukReading, ukSpelling, lettersFind, syllableBuild, readingSpeed, grammarParts,
@@ -80,7 +91,7 @@ export const GAMES: GameDefinition[] = [
   // Наука
   colorsFind, shapes, waterStates, sinkFloat, animalsHabitat, plantGrow, seasonsWeather, gears,
   // Логіка
-  picPuzzle, slidePuzzle, logicSequences, sortingGame, sudoku, magicSquare, commandMachine,
+  picPuzzle, slidePuzzle, pzJugs, pzSort, pzHanoi, pzLights, pzMaze, pzHeavier, pzRiver, logicSequences, sortingGame, sudoku, magicSquare, commandMachine,
   // Пам'ять
   memoryPairs, whatsChanged, digitSpan, reverseSequence, memoryAssociations,
   // Світ
