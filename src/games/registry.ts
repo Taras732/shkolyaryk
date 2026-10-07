@@ -29,6 +29,7 @@ import grammarParts from './grammar-parts';
 // --- Англійська ---
 import lettersFindEn from './letters-find-en';
 import englishWordPicture from './english-word-picture';
+import englishWords from './english-words';
 // --- Наука ---
 import colorsFind from './colors-find';
 import shapes from './shapes';
@@ -66,7 +67,7 @@ export const GAMES: GameDefinition[] = [
   // Мова
   lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
-  lettersFindEn, englishWordPicture,
+  englishWords, lettersFindEn, englishWordPicture,
   // Наука
   colorsFind, shapes, waterStates, sinkFloat, animalsHabitat, plantGrow, seasonsWeather, gears,
   // Логіка
