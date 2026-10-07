@@ -64,6 +64,10 @@ import lifeScenarios from './life-scenarios';
 import breathing from './breathing';
 // --- Увага ---
 import tapTheDot from './tap-the-dot';
+import findShadow from './find-shadow';
+import findSame from './find-same';
+import picPuzzle from './pic-puzzle';
+import slidePuzzle from './slide-puzzle';
 
 export const GAMES: GameDefinition[] = [
   // Математика
@@ -76,7 +80,7 @@ export const GAMES: GameDefinition[] = [
   // Наука
   colorsFind, shapes, waterStates, sinkFloat, animalsHabitat, plantGrow, seasonsWeather, gears,
   // Логіка
-  logicSequences, sortingGame, sudoku, magicSquare, commandMachine,
+  picPuzzle, slidePuzzle, logicSequences, sortingGame, sudoku, magicSquare, commandMachine,
   // Пам'ять
   memoryPairs, whatsChanged, digitSpan, reverseSequence, memoryAssociations,
   // Світ
@@ -84,7 +88,7 @@ export const GAMES: GameDefinition[] = [
   // Життя
   emotionsRecognize, lifeScenarios, breathing,
   // Увага
-  tapTheDot,
+  findShadow, findSame, tapTheDot,
 ];
 
 const byId = new Map<string, GameDefinition>(GAMES.map((g) => [g.id, g]));
