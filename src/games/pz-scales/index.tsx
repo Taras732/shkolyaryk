@@ -56,7 +56,7 @@ function Component({ round, onAnswer }: GameComponentProps<{ tasks: ScaleTask[] 
   return (
     <>
       <Task
-        text={`Зваж ${t.item.name}: ${t.weight} кг ${t.item.emoji}`}
+        text={`Зваж ${t.item.acc}: ${t.weight} кг ${t.item.emoji}`}
         sub={`Задача ${ti + 1} з ${tasks.length}. ${t.twoSided ? 'Гирі можна класти на будь-яку шальку — навіть до предмета!' : 'Клади гирі на праву шальку, поки терези не врівноважаться.'}`}
       />
       <Scales t={t} sides={sides} setSide={setSide} />

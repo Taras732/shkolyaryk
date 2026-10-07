@@ -24,7 +24,7 @@ export interface Cvc {
 
 /** Слова «склад + звук» — лише з того набору приголосних і голосних, що вище. */
 export const CVC_WORDS: Cvc[] = [
-  { syl: 'МА', end: 'К', word: 'МАК', emoji: '🌺' },
+  { syl: 'КИ', end: 'Т', word: 'КИТ', emoji: '🐋' },
   { syl: 'КІ', end: 'Т', word: 'КІТ', emoji: '🐱' },
   { syl: 'ДІ', end: 'М', word: 'ДІМ', emoji: '🏠' },
   { syl: 'НІ', end: 'С', word: 'НІС', emoji: '👃' },

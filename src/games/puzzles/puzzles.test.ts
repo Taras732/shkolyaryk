@@ -53,7 +53,7 @@ describe('Терези', () => {
     }
   });
   it('баланс: гирі справа мінус предмет', () => {
-    const t = { item: { emoji: '🍉', name: 'кавун' }, weight: 7, weights: [1, 2, 5], twoSided: false };
+    const t = { item: { emoji: '🍉', name: 'кавун', acc: 'кавун' }, weight: 7, weights: [1, 2, 5], twoSided: false };
     expect(balance(t, [0, 1, 1])).toBe(0);
   });
 });

@@ -9,15 +9,15 @@ import { pickOne, shuffleWith } from '../puzzles/shared';
 export type Side = 0 | 1 | -1; // 0 — не на терезах, 1 — права шалька, -1 — ліва (до предмета)
 
 export interface ScaleTask {
-  item: { emoji: string; name: string };
+  item: { emoji: string; name: string; acc: string };
   weight: number;
   weights: number[];
   twoSided: boolean;
 }
 
 const ITEMS = [
-  { emoji: '🍉', name: 'кавун' }, { emoji: '🎃', name: 'гарбуз' }, { emoji: '🧺', name: 'кошик' },
-  { emoji: '🐱', name: 'котик' }, { emoji: '🎒', name: 'рюкзак' }, { emoji: '🍍', name: 'ананас' },
+  { emoji: '🍉', name: 'кавун', acc: 'кавун' }, { emoji: '🎃', name: 'гарбуз', acc: 'гарбуз' }, { emoji: '🧺', name: 'кошик', acc: 'кошик' },
+  { emoji: '🐱', name: 'котик', acc: 'котика' }, { emoji: '🎒', name: 'рюкзак', acc: 'рюкзак' }, { emoji: '🍍', name: 'ананас', acc: 'ананас' },
 ];
 
 const SETS: Record<Difficulty, number[]> = { 1: [1, 2, 5], 2: [1, 2, 4, 8], 3: [1, 3, 9] };

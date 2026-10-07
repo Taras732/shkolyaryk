@@ -112,6 +112,9 @@ const NAMES: Name[] = [
   { nom: 'Назар', gen: 'Назара', read: 'прочитав' },
 ];
 
+/** «У Максима», але «В Оленки» — милозвучність на початку речення. */
+const uv = (n: Name) => (/^[АЕЄИІЇОУЮЯ]/.test(n.gen) ? 'В' : 'У');
+
 function twoNames(): [Name, Name] {
   const a = pick(NAMES);
   let b = pick(NAMES);
@@ -165,7 +168,7 @@ const addMore: Template = (cfg) => {
   const a = safe(lo, Math.floor(hi * 0.6));
   const b = safe(2, Math.min(hi - a, Math.max(9, Math.floor(hi / 3))));
   return {
-    text: `У ${p.gen} ${a} ${plural(a, f)}, а в ${q.gen} — на ${b} більше. Скільки марок у ${q.gen}?`,
+    text: `${uv(p)} ${p.gen} ${a} ${plural(a, f)}, а в ${q.gen} — на ${b} більше. Скільки марок у ${q.gen}?`,
     emoji: '✉️', op: '+', x: a, y: b, answer: a + b,
     cue: `«На ${b} більше» — це стільки ж, та ще ${b}: додаємо`,
     solution: [`${a} + ${b} = ${a + b}`],
@@ -180,7 +183,7 @@ const subLess: Template = (cfg) => {
   const a = safe(Math.max(lo, 10), hi);
   const b = safe(2, Math.min(a - 2, Math.max(9, Math.floor(hi / 3))));
   return {
-    text: `У ${p.gen} ${a} ${plural(a, f)}, а в ${q.gen} — на ${b} менше. Скільки наліпок у ${q.gen}?`,
+    text: `${uv(p)} ${p.gen} ${a} ${plural(a, f)}, а в ${q.gen} — на ${b} менше. Скільки наліпок у ${q.gen}?`,
     emoji: '⭐', op: '−', x: a, y: b, answer: a - b,
     cue: `«На ${b} менше» — це стільки ж, але без ${b}: віднімаємо`,
     solution: [`${a} − ${b} = ${a - b}`],
@@ -195,7 +198,7 @@ const subCompare: Template = (cfg) => {
   const a = safe(Math.max(lo, 10), hi);
   const b = safe(Math.max(2, Math.floor(a / 3)), a - 2);
   return {
-    text: `У ${p.gen} ${a} ${plural(a, f)}, а в ${q.gen} — ${b} ${plural(b, f)}. На скільки намистинок у ${p.gen} більше?`,
+    text: `${uv(p)} ${p.gen} ${a} ${plural(a, f)}, а в ${q.gen} — ${b} ${plural(b, f)}. На скільки намистинок у ${p.gen} більше?`,
     emoji: '📿', op: '−', x: a, y: b, answer: a - b,
     cue: '«На скільки більше?» — порівнюємо: від більшого віднімаємо менше',
     solution: [`${a} − ${b} = ${a - b}`],
@@ -210,7 +213,7 @@ const mulGroups: Template = (cfg) => {
   return {
     text: `У кожній з ${k} коробок лежить по ${n} ${plural(n, f)}. Скільки всього олівців?`,
     emoji: '✏️', op: '×', x: n, y: k, answer: n * k,
-    cue: `Однакові групи: ${k} разів по ${n} — це множення`,
+    cue: `Однакові групи: ${times(k)} по ${n} — це множення`,
     solution: [`${n} × ${k} = ${n * k}`],
     hint: { kind: 'groups', groups: k, per: n, emoji: '✏️' },
   };
@@ -224,7 +227,7 @@ const mulTimes: Template = (cfg) => {
   return {
     text: `${p.nom} ${p.read} ${n} ${plural(n, f)}, а ${q.nom} — у ${times(k)} більше. Скільки сторінок ${q.read} ${q.nom}?`,
     emoji: '📖', op: '×', x: n, y: k, answer: n * k,
-    cue: `«У ${times(k)} більше» — ${k} разів по ${n}: множимо`,
+    cue: `«У ${times(k)} більше» — ${times(k)} по ${n}: множимо`,
     solution: [`${n} × ${k} = ${n * k}`],
     hint: { kind: 'groups', groups: k, per: n, emoji: '📄' },
   };
@@ -265,7 +268,7 @@ const divTimes: Template = (cfg) => {
   const k = randInt(2, Math.min(cfg.mulMax, 5));
   const a = n * k;
   return {
-    text: `У ${p.gen} ${a} ${plural(a, f)}, а в ${q.gen} — у ${times(k)} менше. Скільки машинок у ${q.gen}?`,
+    text: `${uv(p)} ${p.gen} ${a} ${plural(a, f)}, а в ${q.gen} — у ${times(k)} менше. Скільки машинок у ${q.gen}?`,
     emoji: '🚗', op: '÷', x: a, y: k, answer: n,
     cue: `«У ${times(k)} менше» — ділимо на ${k}`,
     solution: [`${a} ÷ ${k} = ${n}`],
@@ -294,9 +297,9 @@ const twoGroupsSub: Template = (cfg) => {
   const f: Forms = ['пакет', 'пакети', 'пакетів'];
   const k = randInt(2, cfg.mulMax);
   const n = randInt(3, cfg.mulMax);
-  const c = randInt(1, n * k - 2);
+  const c = safe(2, n * k - 2);
   return {
-    text: `Тато купив ${k} ${plural(k, f)} кульок, у кожному по ${n}. На святі лопнуло ${c}. Скільки кульок лишилось?`,
+    text: `Тато купив ${k} ${plural(k, f)} кульок, у кожному по ${n}. На святі лопнуло ${c} ${plural(c, ['кулька', 'кульки', 'кульок'])}. Скільки кульок лишилось?`,
     emoji: '🎈', op: null, x: 0, y: 0, answer: n * k - c,
     cue: 'Дві дії: спершу скільки всього (×), потім скільки лишилось (−)',
     solution: [`1) ${n} × ${k} = ${n * k}`, `2) ${n * k} − ${c} = ${n * k - c}`],
@@ -323,7 +326,7 @@ const twoAddOnly: Template = (cfg) => {
   const [, hi] = addRange(cfg);
   const a = safe(3, Math.floor(hi / 2));
   const b = safe(2, Math.floor((hi - a) / 2));
-  const c = safe(1, Math.max(1, hi - a - b));
+  const c = safe(2, Math.max(2, hi - a - b));
   return {
     text: `На гілці сиділо ${a} ${plural(a, ['пташка', 'пташки', 'пташок'])}. Прилетіло ще ${b}, а потім ще ${c}. Скільки пташок стало на гілці?`,
     emoji: '🐦', op: null, x: 0, y: 0, answer: a + b + c,
