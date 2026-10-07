@@ -13,7 +13,9 @@ REPORT_HOUR = "20"
 
 # Вечірній звіт батькам у Telegram: події ігор з пристроїв дітей → KV → щогодинний cron,
 # що надсилає підсумок о REPORT_HOUR за Києвом (так перехід на зимовий час не зсуває звіт).
-# Секрети: TG_BOT_TOKEN (бот Школярика від @BotFather), TG_CHAT_ID (чат Тараса з ботом).
+# Секрети: TG_BOT_TOKEN — бот Life OS Тараса (рішення 07.10: звіти через Life OS, не окремий бот);
+#          TG_CHAT_ID — група Life OS; TG_THREAD_ID — тема «Школярик» у ній.
+# Без TG_CHAT_ID воркер сам бере чат з getUpdates — лише для окремого бота, НЕ для Life OS.
 [[kv_namespaces]]
 binding = "REPORTS"
 id = "e2f104788360456ca80119656ff83643"

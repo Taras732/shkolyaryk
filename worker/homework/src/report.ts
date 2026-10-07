@@ -12,6 +12,8 @@ export interface ReportEnv {
   REPORTS: KVNamespace;
   TG_BOT_TOKEN?: string;
   TG_CHAT_ID?: string;
+  /** Тема (topic) у групі з темами — як у Life OS: звіт Школярика окремою темою. */
+  TG_THREAD_ID?: string;
   REPORT_HOUR: string;
 }
 
@@ -117,6 +119,9 @@ const TG_CHAT = 'tg_chat';
  */
 export async function linkTelegram(env: ReportEnv): Promise<string | null> {
   if (!env.TG_BOT_TOKEN) return null;
+  // чат заданий явно (бот Life OS) — getUpdates не чіпаємо: бот уже читає свої оновлення сам,
+  // і наш виклик міг би їх у нього забрати
+  if (env.TG_CHAT_ID) return 'Life OS';
   const res = await fetch(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/getUpdates`);
   if (!res.ok) return null;
   const data = (await res.json()) as { result?: { message?: { chat?: { id: number; type: string; first_name?: string } } }[] };
@@ -133,7 +138,13 @@ export async function sendTelegram(env: ReportEnv, text: string): Promise<boolea
   const res = await fetch(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true }),
+    body: JSON.stringify({
+      chat_id: chatId,
+      ...(env.TG_THREAD_ID ? { message_thread_id: Number(env.TG_THREAD_ID) } : {}),
+      text,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+    }),
   });
   return res.ok;
 }
