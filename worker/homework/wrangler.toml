@@ -9,3 +9,14 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ALLOWED_ORIGINS = "https://shkolyaryk-dev.kuznya.studio,https://shkolyaryk.kuznya.studio,http://localhost:5179"
+REPORT_HOUR = "20"
+
+# Вечірній звіт батькам у Telegram: події ігор з пристроїв дітей → KV → щогодинний cron,
+# що надсилає підсумок о REPORT_HOUR за Києвом (так перехід на зимовий час не зсуває звіт).
+# Секрети: TG_BOT_TOKEN (бот Школярика від @BotFather), TG_CHAT_ID (чат Тараса з ботом).
+[[kv_namespaces]]
+binding = "REPORTS"
+id = "e2f104788360456ca80119656ff83643"
+
+[triggers]
+crons = ["0 * * * *"]

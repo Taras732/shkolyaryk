@@ -7,8 +7,11 @@ import { DIFFICULTY_LABEL, type Difficulty } from '@/games/types';
 import GameShell from '@/games/GameShell';
 import { buildDayReport, isSameDay, type LastAttempt } from '@/school/after-school';
 import { loadPlan } from '@/school/family-plan';
+import { completeDay, goalProgress, loadRewards, saveRewards, streak, type Rewards } from '@/school/rewards';
 import { loadDict } from '@/games/english-words/storage';
 import { loadStats } from '@/games/times-tables/storage';
+import { weakFacts } from '@/games/times-tables/core';
+import { sendDaySummary } from '@/school/report-sync';
 
 /**
  * «Після школи»: три кроки під клас дитини + звіт «що зроблено сьогодні»
@@ -41,6 +44,35 @@ export default function AfterSchool() {
     [attempts, profileId, playing],
   );
 
+  const doneToday = (id: string) => isSameDay(attempts[id]?.at, now);
+  const allDone = plan.length > 0 && plan.every(doneToday);
+  const nextId = plan.find((id) => !doneToday(id));
+
+  const [rewards, setRewards] = useState<Rewards>(() => loadRewards(profileId));
+  const [newSticker, setNewSticker] = useState<string | null>(null);
+  const [showAlbum, setShowAlbum] = useState(false);
+  useEffect(() => setRewards(loadRewards(profileId)), [profileId]);
+  // усі кроки зроблені — зараховуємо день і даємо наліпку (раз на день)
+  useEffect(() => {
+    if (playing || !activeProfile) return;
+    let sticker: string | null = null;
+    if (allDone) {
+      const res = completeDay(loadRewards(profileId), Date.now());
+      sticker = res.sticker;
+      if (sticker) {
+        saveRewards(profileId, res.rewards);
+        setRewards(res.rewards);
+        setNewSticker(sticker);
+      }
+    }
+    // підсумок дня для вечірнього звіту: що зроблено і що дитина ще плутає
+    if (Object.values(attempts).some((a) => isSameDay(a?.at, Date.now()))) {
+      const shaky = weakFacts(loadStats(profileId)).slice(0, 6).map((k) => k.replace('x', '×'));
+      sendDaySummary(activeProfile, { afterSchoolDone: allDone, shaky, sticker: sticker ?? undefined });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allDone, playing, profileId, activeProfile]);
+
   if (!activeProfile) return <div style={{ padding: 24, textAlign: 'center', color: 'var(--c-mut)', fontWeight: 800 }}>Завантаження…</div>;
 
   if (playing) {
@@ -57,9 +89,8 @@ export default function AfterSchool() {
     );
   }
 
-  const doneToday = (id: string) => isSameDay(attempts[id]?.at, now);
-  const allDone = plan.every(doneToday);
-  const nextId = plan.find((id) => !doneToday(id));
+  const fire = streak(rewards, now);
+  const goal = goalProgress(rewards);
 
   return (
     <div className="g-screen">
@@ -77,6 +108,44 @@ export default function AfterSchool() {
               {allDone ? 'Готово на сьогодні!' : `Привіт, ${activeProfile.nickname}! ${plan.length} ${plan.length === 1 ? 'крок' : plan.length < 5 ? 'кроки' : 'кроків'} — і на сьогодні все`}
             </div>
           </div>
+
+          {newSticker && (
+            <div className="g-card" style={{ marginBottom: 14, background: '#FFF7ED', borderColor: '#FED7AA', animation: 'fadeInUp .4s ease both' }}>
+              <div style={{ fontSize: 13, fontWeight: 900, color: '#C2410C', textTransform: 'uppercase' }}>Нова наліпка!</div>
+              <div style={{ fontSize: 72, animation: 'starPop .6s ease both' }}>{newSticker}</div>
+            </div>
+          )}
+
+          {(fire > 0 || goal || rewards.stickers.length > 0) && (
+            <div className="g-card" style={{ marginBottom: 14, textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                {fire > 0 && <span style={{ fontWeight: 900, fontSize: 16, color: '#C2410C' }}>🔥 {fire} {fire === 1 ? 'день' : fire < 5 ? 'дні' : 'днів'} поспіль</span>}
+                <span style={{ flex: 1 }} />
+                {rewards.stickers.length > 0 && (
+                  <button className="g-btn soft" style={{ width: 'auto', padding: '6px 12px', fontSize: 13 }} onClick={() => setShowAlbum(!showAlbum)}>
+                    Мої наліпки · {rewards.stickers.length}
+                  </button>
+                )}
+              </div>
+              {goal && rewards.goal && (
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--c-ink)' }}>
+                    {goal.reached ? `🎉 Нагорода твоя: ${rewards.goal.text}! Покажи батькам` : `🎁 ${rewards.goal.text}: ${goal.done} з ${goal.need} днів`}
+                  </div>
+                  <div style={{ height: 10, borderRadius: 5, background: 'var(--c-line)', marginTop: 6, overflow: 'hidden' }}>
+                    <div style={{ width: `${(goal.done / goal.need) * 100}%`, height: '100%', background: goal.reached ? 'var(--c-green)' : 'var(--c-primary)', transition: 'width .5s' }} />
+                  </div>
+                </div>
+              )}
+              {showAlbum && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 4, marginTop: 10, fontSize: 26, textAlign: 'center' }}>
+                  {rewards.stickers.map((st, i) => (
+                    <span key={i}>{st}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {plan.map((id, i) => {
             const g = getGame(id);

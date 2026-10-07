@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Event, buildReport, scheduledReport, storeEvent, type ReportEnv } from './report';
 
 /**
  * «Що в завданні?» — дитина фотографує сторінку підручника чи зошита,
@@ -16,7 +17,7 @@ import { z } from 'zod';
  * Від чужих запитів — сімейний код (секрет FAMILY_CODE) і список дозволених origin.
  */
 
-interface Env {
+interface Env extends ReportEnv {
   DEEPSEEK_API_KEY: string;
   FAMILY_CODE: string;
   ALLOWED_ORIGINS: string;
@@ -59,7 +60,7 @@ function cors(origin: string | null, env: Env): Record<string, string> {
   if (!origin || !allowed.includes(origin)) return {};
   return {
     'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, X-Family-Code',
     Vary: 'Origin',
   };
@@ -114,8 +115,22 @@ export default {
 
     if (req.method === 'OPTIONS') return new Response(null, { status: headers['Access-Control-Allow-Origin'] ? 204 : 403, headers });
     if (!headers['Access-Control-Allow-Origin']) return json({ error: 'origin' }, 403, {});
-    if (req.method !== 'POST') return json({ error: 'method' }, 405, headers);
     if (!sameCode(req.headers.get('X-Family-Code') ?? '', env.FAMILY_CODE ?? '')) return json({ error: 'code' }, 401, headers);
+
+    const path = new URL(req.url).pathname;
+    // подія гри з пристрою дитини — для вечірнього звіту
+    if (path === '/event' && req.method === 'POST') {
+      const parsed = Event.safeParse(await req.json().catch(() => null));
+      if (!parsed.success) return json({ error: 'bad_request' }, 400, headers);
+      await storeEvent(parsed.data, env);
+      return json({ ok: true }, 200, headers);
+    }
+    // перегляд сьогоднішнього звіту (для батьків і для перевірки без Telegram)
+    if (path === '/report' && req.method === 'GET') {
+      const { text } = await buildReport(env, new Date());
+      return json({ text }, 200, headers);
+    }
+    if (req.method !== 'POST' || (path !== '/' && path !== '/explain')) return json({ error: 'not_found' }, 404, headers);
 
     let image: string;
     try {
@@ -138,5 +153,9 @@ export default {
       // невалідний JSON від моделі теж сюди — для дитини це «не вдалося пояснити»
       return json({ error: 'no_answer' }, 422, headers);
     }
+  },
+
+  async scheduled(_ctrl: ScheduledController, env: Env): Promise<void> {
+    await scheduledReport(env, new Date());
   },
 };

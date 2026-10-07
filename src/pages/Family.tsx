@@ -13,6 +13,9 @@ import { loadDict } from '@/games/english-words/storage';
 import { counts as wordCounts } from '@/games/english-words/core';
 import { LETTERS } from '@/games/uk-letters/letters';
 import { isKnown as letterKnown, type LetterProgress } from '@/games/uk-letters/core';
+import { HOMEWORK_API, loadFamilyCode, saveFamilyCode } from '@/school/homework';
+import { fetchTodayReport } from '@/school/report-sync';
+import { claimGoal, goalProgress, loadRewards, saveRewards, setGoal, streak, type Rewards } from '@/school/rewards';
 
 const DOW = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
@@ -178,6 +181,103 @@ function PlanEditor({ child }: { child: ChildProfile }) {
   );
 }
 
+/** Нагорода, яку ставлять батьки: «N днів «Після школи» — …». Дні не обов'язково поспіль. */
+function RewardEditor({ child }: { child: ChildProfile }) {
+  const [r, setR] = useState<Rewards>(() => loadRewards(child.id));
+  const [text, setText] = useState(r.goal?.text ?? '');
+  const [days, setDays] = useState(r.goal?.days ?? 5);
+  const p = goalProgress(r);
+  const update = (next: Rewards) => {
+    setR(next);
+    saveRewards(child.id, next);
+  };
+  const fire = streak(r, Date.now());
+
+  return (
+    <>
+      <div style={h}>Нагорода</div>
+      <div style={{ ...small, marginBottom: 8 }}>
+        Наліпок: <b style={{ color: 'var(--c-ink)' }}>{r.stickers.length}</b> · серія: <b style={{ color: 'var(--c-ink)' }}>{fire}</b> · нагород видано: <b style={{ color: 'var(--c-ink)' }}>{r.claimed}</b>
+      </div>
+      {p && r.goal && (
+        <div style={{ fontSize: 14, fontWeight: 800, color: p.reached ? '#15803D' : 'var(--c-ink)', marginBottom: 8 }}>
+          {p.reached ? `🎉 Заслужено: ${r.goal.text}` : `🎁 ${r.goal.text}: ${p.done} з ${p.need} днів`}
+          {p.reached && (
+            <button className="g-btn primary" style={{ marginTop: 8 }} onClick={() => update(claimGoal(r, Date.now()))}>
+              ✅ Нагороду видано — почати знову
+            </button>
+          )}
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Напр.: кіно в суботу"
+          style={{ flex: 1, minWidth: 0, padding: 10, borderRadius: 'var(--c-r-sm)', border: '1.5px solid var(--c-line)', fontWeight: 700 }}
+        />
+        <select value={days} onChange={(e) => setDays(Number(e.target.value))} style={{ padding: 10, borderRadius: 'var(--c-r-sm)', border: '1.5px solid var(--c-line)', fontWeight: 800 }}>
+          {[3, 5, 7, 10, 14].map((n) => (
+            <option key={n} value={n}>
+              {n} днів
+            </option>
+          ))}
+        </select>
+      </div>
+      <button className="g-btn soft" style={{ marginTop: 8, padding: 10, fontSize: 14 }} onClick={() => update(setGoal(r, text, days, Date.now()))}>
+        {r.goal ? 'Змінити нагороду (лічба почнеться з сьогодні)' : 'Поставити нагороду'}
+      </button>
+    </>
+  );
+}
+
+/**
+ * Звіт у Telegram і сімейний код ЦЬОГО пристрою. Код треба ввести на кожному
+ * пристрої дитини один раз — без нього ігри не надсилають подій для звіту.
+ */
+function ReportPanel() {
+  const [code, setCode] = useState(loadFamilyCode);
+  const [draft, setDraft] = useState('');
+  const [preview, setPreview] = useState<string | null>(null);
+  if (!HOMEWORK_API) return null;
+  return (
+    <div className="g-card" style={{ textAlign: 'left', marginBottom: 14 }}>
+      <div style={{ ...h, marginTop: 0 }}>Вечірній звіт у Telegram</div>
+      {code ? (
+        <>
+          <div style={small}>✅ Цей пристрій надсилає події для звіту. Звіт приходить о 20:00.</div>
+          <button
+            className="g-btn soft"
+            style={{ marginTop: 10, padding: 10, fontSize: 14 }}
+            onClick={async () => setPreview((await fetchTodayReport()) ?? 'Не вдалося отримати звіт.')}
+          >
+            Показати, що прийде сьогодні
+          </button>
+          {preview && (
+            <div style={{ marginTop: 10, whiteSpace: 'pre-wrap', fontSize: 13.5, fontWeight: 600, color: 'var(--c-ink)', background: 'var(--c-primary-soft)', borderRadius: 'var(--c-r-sm)', padding: 12 }}>
+              {/* у Telegram жирний — тут просто текст: без innerHTML, імена дітей не інтерпретуються як розмітка */}
+              {preview.replace(/<\/?b>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')}
+            </div>
+          )}
+          <button className="g-btn ghost" style={{ marginTop: 8, padding: 8, fontSize: 12 }} onClick={() => { saveFamilyCode(''); setCode(''); }}>
+            Забути код на цьому пристрої
+          </button>
+        </>
+      ) : (
+        <>
+          <div style={{ ...small, marginBottom: 8 }}>Введіть сімейний код на цьому пристрої — тоді ігри дитини потраплять у вечірній звіт.</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input type="password" inputMode="numeric" value={draft} onChange={(e) => setDraft(e.target.value)} style={{ flex: 1, minWidth: 0, padding: 10, borderRadius: 'var(--c-r-sm)', border: '1.5px solid var(--c-line)', fontSize: 18, textAlign: 'center' }} />
+            <button className="g-btn primary" style={{ width: 'auto', padding: '10px 16px' }} disabled={!draft.trim()} onClick={() => { saveFamilyCode(draft.trim()); setCode(draft.trim()); setDraft(''); }}>
+              Зберегти
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 /** «Для батьків»: план і тиждень кожної дитини на одному екрані. За батьківським замком. */
 export default function Family() {
   const navigate = useNavigate();
@@ -217,6 +317,7 @@ export default function Family() {
           <div style={{ flex: 1, fontWeight: 900, fontFamily: 'var(--font-round)', color: 'var(--c-ink)' }}>Для батьків</div>
         </div>
         <div className="g-scroll">
+          <ReportPanel />
           {profiles.length === 0 && <div className="g-card" style={small}>Профілів дітей ще немає.</div>}
           {profiles.map((child) => (
             <div key={child.id} className="g-card" style={{ textAlign: 'left', marginBottom: 14 }}>
@@ -229,7 +330,12 @@ export default function Family() {
                   {open === child.id ? 'Згорнути' : '⚙️ План'}
                 </button>
               </div>
-              {open === child.id && <PlanEditor child={child} />}
+              {open === child.id && (
+                <>
+                  <PlanEditor child={child} />
+                  <RewardEditor child={child} />
+                </>
+              )}
               <Week child={child} />
             </div>
           ))}
