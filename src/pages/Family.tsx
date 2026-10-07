@@ -242,7 +242,7 @@ function ReportPanel() {
   const [link, setLink] = useState<string | null>(null);
   if (!HOMEWORK_API) return null;
   const LINK_TEXT = {
-    ok: '✅ Telegram під'єднано — пробний звіт уже в чаті.',
+    ok: "✅ Telegram під'єднано — пробний звіт уже в чаті.",
     no_start: 'Спершу напишіть боту /start у Telegram, потім натисніть ще раз.',
     no_token: 'Бот ще не налаштований на сервері.',
     error: 'Не вдалося. Спробуйте пізніше.',
