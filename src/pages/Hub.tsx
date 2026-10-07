@@ -204,6 +204,20 @@ export default function Hub() {
                 </div>
               )}
 
+              {/* «Після школи» — одна точка входу для дитини; нагорі, бо на телефоні права колонка падає під усі предмети */}
+              <button
+                className="panel"
+                onClick={() => navigate('/after-school')}
+                style={{ display: 'flex', alignItems: 'center', gap: 14, width: '100%', textAlign: 'left', cursor: 'pointer', marginBottom: 18, background: 'var(--c-primary-soft)', border: '2px solid var(--c-primary)' }}
+              >
+                <span style={{ fontSize: 34 }}>🎒</span>
+                <span style={{ flex: 1 }}>
+                  <span style={{ display: 'block', fontWeight: 900, fontSize: 17, color: 'var(--c-primary)' }}>Після школи · 15 хв</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-mut)' }}>Три кроки: математика, задачі, англійські слова</span>
+                </span>
+                <Play size={20} strokeWidth={2} color="var(--c-primary)" />
+              </button>
+
               <div className="hub-cols">
                 {/* ліва: предмети */}
                 <div>

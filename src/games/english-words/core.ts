@@ -24,6 +24,10 @@ export interface WordState {
   due: number;
   ok: number;
   bad: number;
+  /** Коли дитина востаннє відповідала на це слово — для звіту «що зроблено сьогодні». */
+  last?: number;
+  /** Коли слово вперше з'явилось у словнику. */
+  added?: number;
 }
 
 export interface Dict {
@@ -73,13 +77,15 @@ export function newWords(dict: Dict, topic?: string, n = NEW_PER_LESSON): Word[]
  * інтервал; помилка → коробка 0, повтор сьогодні (і ще раз у цій же сесії).
  */
 export function record(dict: Dict, en: string, firstTry: boolean, now: number): Dict {
-  const prev = dict.words[en] ?? { box: 0, due: now, ok: 0, bad: 0 };
+  const prev: WordState = dict.words[en] ?? { box: 0, due: now, ok: 0, bad: 0, added: now };
   const box = firstTry ? Math.min(prev.box + 1, INTERVAL_DAYS.length - 1) : 0;
   const next: WordState = {
     box,
     due: now + INTERVAL_DAYS[box] * DAY,
     ok: prev.ok + (firstTry ? 1 : 0),
     bad: prev.bad + (firstTry ? 0 : 1),
+    last: now,
+    added: prev.added ?? now,
   };
   return { ...dict, words: { ...dict.words, [en]: next } };
 }
