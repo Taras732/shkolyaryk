@@ -26,6 +26,8 @@ import lettersFind from './letters-find';
 import syllableBuild from './syllable-build';
 import readingSpeed from './reading-speed';
 import grammarParts from './grammar-parts';
+import ukLetters from './uk-letters';
+import ukSyllables from './uk-syllables';
 // --- Англійська ---
 import lettersFindEn from './letters-find-en';
 import englishWordPicture from './english-word-picture';
@@ -65,7 +67,7 @@ export const GAMES: GameDefinition[] = [
   counting, addition, compare, mathExamples, timesTables, mathCompare,
   columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
-  lettersFind, syllableBuild, readingSpeed, grammarParts,
+  ukLetters, ukSyllables, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
   englishWords, lettersFindEn, englishWordPicture,
   // Наука

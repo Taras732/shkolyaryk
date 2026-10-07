@@ -13,7 +13,8 @@ import { statusOf } from '@/games/english-words/core';
  * стовпчиком (2 кл), текстові задачі з вибором дії, англійські слова.
  */
 export const AFTER_SCHOOL_PLAN: Record<ClassLevel, string[]> = {
-  preschool: ['counting', 'addition', 'english-words'],
+  // дошкілля: буквар (Марія — букви з нуля) і злиття складів (Дарина), потім лічба
+  preschool: ['uk-letters', 'uk-syllables', 'counting'],
   grade1: ['math-examples', 'word-problems', 'english-words'],
   grade2: ['column-arithmetic', 'word-problems', 'english-words'],
   grade3: ['times-tables', 'word-problems', 'english-words'],
