@@ -235,12 +235,19 @@ export default function GameShell({ game, level, classLevel, profileId, onExit }
           >
             ✕
           </button>
-          <div className="g-progress">
-            <span style={{ width: `${(state.roundIndex / total) * 100}%` }} />
-          </div>
-          <div className="g-count">
-            {state.roundIndex + 1}/{total}
-          </div>
+          {/* board-ігри ведуть власний лічильник — оболончиний «1/N» там не рухається */}
+          {round.answer === BOARD_DONE ? (
+            <div style={{ flex: 1 }} />
+          ) : (
+            <>
+              <div className="g-progress">
+                <span style={{ width: `${(state.roundIndex / total) * 100}%` }} />
+              </div>
+              <div className="g-count">
+                {state.roundIndex + 1}/{total}
+              </div>
+            </>
+          )}
           <div className="g-diffbadge">{DIFFICULTY_LABEL[state.difficulty]}</div>
         </div>
 
