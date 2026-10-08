@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { BOARD_DONE } from '../types';
 import { randInt } from '../shared/ui';
@@ -8,19 +8,21 @@ type Answer = typeof BOARD_DONE;
 interface Payload {
   dotSize: number;
   hitsNeeded: number;
+  /** Як часто крапка перелітає на нове місце, мс (вона весь час рухається). */
+  hopMs: number;
 }
 
-function paramsFor(difficulty: Difficulty): { dotSize: number; hitsNeeded: number } {
-  if (difficulty === 1) return { dotSize: 72, hitsNeeded: 6 };
-  if (difficulty === 2) return { dotSize: 54, hitsNeeded: 8 };
-  return { dotSize: 38, hitsNeeded: 10 };
+function paramsFor(difficulty: Difficulty): Payload {
+  if (difficulty === 1) return { dotSize: 76, hitsNeeded: 6, hopMs: 2200 };
+  if (difficulty === 2) return { dotSize: 58, hitsNeeded: 8, hopMs: 1500 };
+  return { dotSize: 44, hitsNeeded: 10, hopMs: 1050 };
 }
 
 function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
-  const { dotSize, hitsNeeded } = paramsFor(difficulty);
+  const payload = paramsFor(difficulty);
   const round: Round<Payload, Answer> = {
     id: `board-${difficulty}`,
-    payload: { dotSize, hitsNeeded },
+    payload,
     answer: BOARD_DONE,
   };
   return { difficulty, rounds: [round] };
@@ -31,9 +33,17 @@ function randomPos() {
 }
 
 function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<Payload, Answer>) {
-  const { dotSize, hitsNeeded } = round.payload;
+  const { dotSize, hitsNeeded, hopMs = 1800 } = round.payload;
   const [pos, setPos] = useState(randomPos);
   const [hits, setHits] = useState(0);
+  const [pop, setPop] = useState(false);
+
+  // крапка весь час перелітає з місця на місце (раніше стояла, поки не влучиш)
+  useEffect(() => {
+    if (disabled) return;
+    const t = setInterval(() => setPos(randomPos()), hopMs);
+    return () => clearInterval(t);
+  }, [hopMs, disabled, hits]);
 
   function handleHit() {
     if (disabled) return;
@@ -43,11 +53,14 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
       return;
     }
     setHits(next);
+    setPop(true);
+    setTimeout(() => setPop(false), 160);
     setPos(randomPos());
   }
 
   function handleMiss() {
-    if (disabled) return;
+    // на легкому рівні промах не карається: малі тільки вчаться влучати
+    if (disabled || hopMs >= 2000) return;
     onMistake();
   }
 
@@ -66,7 +79,7 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
       </div>
 
       <div
-        onClick={handleMiss}
+        onPointerDown={handleMiss}
         style={{
           position: 'relative',
           width: '100%',
@@ -75,11 +88,12 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
           background: 'var(--c-primary-soft)',
           overflow: 'hidden',
           cursor: 'pointer',
+          touchAction: 'manipulation',
         }}
       >
         <button
           type="button"
-          onClick={(e) => {
+          onPointerDown={(e) => {
             e.stopPropagation();
             handleHit();
           }}
@@ -97,6 +111,9 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
             background: 'linear-gradient(135deg, var(--c-pink), var(--c-primary))',
             boxShadow: '0 4px 14px rgba(255,110,199,.45)',
             cursor: disabled ? 'default' : 'pointer',
+            touchAction: 'manipulation',
+            transform: pop ? 'scale(1.35)' : 'scale(1)',
+            transition: `left ${hopMs * 0.6}ms cubic-bezier(.45,.05,.35,1), top ${hopMs * 0.6}ms cubic-bezier(.45,.05,.35,1), transform .15s`,
           }}
         />
       </div>
