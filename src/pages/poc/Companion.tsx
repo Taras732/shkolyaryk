@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { sayUk } from '@/games/shared/uk-audio';
-import Bunny, { type Face, type Zone } from './Bunny';
+import { type Face, type Zone } from './Bunny';
+import PuppetBunny from './PuppetBunny';
 
 /**
  * PoC звірятка v2 — «Друг-учень» (концепція B) + дотики з A.
@@ -159,8 +160,8 @@ export default function Companion() {
       </AnimatePresence>
 
       {/* зайчик */}
-      <div ref={bunnyBox} style={{ position: 'absolute', left: '14%', right: '14%', top: checkShown ? '36%' : '26%', height: '44%', transition: 'top .3s' }}>
-        <Bunny face={face} onZone={onZone} bounce={bounce} earFlop={ear} />
+      <div ref={bunnyBox} style={{ position: 'absolute', left: '4%', right: '4%', top: checkShown ? '32%' : '21%', height: 'auto', transition: 'top .3s' }}>
+        <PuppetBunny face={face} onZone={onZone} bounce={bounce} earFlop={ear} />
       </div>
 
       {/* що зайчик уже знає */}
