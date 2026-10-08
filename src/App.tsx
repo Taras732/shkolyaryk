@@ -17,6 +17,7 @@ import Sheet from './pages/Sheet';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 const Poc = lazy(() => import('./pages/poc/Poc'));
+const PlacePage = lazy(() => import('./pages/preschool/PlacePage'));
 import { runFamilySync } from '@/school/family-sync-run';
 
 // Легасі-сторінки (Welcome/Auth/Onboarding/...) поки в телефонній рамці.
@@ -66,6 +67,8 @@ export default function App() {
         <Route path="/game/:id" element={<WebShell><GamePlayer /></WebShell>} />
         {/* RL1 — движок «Правило» (Direct Instruction). Крок «Правило дня» у /day прийде окремо (Фаза 2). */}
         <Route path="/rule/:id" element={<WebShell><RuleLessonPlayer /></WebShell>} />
+        {/* Місце дошкілля (кімната з іграми). */}
+        <Route path="/place/:id" element={<WebShell><Suspense fallback={null}><PlacePage /></Suspense></WebShell>} />
         {/* PoC анімації — лише за прямим посиланням, окремим чанком. */}
         <Route path="/poc" element={<WebShell><Suspense fallback={null}><Poc /></Suspense></WebShell>} />
         {/* Невідомий URL → на головну (без білого екрана). */}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Home, Trophy, Star, Flame, Target, CalendarDays, Settings, Repeat, Play, Lock } from 'lucide-react';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -10,6 +10,9 @@ import { DIFFICULTY_LABEL, type Difficulty, type GameDefinition } from '@/games/
 import { getActivitySummary } from '@/utils/activity';
 import { storage } from '@/utils/storage';
 import { placementDoneKey } from '@/pages/Placement';
+
+// Дошкіллю — своя головна (кімнати зі свайпом + звірятко), окремим чанком.
+const PreschoolHome = lazy(() => import('./preschool/PreschoolHome'));
 
 const MASCOTS: Record<string, string> = {
   dragon: '/creatures/zodiac_dragon_fire.png',
@@ -53,6 +56,10 @@ export default function Hub() {
         Підготовка…
       </div>
     );
+  }
+
+  if (profileClass(activeProfile) === 'preschool') {
+    return <Suspense fallback={null}><PreschoolHome /></Suspense>;
   }
 
   const games = gamesForClass(profileClass(activeProfile)).filter((g) => !HUB_HIDDEN.has(g.id));
