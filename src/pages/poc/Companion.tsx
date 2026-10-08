@@ -27,8 +27,12 @@ function newRound(known: string[]): Round {
   return { kind: 'find', target, options: shuffle([target, ...shuffle(LETTERS.filter((l) => l !== target)).slice(0, 2)]) };
 }
 
+// Те, що дитина має впізнати, лише ЗВУЧИТЬ — у тексті бульбашки букви немає,
+// інакше завдання зводиться до пошуку такої самої фігури.
 const ask = (r: Round, first: boolean) =>
   r.kind === 'find' ? (first ? `Покажи мені букву ${r.target}!` : `А тепер — де буква ${r.target}?`) : `Я думаю, це буква ${r.target}. Правильно?`;
+const askText = (r: Round, first: boolean) =>
+  r.kind === 'find' ? (first ? 'Покажи мені букву, яку я скажу 🔊' : 'А тепер — послухай, яку букву шукаємо 🔊') : 'Я думаю, ця буква звучить так 🔊 Правильно?';
 
 export default function Companion() {
   const [mode, setMode] = useState<Mode>('friend');
@@ -43,12 +47,13 @@ export default function Companion() {
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const later = (ms: number, f: () => void) => { timers.current.push(setTimeout(f, ms)); };
-  const react = (f: Face, text: string | null, ms = 1500, after: Face = 'smile') => {
+  const react = (f: Face, text: string | null, ms = 1500, after: Face = 'smile', voice?: string) => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
     setFace(f);
     setBubble(text);
-    if (text) sayUk('poc.bunny', text.replace(/[^\p{L}\p{N}\s!?,.'-]/gu, ''));
+    const v = voice ?? text;
+    if (v) sayUk('poc.bunny', v.replace(/[^\p{L}\p{N}\s!?,.'-]/gu, ''));
     later(ms, () => setFace(after));
   };
 
@@ -72,7 +77,7 @@ export default function Companion() {
     setMode('teach');
     const r = newRound(known);
     setRound(r);
-    react('o', ask(r, true), 1200);
+    react('o', askText(r, true), 1200, 'smile', ask(r, true));
   };
 
   const next = (k: string[]) => {
@@ -80,7 +85,7 @@ export default function Companion() {
       const r = newRound(k);
       setRound(r);
       setFace('o');
-      setBubble(ask(r, false));
+      setBubble(askText(r, false));
       sayUk('poc.bunny', ask(r, false));
       later(1200, () => setFace('smile'));
     });
@@ -145,6 +150,9 @@ export default function Companion() {
           <motion.div key={bubble} initial={{ scale: 0.6, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             style={{ ...big, position: 'absolute', top: '11%', left: '8%', right: '8%', background: '#fff', borderRadius: 20, padding: '10px 14px', fontSize: 17, textAlign: 'center', color: '#1F2138', boxShadow: '0 6px 16px -8px rgba(0,0,0,.3)', zIndex: 3 }}>
             {bubble}
+            {mode === 'teach' && round && bubble === askText(round, true) || (mode === 'teach' && round && bubble === askText(round, false)) ? (
+              <button onClick={() => sayUk('poc.bunny', ask(round!, false))} style={{ display: 'block', margin: '6px auto 0', border: 0, borderRadius: 99, padding: '6px 14px', background: '#EDE7FF', color: '#7c3aed', fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 14, cursor: 'pointer' }}>🔊 Повтори</button>
+            ) : null}
             {checkShown && round?.kind === 'check' && <div style={{ fontSize: 56, lineHeight: 1.1, color: '#7c3aed', marginTop: 4 }}>{round.shown}</div>}
           </motion.div>
         )}
