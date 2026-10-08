@@ -18,6 +18,10 @@ export interface HomeworkExplanation {
   subject: 'english' | 'math' | 'ukrainian' | 'other';
   task: string;
   steps: string[];
+  /** Навідні запитання (новий воркер; старі відповіді без них). */
+  questions?: string[];
+  /** Як перевірити себе. */
+  selfCheck?: string;
   words: HomeworkWord[];
 }
 

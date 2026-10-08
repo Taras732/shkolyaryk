@@ -33,6 +33,8 @@ export default function Homework() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<HomeworkError | null>(null);
   const [result, setResult] = useState<HomeworkExplanation | null>(null);
+  // скільки підказок відкрито — спершу жодної
+  const [shown, setShown] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -45,6 +47,7 @@ export default function Homework() {
     setBusy(true);
     setError(null);
     setResult(null);
+    setShown(0);
     try {
       const image = await compressPhoto(file);
       setResult(await explainPhoto(image, code));
@@ -128,15 +131,37 @@ export default function Homework() {
               <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--c-ink)', lineHeight: 1.45 }}>{result.task}</div>
             </div>
 
+            {result.readable && (result.questions?.length ?? 0) > 0 && (
+              <div className="g-card" style={{ textAlign: 'left', marginBottom: 12 }}>
+                <div className="g-question" style={{ textAlign: 'left' }}>Подумай 🤔</div>
+                {result.questions!.map((q, i) => (
+                  <div key={i} style={{ fontWeight: 700, fontSize: 15, color: 'var(--c-ink)', marginTop: i ? 7 : 0 }}>• {q}</div>
+                ))}
+              </div>
+            )}
+
             {result.readable && result.steps.length > 0 && (
               <div className="g-card" style={{ textAlign: 'left', marginBottom: 12, background: 'var(--c-ok-bg)', borderColor: 'var(--c-ok-line)' }}>
-                <div className="g-question" style={{ textAlign: 'left', color: 'var(--c-ok-ink)' }}>З чого почати</div>
-                {result.steps.map((s, i) => (
+                <div className="g-question" style={{ textAlign: 'left', color: 'var(--c-ok-ink)' }}>Підказки — по одній</div>
+                {/* підказки відкриваються по одній: спершу дитина пробує сама */}
+                {result.steps.slice(0, shown).map((s, i) => (
                   <div key={i} style={{ display: 'flex', gap: 9, fontWeight: 700, fontSize: 15, color: 'var(--c-ok-ink)', marginTop: i ? 7 : 0 }}>
                     <span>{i + 1}.</span>
                     <span>{s}</span>
                   </div>
                 ))}
+                {shown < result.steps.length && (
+                  <button className="g-btn soft" style={{ marginTop: 10, padding: 10, fontSize: 14 }} onClick={() => setShown((n) => n + 1)}>
+                    {shown === 0 ? '💡 Дай підказку' : '💡 Ще підказку'}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {result.readable && result.selfCheck && (
+              <div className="g-card" style={{ textAlign: 'left', marginBottom: 12 }}>
+                <div className="g-question" style={{ textAlign: 'left' }}>Перевір себе ✅</div>
+                <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--c-ink)' }}>{result.selfCheck}</div>
               </div>
             )}
 
