@@ -7,7 +7,6 @@ import { DIFFICULTY_LABEL, type Difficulty } from '@/games/types';
 import GameShell from '@/games/GameShell';
 import { buildDayReport, isSameDay, type LastAttempt } from '@/school/after-school';
 import { resolvePlan } from '@/school/plan-resolve';
-import { checkDue } from '@/school/monthly-check';
 import { completeDay, goalProgress, loadRewards, saveRewards, streak, type Rewards } from '@/school/rewards';
 import { loadDict } from '@/games/english-words/storage';
 import { loadStats } from '@/games/times-tables/storage';
@@ -151,15 +150,6 @@ export default function AfterSchool() {
             </div>
           )}
 
-          {checkDue(profileId, now) && (
-            <button className="g-card" onClick={() => navigate('/check')} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', marginBottom: 10, cursor: 'pointer', background: '#FEF3C7', borderColor: '#FDE68A' }}>
-              <span style={{ fontSize: 30 }}>🧭</span>
-              <span style={{ flex: 1 }}>
-                <span style={{ display: 'block', fontWeight: 900, fontSize: 16, color: 'var(--c-ink)' }}>Перевірка місяця · 5 хв</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--c-mut)' }}>Раз на місяць — щоб план знав, що тренувати</span>
-              </span>
-            </button>
-          )}
 
           {plan.map((id, i) => {
             const g = getGame(id);
