@@ -62,7 +62,7 @@ export default function Companion() {
 
       <motion.img
         ref={bunny}
-        src="/poc/rabbit.webp"
+        src="/poc-assets/rabbit.webp"
         alt=""
         draggable={false}
         key={mood}

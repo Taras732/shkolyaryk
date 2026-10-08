@@ -52,7 +52,7 @@ function Bush({ pos, onTap, found, shaking, here }: { pos: [number, number, numb
 }
 
 function Rabbit({ pos, found }: { pos: [number, number, number]; found: boolean }) {
-  const { scene } = useGLTF('/poc/rabbit.glb');
+  const { scene } = useGLTF('/poc-assets/rabbit.glb');
   const model = useMemo(() => {
     const m = scene.clone(true);
     const box = new THREE.Box3().setFromObject(m);
@@ -127,4 +127,4 @@ export default function HideSeek3D() {
   );
 }
 
-useGLTF.preload('/poc/rabbit.glb');
+useGLTF.preload('/poc-assets/rabbit.glb');

@@ -68,7 +68,7 @@ export default function HideSeek2D() {
   };
 
   return (
-    <div style={{ position: 'relative', width: '100%', aspectRatio: '9 / 14', maxHeight: '78vh', borderRadius: 28, overflow: 'hidden', background: 'url(/poc/meadow.webp) center / cover', userSelect: 'none', touchAction: 'manipulation' }}>
+    <div style={{ position: 'relative', width: '100%', aspectRatio: '9 / 14', maxHeight: '78vh', borderRadius: 28, overflow: 'hidden', background: 'url(/poc-assets/meadow.webp) center / cover', userSelect: 'none', touchAction: 'manipulation' }}>
       {/* хмарка-підказка */}
       <motion.div
         key={round + phase}
@@ -86,7 +86,7 @@ export default function HideSeek2D() {
             {/* зайчик — шар ЗА кущем */}
             {here && (
               <motion.img
-                src="/poc/rabbit.webp"
+                src="/poc-assets/rabbit.webp"
                 alt=""
                 draggable={false}
                 initial={{ y: '18%' }}
@@ -97,7 +97,7 @@ export default function HideSeek2D() {
             )}
             {/* кущ — шар ПОПЕРЕДУ */}
             <motion.img
-              src="/poc/bush.webp"
+              src="/poc-assets/bush.webp"
               alt=""
               draggable={false}
               onClick={() => tap(i)}
