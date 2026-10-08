@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore, type ChildProfile } from '@/stores/useProfileStore';
 import ParentalGate from '@/components/ParentalGate';
 import { gamesForClass, getGame, profileClass } from '@/games/registry';
-import { CLASS_META } from '@/games/types';
+import { CLASS_LEVELS, CLASS_META, type ClassLevel } from '@/games/types';
 import { smartPlanFor } from '@/school/plan-resolve';
 import { MAX_STEPS, defaultPlan, loadPlan, moveStep, savePlan, type FamilyPlan } from '@/school/family-plan';
 import { readLog, weekSummary } from '@/school/game-log';
@@ -340,7 +340,7 @@ function ReportPanel() {
 export default function Family() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { profiles, activeProfile, loadProfiles } = useProfileStore();
+  const { profiles, activeProfile, loadProfiles, setProfileClass } = useProfileStore();
   const [unlocked, setUnlocked] = useState(false);
   // замок після правильної відповіді кличе і onSuccess, і onClose — назад ідемо лише тоді, коли закрили без відповіді
   const passed = useRef(false);
@@ -382,7 +382,14 @@ export default function Family() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ flex: 1 }}>
                   <span style={{ display: 'block', fontWeight: 900, fontSize: 18, color: 'var(--c-ink)' }}>{child.nickname}</span>
-                  <span style={small}>{CLASS_META[profileClass(child)].title}</span>
+                  <select
+                    aria-label="Клас"
+                    value={profileClass(child)}
+                    onChange={(e) => setProfileClass(child.id, e.target.value as ClassLevel, user?.id)}
+                    style={{ ...small, border: '1px solid var(--c-line)', borderRadius: 8, padding: '2px 6px', background: '#fff', fontFamily: 'inherit' }}
+                  >
+                    {CLASS_LEVELS.map((c) => <option key={c} value={c}>{CLASS_META[c].title}</option>)}
+                  </select>
                 </span>
                 <button className="g-btn ghost" style={{ width: 'auto', padding: '8px 12px', fontSize: 13 }} onClick={() => navigate(`/sheet/${child.id}`)}>
                   🖨️ Аркуш

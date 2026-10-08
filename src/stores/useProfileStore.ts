@@ -40,6 +40,8 @@ interface ProfileState {
   createProfile: (nickname: string, ageGroup: ChildProfile['age_group'], avatarId: string, parentUserId?: string, classLevel?: ClassLevel | null) => Promise<void>;
   deleteProfile: (profileId: string, parentUserId?: string) => Promise<void>;
   selectProfile: (profileId: string) => void;
+  /** Змінити клас дитини (рівень — за дитиною, не за віком). Локально; у Supabase поки не синхронізується. */
+  setProfileClass: (profileId: string, classLevel: ClassLevel, parentUserId?: string) => void;
   updateProgress: (profileId: string, gameId: string, level: number, starsEarned: number, history: any, parentUserId?: string) => Promise<void>;
   syncPendingData: (parentUserId: string) => Promise<void>;
 }
@@ -162,6 +164,13 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         set({ error: err.message });
       }
     }
+  },
+
+  setProfileClass: (profileId, classLevel, parentUserId) => {
+    const profiles = get().profiles.map((p) => (p.id === profileId ? { ...p, class_level: classLevel } : p));
+    storage.setJSON(parentUserId ? getUserProfilesKey(parentUserId) : getGuestProfilesKey(), profiles);
+    const active = get().activeProfile;
+    set({ profiles, activeProfile: active && active.id === profileId ? { ...active, class_level: classLevel } : active });
   },
 
   createProfile: async (nickname, ageGroup, avatarId, parentUserId, classLevel) => {
