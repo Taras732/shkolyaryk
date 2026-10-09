@@ -3,7 +3,7 @@ import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData }
 import { BOARD_DONE } from '../types';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { hasUkAudio, sayUk, sayUkSeq } from '../shared/uk-audio';
-import { Balloons, FiveStars, TaskBubble } from '../shared/preschool';
+import { Balloons, FiveStars, PictureCard, TaskBubble } from '../shared/preschool';
 import { findLetterKey, letterParts } from '../shared/spoken-names';
 import { introKey, introText, wordKey, type Letter } from './letters';
 import {
@@ -49,10 +49,10 @@ function Intro({ letter, onDone }: { letter: Letter; onDone: () => void }) {
   const hear = () => sayUk(introKey(letter), introText(letter));
   useEffect(hear, [letter]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <TaskBubble text="Нова буква!" onSay={hear} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, height: '100%' }}>
+      <TaskBubble text="Нова буква!" onSay={hear}>
       <button type="button" onClick={hear}
-        style={{ border: 0, cursor: 'pointer', background: '#fff', borderRadius: 32, boxShadow: 'var(--c-shadow)', padding: '18px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+        style={{ border: 0, cursor: 'pointer', background: '#fff', borderRadius: 36, boxShadow: '0 8px 0 #F1E3CF', padding: '14px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
           <span style={BIG_LETTER}>{letter.ch}</span>
           <span style={{ ...BIG_LETTER, fontSize: 64, color: 'var(--c-mut)' }}>{letter.ch.toLowerCase()}</span>
@@ -62,6 +62,7 @@ function Intro({ letter, onDone }: { letter: Letter; onDone: () => void }) {
           {letter.initial ? (<><span style={{ color: 'var(--c-primary)' }}>{letter.word[0].toUpperCase()}</span>{letter.word.slice(1)}</>) : letter.word}
         </div>
       </button>
+      </TaskBubble>
       <button className="g-btn primary" onClick={onDone}>Пограємо! →</button>
     </div>
   );
@@ -134,9 +135,9 @@ function Quiz({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <FiveStars filled={Math.round((idx / queue.length) * 5)} size={26} />
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly' }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12, marginTop: 10 }}>
       <TaskBubble text={task} onSay={onSay}>
-        {shown && <div style={{ background: '#fff', borderRadius: 28, boxShadow: 'var(--c-shadow)', padding: '10px 26px' }} className={picked && !correct ? 'shake' : ''}>{shown}</div>}
+        {shown && <div className={picked && !correct ? 'shake' : ''}><PictureCard>{shown}</PictureCard></div>}
       </TaskBubble>
       <Balloons
         options={q.options.map((o) => ({ value: o.ch, node: q.mode === 'picture' ? <span style={{ fontSize: 50 }}>{o.emoji}</span> : o.ch }))}

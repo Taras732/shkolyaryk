@@ -10,8 +10,7 @@ import { recordGameResult } from '@/school/mastery';
 import { fetchPrereqHint, type PrereqHint } from '@/school/hint';
 import { isWeakResult, buildPrereqHintMessage } from '@/school/hint-core';
 import { encouragementFor } from './shared/encouragement';
-import { FiveStars, PreschoolProvider, SKY, SkyScene } from './shared/preschool';
-import BottomNav from '@/pages/preschool/BottomNav';
+import { CloseButton, FiveStars, PreschoolProvider, SKY, SkyScene } from './shared/preschool';
 import { sayUk } from './shared/uk-audio';
 import {
   type GameDefinition,
@@ -242,16 +241,15 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
         <div style={{ position: 'relative', zIndex: 1, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520, margin: '0 auto', padding: '12px 16px 8px' }}>
           {/* угорі лише ← (у місце) і 5 зірочок прогресу */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={onExit} aria-label="Назад"
-              style={{ width: 46, height: 46, borderRadius: '50%', border: 0, background: 'var(--c-primary)', boxShadow: '0 4px 12px rgba(124,58,237,.35)', fontSize: 22, color: '#fff', cursor: 'pointer', fontWeight: 900 }}>←</button>
+            <CloseButton onClick={onExit} />
             <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
               {!isBoard && (
                 <FiveStars filled={Math.round((state.roundIndex / total) * 5)} size={26} />
               )}
             </div>
-            <div style={{ width: 46 }} />
+            <div style={{ width: 42 }} />
           </div>
-          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', paddingTop: 6, paddingBottom: 8 }}>
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 12, paddingBottom: 12 }}>
             <PreschoolProvider>
               <GameComponent
                 key={round.id}
@@ -274,7 +272,6 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
             )}
           </div>
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -389,7 +386,6 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
             <button onClick={onExit} aria-label="Назад у місце" style={icon}>🏝<small style={{ fontSize: 11, color: 'var(--c-mut)' }}>назад</small></button>
           </div>
         </div>
-        <BottomNav />
       </div>
     );
   }

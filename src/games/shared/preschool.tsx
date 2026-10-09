@@ -2,8 +2,10 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { motion } from 'motion/react';
 
 /**
- * Рамка гри дошкілля, варіант B «Кульки в небі» (рішення 09.10.2026, 2.5D скрізь).
- * Ігри не переписуємо: PromptCard стає бульбашкою зайчика, ChoiceGrid — кульками,
+ * Рамка гри дошкілля — концепт B2 «книжка-картинка» (рішення 09.10.2026, за референсами
+ * Duolingo ABC / Khan Kids): кремове тло, бліда сцена місця з картинкою, зайчик визирає з кутка,
+ * варіанти — білі кружечки з кольоровою буквою, прогрес — морквинки.
+ * Ігри не переписуємо: PromptCard стає завданням + сценою, ChoiceGrid — кружечками,
  * коли гра грає всередині <PreschoolProvider>.
  */
 const PreschoolCtx = createContext(false);
@@ -12,62 +14,70 @@ export function PreschoolProvider({ children }: { children: ReactNode }) {
   return <PreschoolCtx.Provider value>{children}</PreschoolCtx.Provider>;
 }
 
-export const SKY = 'linear-gradient(180deg, #BFE3FF 0%, #E3F1FF 55%, #FFF4E8 100%)';
+/** Тло рамки — «сторінка книжки». */
+export const SKY = '#FFF8EE';
+/** Тінь-«підставка» під білими елементами, тон тла. */
+const EDGE = '#F1E3CF';
 const BIG = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 
-/** Небо: хмарки пливуть, внизу пагорб. Лежить під грою. */
+/** Анімації рамки (підключається один раз на екран). Назва лишилась з першої версії. */
 export function SkyScene() {
   return (
-    <div aria-hidden style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-      <style>{`
-        @keyframes pk-drift { from { transform: translateX(-24px) } to { transform: translateX(24px) } }
-        @keyframes pk-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
-        @keyframes pk-pop { 0% { transform: scale(1); opacity: 1 } 60% { transform: scale(1.35); opacity: .8 } 100% { transform: scale(1.6); opacity: 0 } }
-        @keyframes pk-spark { from { transform: translate(0,0) scale(.6); opacity: 1 } to { transform: translate(var(--dx), var(--dy)) scale(1.1); opacity: 0 } }
-        @keyframes pk-shake { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-8px) } 75% { transform: translateX(8px) } }
-        @media (prefers-reduced-motion: reduce) { .pk-anim { animation: none !important } }
-      `}</style>
-      {[[16, 104, 1, 0], [200, 176, 0.8, -3], [120, 46, 0.6, -6]].map(([x, y, k, d], i) => (
-        <svg key={i} className="pk-anim" viewBox="0 0 120 64" width={120 * k} height={64 * k}
-          style={{ position: 'absolute', left: x, top: y, animation: `pk-drift ${9 + i * 3}s ease-in-out ${d}s infinite alternate`, filter: 'drop-shadow(0 4px 6px rgba(80,120,180,.18))' }}>
-          {/* пухнаста хмаринка: кілька кругів і плаский низ, легка тінь знизу */}
-          <g fill="#fff">
-            <circle cx="34" cy="38" r="20" /><circle cx="58" cy="28" r="24" /><circle cx="84" cy="36" r="18" /><circle cx="100" cy="44" r="12" />
-            <rect x="18" y="40" width="92" height="18" rx="9" />
-          </g>
-          <path d="M22 54 Q60 62 106 54" stroke="#DCEBFA" strokeWidth="4" fill="none" strokeLinecap="round" />
-        </svg>
-      ))}
-      <div style={{ position: 'absolute', left: -30, right: -30, bottom: -40, height: 150, borderRadius: '50% 50% 0 0', background: '#BDE8C6' }} />
-      <div style={{ position: 'absolute', left: -60, right: 40, bottom: -70, height: 130, borderRadius: '50% 50% 0 0', background: '#A9E2B4' }} />
-    </div>
+    <style>{`
+      @keyframes pk-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+      @keyframes pk-pop { 0% { transform: scale(1) } 40% { transform: scale(1.18) } 100% { transform: scale(1.08) } }
+      @keyframes pk-spark { from { transform: translate(0,0) scale(.6); opacity: 1 } to { transform: translate(var(--dx), var(--dy)) scale(1.1); opacity: 0 } }
+      @keyframes pk-shake { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-8px) } 75% { transform: translateX(8px) } }
+      @keyframes pk-peek { 0%,100% { transform: rotate(-12deg) translateY(0) } 50% { transform: rotate(-8deg) translateY(-6px) } }
+      @media (prefers-reduced-motion: reduce) { .pk-anim { animation: none !important } }
+    `}</style>
   );
 }
 
-/** Завдання — бульбашка зайчика з маленькою 🔊 усередині. */
-export function TaskBubble({ text, onSay, children }: { text: string; onSay?: () => void; children?: ReactNode }) {
+/** Кнопка 🔊 — персиковий кружечок. */
+function Speaker({ onClick }: { onClick: () => void }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6 }}>
-        <img src="/creatures/zodiac_rabbit_wood.png" alt="" style={{ width: 78, flex: 'none' }} />
-        <div style={{ ...BIG, flex: 1, display: 'flex', alignItems: 'center', gap: 8, background: '#fff', borderRadius: '22px 22px 22px 6px', padding: '12px 12px 12px 16px', boxShadow: 'var(--c-shadow)', fontSize: 19, lineHeight: 1.2, color: 'var(--c-ink)' }}>
-          <span style={{ flex: 1 }}>{text}</span>
-          {onSay && (
-            <button type="button" onClick={onSay} aria-label="Послухати ще раз"
-              style={{ flex: 'none', width: 42, height: 42, borderRadius: '50%', border: 0, background: 'var(--c-primary-soft)', fontSize: 19, cursor: 'pointer' }}>
-              🔊
-            </button>
-          )}
-        </div>
+    <button type="button" onClick={onClick} aria-label="Послухати ще раз"
+      style={{ flex: 'none', width: 48, height: 48, borderRadius: '50%', border: 0, background: '#FFE7CF', fontSize: 21, cursor: 'pointer' }}>
+      🔊
+    </button>
+  );
+}
+
+/**
+ * Завдання + сцена: біла бульбашка з 🔊, під нею бліда сцена місця на всю вільну висоту
+ * з картинкою (children); зайчик визирає з кутка. Без картинки — зайчик по центру «слухає».
+ */
+export function TaskBubble({ text, onSay, children, sceneBg = '#FFE9D2' }: { text: string; onSay?: () => void; children?: ReactNode; sceneBg?: string }) {
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ ...BIG, flex: 1, background: '#fff', borderRadius: 20, padding: '12px 16px', boxShadow: `0 3px 0 ${EDGE}`, fontSize: 19, lineHeight: 1.2, color: 'var(--c-ink)' }}>{text}</div>
+        {onSay && <Speaker onClick={onSay} />}
       </div>
-      {children && <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>{children}</div>}
+      <div style={{ flex: 1, minHeight: 150, borderRadius: 34, background: sceneBg, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 12 }}>
+        {children ?? <img src="/creatures/zodiac_rabbit_wood.png" alt="" style={{ height: '70%', maxHeight: 200, objectFit: 'contain' }} />}
+        {children && (
+          <img src="/creatures/zodiac_rabbit_wood.png" alt="" className="pk-anim"
+            style={{ position: 'absolute', right: -14, bottom: -18, width: 104, animation: 'pk-peek 3.5s ease-in-out infinite' }} />
+        )}
+      </div>
     </div>
   );
 }
 
-const BALLOON = ['#FF8FA3', '#8CC8FF', '#8EDB9E', '#FFC36B', '#B79CFF', '#FF9E7A'];
+/** Біла картка під картинку в сцені. */
+export function PictureCard({ children }: { children: ReactNode }) {
+  return (
+    <div style={{ background: '#fff', borderRadius: 40, boxShadow: `0 8px 0 ${EDGE}`, padding: '14px 26px', display: 'grid', placeItems: 'center', minWidth: 150, minHeight: 150 }}>
+      {children}
+    </div>
+  );
+}
 
-/** Варіанти — кульки, що погойдуються. Правильна лопає зірочками, хибна хитається. */
+const INK = ['#E25B7A', '#7C3AED', '#16A34A', '#F08A24', '#2563EB', '#DB2777'];
+
+/** Варіанти — білі кружечки з кольоровою буквою. Правильна зеленіє й підстрибує, хибна хитається. */
 export function Balloons<T extends string | number>({
   options, correct, disabled, answerState, onPick,
 }: {
@@ -78,25 +88,24 @@ export function Balloons<T extends string | number>({
   onPick: (v: T) => void;
 }) {
   const [sel, setSel] = useState<T | null>(null);
-  // новий раунд чи повтор після помилки — кульки знову цілі
+  // новий раунд чи повтор після помилки — кружечки знову цілі
   useEffect(() => {
     if (answerState === 'idle') setSel(null);
   }, [answerState]);
-  // кульки завжди в один ряд: що більше варіантів, то менша кулька
+  // завжди в один ряд: що більше варіантів, то менший кружечок
   const n = options.length;
-  const bw = n <= 3 ? 108 : n === 4 ? 82 : 66;
-  const bh = Math.round(bw * 1.17);
-  const wide = options.some((o) => String(o.node ?? o.value).length > 3 && (typeof o.node === 'string' || o.node === undefined));
+  const d = n <= 3 ? 90 : n === 4 ? 74 : 60;
+  const text = options.some((o) => (typeof o.node === 'string' || o.node === undefined) && String(o.node ?? o.value).length > 2);
   return (
-    <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'flex-start', gap: n <= 3 ? 14 : 8, padding: '12px 0 36px' }}>
+    <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'center', gap: n <= 3 ? 14 : 8, padding: '4px 0 10px' }}>
       {options.map((o, i) => {
         const picked = sel === o.value;
-        const popped = picked && answerState === 'correct';
+        const ok = picked && answerState === 'correct';
         const wrong = picked && answerState === 'incorrect';
         const dim = answerState === 'correct' && !picked;
         const hint = answerState === 'incorrect' && o.value === correct;
         return (
-          <div key={i} style={{ position: 'relative', animation: `pk-float 3s ease-in-out ${-i * 0.9}s infinite` }} className="pk-anim">
+          <div key={i} style={{ position: 'relative' }}>
             <motion.button
               type="button"
               disabled={disabled}
@@ -104,31 +113,27 @@ export function Balloons<T extends string | number>({
               onClick={() => { if (disabled) return; setSel(o.value); onPick(o.value); }}
               style={{
                 ...BIG,
-                position: 'relative',
-                minWidth: wide ? Math.max(bw, 96) : bw,
-                height: bh,
-                padding: '0 14px',
+                minWidth: d,
+                height: d,
+                padding: text ? '0 16px' : 0,
                 border: 0,
-                borderRadius: wide ? 56 : '50% 50% 48% 48%',
-                background: BALLOON[i % BALLOON.length],
-                color: '#fff',
-                fontSize: wide ? 22 : Math.round(bw * 0.48),
-                textShadow: '0 2px 0 rgba(0,0,0,.15)',
-                boxShadow: `inset -10px -12px 0 rgba(0,0,0,.08), inset 10px 10px 0 rgba(255,255,255,.25)${hint ? ', 0 0 0 4px #fff' : ''}`,
+                borderRadius: d,
+                background: ok ? '#22C55E' : '#fff',
+                color: ok ? '#fff' : INK[i % INK.length],
+                fontSize: text ? 20 : Math.round(d * 0.56),
+                boxShadow: `0 6px 0 ${ok ? '#15803d' : '#EED9BF'}${hint ? ', 0 0 0 4px #22C55E' : ''}`,
                 cursor: 'pointer',
                 display: 'grid',
                 placeItems: 'center',
                 opacity: dim ? 0.35 : 1,
-                animation: popped ? 'pk-pop .5s ease-out forwards' : wrong ? 'pk-shake .4s ease' : undefined,
+                animation: ok ? 'pk-pop .45s ease-out forwards' : wrong ? 'pk-shake .4s ease' : undefined,
               }}
             >
               {o.node ?? o.value}
             </motion.button>
-            {/* ниточка */}
-            <div style={{ position: 'absolute', left: '50%', top: bh, width: 2, height: 34, background: 'rgba(31,33,56,.22)', opacity: popped ? 0 : 1 }} />
-            {popped && ['-50px,-40px', '50px,-36px', '-40px,40px', '44px,44px', '0,-60px'].map((d, k) => {
-              const [dx, dy] = d.split(',');
-              return <span key={k} style={{ position: 'absolute', left: '42%', top: '38%', fontSize: 22, ['--dx' as string]: dx, ['--dy' as string]: dy, animation: 'pk-spark .6s ease-out forwards' }}>⭐</span>;
+            {ok && ['-46px,-34px', '46px,-30px', '-36px,36px', '40px,38px', '0,-54px'].map((p, k) => {
+              const [dx, dy] = p.split(',');
+              return <span key={k} style={{ position: 'absolute', left: '40%', top: '36%', fontSize: 20, ['--dx' as string]: dx, ['--dy' as string]: dy, animation: 'pk-spark .6s ease-out forwards' }}>⭐</span>;
             })}
           </div>
         );
@@ -137,13 +142,21 @@ export function Balloons<T extends string | number>({
   );
 }
 
-/** 5 зірочок прогресу (угорі гри й на екрані кінця — однаково). */
+/** 5 морквинок прогресу (угорі гри й на екрані кінця — однаково). */
 export function FiveStars({ filled, size = 22 }: { filled: number; size?: number }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', gap: 4, fontSize: size }}>
       {[0, 1, 2, 3, 4].map((i) => (
-        <span key={i} style={{ filter: i < filled ? 'none' : 'grayscale(1)', opacity: i < filled ? 1 : 0.45, transition: 'all .3s' }}>⭐</span>
+        <span key={i} style={{ filter: i < filled ? 'none' : 'grayscale(1)', opacity: i < filled ? 1 : 0.3, transition: 'all .3s' }}>🥕</span>
       ))}
     </div>
+  );
+}
+
+/** Кнопка ✕ у шапці гри (назад у місце). */
+export function CloseButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button onClick={onClick} aria-label="Назад"
+      style={{ width: 42, height: 42, borderRadius: 14, border: 0, background: '#fff', boxShadow: `0 3px 0 ${EDGE}`, fontSize: 18, color: '#B07A3C', cursor: 'pointer', fontWeight: 900 }}>✕</button>
   );
 }

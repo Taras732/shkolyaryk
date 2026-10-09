@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import type { AnswerState } from '../types';
-import { Balloons, TaskBubble, usePreschool } from './preschool';
+import { Balloons, PictureCard, TaskBubble, usePreschool } from './preschool';
 
 /** Картка-завдання (canon): питання зверху + візуальний вміст. */
 export function PromptCard({
@@ -25,7 +25,7 @@ export function PromptCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sayKey]);
   if (preschool) {
-    return <TaskBubble text={question} onSay={say ? () => say(true) : undefined}>{children}</TaskBubble>;
+    return <TaskBubble text={question} onSay={say ? () => say(true) : undefined}>{children ? <PictureCard>{children}</PictureCard> : undefined}</TaskBubble>;
   }
   return (
     <div className={`g-card${answerState === 'incorrect' ? ' shake' : ''}`} style={{ marginBottom: 18 }}>
