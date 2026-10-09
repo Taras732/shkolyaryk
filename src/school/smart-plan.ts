@@ -17,7 +17,7 @@ export type Subject = 'math' | 'language' | 'english' | 'fun';
 export const POOLS: Record<ClassLevel, Partial<Record<Subject, string[]>>> = {
   preschool: {
     language: ['uk-letters', 'uk-syllables'],
-    math: ['counting', 'addition', 'compare', 'pour-kids'],
+    math: ['counting', 'addition', 'compare'],
     fun: ['odd-one-out', 'find-shadow', 'pic-puzzle', 'pz-maze', 'memory-pairs', 'pz-sort'],
   },
   grade1: {
