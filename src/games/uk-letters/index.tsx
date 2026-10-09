@@ -133,7 +133,11 @@ function Quiz({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <FiveStars filled={Math.round((idx / queue.length) * 5)} />
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ background: 'rgba(255,255,255,.92)', borderRadius: 99, padding: '6px 14px', boxShadow: 'var(--c-shadow)' }}>
+          <FiveStars filled={Math.round((idx / queue.length) * 5)} />
+        </div>
+      </div>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly' }}>
       <TaskBubble text={task} onSay={onSay}>
         {shown && <div style={{ background: '#fff', borderRadius: 28, boxShadow: 'var(--c-shadow)', padding: '10px 26px' }} className={picked && !correct ? 'shake' : ''}>{shown}</div>}

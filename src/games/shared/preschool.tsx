@@ -138,7 +138,7 @@ export function FiveStars({ filled, size = 22 }: { filled: number; size?: number
   return (
     <div style={{ display: 'flex', justifyContent: 'center', gap: 4, fontSize: size }}>
       {[0, 1, 2, 3, 4].map((i) => (
-        <span key={i} style={{ filter: i < filled ? 'none' : 'grayscale(1)', opacity: i < filled ? 1 : 0.28, transition: 'all .3s' }}>⭐</span>
+        <span key={i} style={{ filter: i < filled ? 'none' : 'grayscale(1)', opacity: i < filled ? 1 : 0.35, transition: 'all .3s' }}>⭐</span>
       ))}
     </div>
   );

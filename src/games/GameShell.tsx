@@ -243,8 +243,14 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
           {/* угорі лише ← (у місце) і 5 зірочок прогресу */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <button onClick={onExit} aria-label="Назад"
-              style={{ width: 46, height: 46, borderRadius: 16, border: 0, background: '#fff', boxShadow: 'var(--c-shadow)', fontSize: 22, color: 'var(--c-primary)', cursor: 'pointer', fontWeight: 900 }}>←</button>
-            <div style={{ flex: 1 }}>{!isBoard && <FiveStars filled={Math.round((state.roundIndex / total) * 5)} />}</div>
+              style={{ width: 46, height: 46, borderRadius: '50%', border: 0, background: 'var(--c-primary)', boxShadow: '0 4px 12px rgba(124,58,237,.35)', fontSize: 22, color: '#fff', cursor: 'pointer', fontWeight: 900 }}>←</button>
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+              {!isBoard && (
+                <div style={{ background: 'rgba(255,255,255,.92)', borderRadius: 99, padding: '6px 14px', boxShadow: 'var(--c-shadow)' }}>
+                  <FiveStars filled={Math.round((state.roundIndex / total) * 5)} />
+                </div>
+              )}
+            </div>
             <div style={{ width: 46 }} />
           </div>
           <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', paddingTop: 6, paddingBottom: 8 }}>
