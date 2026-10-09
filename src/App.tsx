@@ -15,6 +15,7 @@ import Homework from './pages/Homework';
 import Family from './pages/Family';
 import Sheet from './pages/Sheet';
 import Start from './pages/Start';
+import ParentHome from './pages/ParentHome';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 const Poc = lazy(() => import('./pages/poc/Poc'));
@@ -64,6 +65,7 @@ export default function App() {
         <Route path="/old/onboarding" element={<PhoneFrame><Onboarding /></PhoneFrame>} />
         {/* S1: кабінет батьків — веб-SaaS layout, як Hub/GamePlayer, а не телефонна рамка. */}
         <Route path="/parent" element={<WebShell><ParentDashboard /></WebShell>} />
+        <Route path="/parents" element={<WebShell><ParentHome /></WebShell>} />
         <Route path="/hub" element={<WebShell><Hub /></WebShell>} />
         <Route path="/placement" element={<WebShell><Placement /></WebShell>} />
         <Route path="/day" element={<WebShell><DayPlan /></WebShell>} />

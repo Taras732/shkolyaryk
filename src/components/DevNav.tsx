@@ -9,6 +9,8 @@ import { PLACES } from '@/pages/preschool/places';
 const LINKS: [string, string][] = [
   ['Старт', '/'],
   ['Хто грає', '/onboarding?pick=1'],
+  ['Батькам (дашборд)', '/parents'],
+  ['Додати дитину', '/?add=1'],
   ['Головна', '/hub'],
   ['Для батьків', '/family'],
   ['Мій день', '/day'],

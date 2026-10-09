@@ -134,15 +134,19 @@ export default function Start() {
   // куди вести: вирішуємо, коли профілі підвантажились
   // ?pick — свідомо прийшли змінити профіль: не перекидати назад на головну
   const wantPick = new URLSearchParams(window.location.search).has('pick');
+  // ?add=1 — батьки додають дитину з «Батькам»; після «Готово» повертаємось туди з кодом
+  const wantAdd = new URLSearchParams(window.location.search).has('add');
   useEffect(() => {
     if (loading || step !== null) return;
-    if (wantPick && profiles.length > 0) setStep('pick');
+    if (wantAdd) setStep('child');
+    else if (wantPick && profiles.length > 0) setStep('pick');
     else if (profiles.length === 1) {
       selectProfile(profiles[0].id);
       navigate('/hub', { replace: true });
     } else if (profiles.length > 1) setStep('pick');
+    else if (user && readRole() !== 'student') navigate('/parents', { replace: true }); // батьки без дітей — дашборд з підсвіченим «Додай дитину»
     else setStep(user ? 'child' : 'hello');
-  }, [loading, profiles, step, wantPick, user, selectProfile, navigate]);
+  }, [loading, profiles, step, wantPick, wantAdd, user, selectProfile, navigate]);
 
   // повернення з Google веде на /onboarding = цей самий екран; далі вирішує ефект маршруту
   const google = async () => {
@@ -188,7 +192,9 @@ export default function Start() {
     await createProfile(name.trim(), AGE_GROUP[level], friend, user?.id, level);
     const made = useProfileStore.getState().profiles.find((p) => p.nickname === name.trim());
     if (made) selectProfile(made.id);
-    navigate('/hub', { replace: true });
+    // батьківський акаунт — у «Батькам» з кодом для нової дитини; гість — одразу грати
+    if (wantAdd || user) navigate(made ? `/parents?code=${made.id}` : '/parents', { replace: true });
+    else navigate('/hub', { replace: true });
   };
 
   const pick = (id: string) => {
@@ -288,7 +294,7 @@ export default function Start() {
             <>
               {/* варіант B (рішення 09.10): сходинки віку, обраний друг великий, решта кружечками */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                <button onClick={() => setStep('hello')} style={{ ...link, fontSize: 22 }} aria-label="Назад">←</button>
+                <button onClick={() => (wantAdd ? navigate('/parents') : setStep('hello'))} style={{ ...link, fontSize: 22 }} aria-label="Назад">←</button>
                 <div style={{ ...big, fontSize: 22, color: 'var(--c-ink)' }}>{role === 'student' ? 'Розкажи про себе!' : 'Додаймо дитину!'}</div>
               </div>
 
