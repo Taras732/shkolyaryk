@@ -1,7 +1,7 @@
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid, shuffle } from '../shared/ui';
 import { canSpeak, speak } from '../english-words/speech';
-import { findEnLetterText } from '../shared/spoken-names';
+import { EN_LETTER_NAMES } from '../shared/spoken-names';
 
 interface Payload {
   target: string;
@@ -75,7 +75,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
     <>
       {canSpeak() ? (
         // ціль лише звучить: намальована, вона була б і серед варіантів — відповідь у завданні
-        <PromptCard question="Find the letter" answerState={answerState} say={() => speak(findEnLetterText(target))} sayKey={`${round.id}-${target}`} />
+        <PromptCard question="Find the letter" answerState={answerState} say={() => speak(EN_LETTER_NAMES[target] ?? target)} sayKey={`${round.id}-${target}`} />
       ) : (
         <PromptCard question="Find the same letter" answerState={answerState}>
           <div style={{ fontSize: 72, fontWeight: 700, color: 'var(--c-primary)', textAlign: 'center', margin: '8px auto' }}>{target}</div>
