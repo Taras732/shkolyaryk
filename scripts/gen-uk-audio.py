@@ -45,13 +45,25 @@ def items() -> dict[str, tuple[str, str]]:
     return out
 
 
+# Винятки (09.10.2026, прослухав Тарас): український голос читає окрему «И» як «І»,
+# а знак «ы» вимовити відмовляється. Назва «И» — звук «ы» іншим голосом (вибір Тараса, варіант K);
+# знайомство з «И» — без окремої букви, через слово.
+OVERRIDES: dict[str, tuple[str, str, str]] = {
+    "n_И": ("ru-RU-SvetlanaNeural", "Ы.", RATE_NAME),
+    "l_И": (VOICE, "Ця буква звучить у слові кит. Кит.", RATE_PHRASE),
+}
+
+
 async def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for key, (text, rate) in items().items():
         path = OUT / f"{key}.mp3"
         if path.exists():
             continue
-        await edge_tts.Communicate(text, VOICE, rate=rate).save(str(path))
+        voice = VOICE
+        if key in OVERRIDES:
+            voice, text, rate = OVERRIDES[key]
+        await edge_tts.Communicate(text, voice, rate=rate).save(str(path))
         print("ok", key)
     keys = sorted(p.stem for p in OUT.glob("*.mp3"))
     body = ",\n".join(f"  '{k}'" for k in keys)
