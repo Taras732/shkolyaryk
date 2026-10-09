@@ -1,40 +1,59 @@
 import type { Difficulty } from '../types';
-import { ALL_LOOK_ALIKE, LOOK_ALIKE } from '../shared/look-alike';
 
 /**
- * «Що тут зайве?» (переробка 09.10.2026). Чотири великі картки в сцені, одна зайва.
- * Після правильної відповіді зайчик ПОЯСНЮЄ, чому зайва («Решта — фрукти!») — це і є розвиток:
- * не вгадати, а назвати ознаку.
- *  сходинка 1 — три однакові + одна зовсім інша (уважність);
- *  сходинка 2 — три однакові + одна схожа (уважність до деталей: 🍎🍎🍅🍎);
- *  сходинка 3 — три з однієї групи + одна з іншої (класифікація: 🍎🍌🍐 + 🚗).
+ * «Що тут зайве?» — лише КЛАСИФІКАЦІЯ (рішення Тараса 09.10.2026: однакові картинки не змушують думати).
+ * Чотири картки: три з однієї категорії, одна — ні. Після відповіді зайчик пояснює: «Решта — меблі».
+ * Сходинки — наскільки близько зайва:
+ *  1 — з ДАЛЕКОЇ категорії (інша «сімʼя»: меблі + рослина);
+ *  2 — з СУСІДНЬОЇ категорії тієї ж сімʼї (фрукти + овоч, тварини + морський мешканець);
+ *  3 — за ОЗНАКОЮ (літають / плавають / домашні тварини / солодке).
  */
+export type Family = 'living' | 'food' | 'things';
+
 export interface Category {
   id: string;
   /** «Решта — …» */
   plural: string;
+  family: Family;
   items: string[];
 }
 
-/** Чисті групи для класифікації (кожен емодзі — лише в одній групі). */
+/** Категорії (кожен емодзі — лише в одній; перевіряє тест). */
 export const CATEGORIES: Category[] = [
-  { id: 'animals', plural: 'тварини', items: ['🐶', '🐱', '🐰', '🐻', '🐼', '🦁', '🐯', '🐸'] },
-  { id: 'fruits', plural: 'фрукти', items: ['🍎', '🍌', '🍐', '🍇', '🍓', '🍊', '🍉'] },
-  { id: 'veggies', plural: 'овочі', items: ['🥕', '🥒', '🌽', '🥔', '🧅', '🥦'] },
-  { id: 'transport', plural: 'транспорт', items: ['🚗', '🚌', '🚲', '✈️', '🚂', '🚀', '⛵'] },
-  { id: 'clothes', plural: 'одяг', items: ['👕', '👖', '🧦', '🧢', '👗', '🧥'] },
-  { id: 'flowers', plural: 'квіти', items: ['🌸', '🌻', '🌷', '🌹', '🌼'] },
-  { id: 'sea', plural: 'морські мешканці', items: ['🐟', '🐠', '🐙', '🦀', '🐳'] },
+  { id: 'animals', plural: 'тварини', family: 'living', items: ['🐶', '🐱', '🐰', '🐻', '🐼', '🦁', '🐯', '🐸'] },
+  { id: 'sea', plural: 'морські мешканці', family: 'living', items: ['🐟', '🐠', '🐙', '🦀', '🐳'] },
+  { id: 'plants', plural: 'рослини', family: 'living', items: ['🌳', '🌵', '🌲', '🌴', '🪴'] },
+  { id: 'flowers', plural: 'квіти', family: 'living', items: ['🌸', '🌻', '🌷', '🌹', '🌼'] },
+  { id: 'fruits', plural: 'фрукти', family: 'food', items: ['🍎', '🍌', '🍐', '🍇', '🍓', '🍊', '🍉'] },
+  { id: 'veggies', plural: 'овочі', family: 'food', items: ['🥕', '🥒', '🌽', '🥔', '🧅', '🥦'] },
+  { id: 'sweets', plural: 'солодощі', family: 'food', items: ['🍰', '🍭', '🍫', '🍬', '🍩', '🧁'] },
+  { id: 'furniture', plural: 'меблі', family: 'things', items: ['🪑', '🛋️', '🛏️', '🚪', '🪟'] },
+  { id: 'transport', plural: 'транспорт', family: 'things', items: ['🚗', '🚌', '🚲', '🚂', '⛵', '🚜'] },
+  { id: 'clothes', plural: 'одяг', family: 'things', items: ['👕', '👖', '🧦', '🧢', '👗', '🧥'] },
+  { id: 'toys', plural: 'іграшки', family: 'things', items: ['🧸', '🪀', '🪁', '🎈', '🪆'] },
+  { id: 'dishes', plural: 'посуд', family: 'things', items: ['🍽️', '🥄', '🍴', '☕', '🫖', '🥣'] },
 ];
 
-export type Kind = 'different' | 'lookalike' | 'category';
+/** Ознаки (сходинка 3): у «так» — предмети з різних категорій, що мають ознаку; «ні» — схожі, але без неї. */
+export interface Trait {
+  id: string;
+  plural: string;
+  yes: string[];
+  no: string[];
+}
+export const TRAITS: Trait[] = [
+  { id: 'fly', plural: 'літають', yes: ['🐦', '✈️', '🦋', '🚁', '🦅', '🐝'], no: ['🚗', '🐢', '🐌', '🚂', '🐘'] },
+  { id: 'swim', plural: 'плавають', yes: ['🦆', '🐬', '🛥️', '🦭', '🐧'], no: ['🐓', '🚕', '🦒', '🐿️'] },
+  { id: 'pets', plural: 'домашні тварини', yes: ['🐄', '🐖', '🐓', '🐐', '🐕', '🐈'], no: ['🦁', '🐺', '🦊', '🦓', '🐊'] },
+  { id: 'cold', plural: 'холодне', yes: ['🍦', '🧊', '⛄', '🍧'], no: ['🔥', '☀️', '🍵', '🌶️'] },
+];
 
 export interface OddTask {
   items: string[];
   odd: number;
-  kind: Kind;
-  /** Для «category» — група решти (щоб пояснити «Решта — фрукти»). */
-  category?: Category;
+  /** «Решта — …» і ключ аудіо пояснення. */
+  plural: string;
+  why: string;
 }
 
 export const ROUNDS = 6;
@@ -50,38 +69,33 @@ function shuffle<T>(arr: readonly T[], rng: Rng): T[] {
   return out;
 }
 
-export function makeTask(kind: Kind, rng: Rng = Math.random): OddTask {
-  let three: string[];
-  let oddItem: string;
-  let category: Category | undefined;
-  if (kind === 'category') {
-    const [c, other] = shuffle(CATEGORIES, rng);
-    category = c;
-    three = shuffle(c.items, rng).slice(0, 3);
-    oddItem = pick(other.items, rng);
-  } else {
-    const g = pick(LOOK_ALIKE, rng);
-    const main = pick(g, rng);
-    three = [main, main, main];
-    oddItem = kind === 'lookalike' ? pick(g.filter((e) => e !== main), rng) : pick(ALL_LOOK_ALIKE.filter((e) => !g.includes(e)), rng);
-  }
+function place(three: string[], oddItem: string, rng: Rng): { items: string[]; odd: number } {
   const odd = Math.floor(rng() * 4);
   const items = [...three];
   items.splice(odd, 0, oddItem);
-  return { items, odd, kind, category };
+  return { items, odd };
 }
 
-/** Сесія: що вища сходинка, то більше складних видів; вид не повторюється тричі поспіль. */
+export function makeTask(step: 1 | 2 | 3, rng: Rng = Math.random): OddTask {
+  if (step === 3) {
+    const t = pick(TRAITS, rng);
+    const { items, odd } = place(shuffle(t.yes, rng).slice(0, 3), pick(t.no, rng), rng);
+    return { items, odd, plural: t.plural, why: `odd_${t.id}` };
+  }
+  const c = pick(CATEGORIES, rng);
+  // 1 — зайва з іншої «сімʼї» (далеко); 2 — з тієї ж сімʼї, але іншої категорії (близько)
+  const others = CATEGORIES.filter((o) => o.id !== c.id && (step === 1 ? o.family !== c.family : o.family === c.family));
+  const o = pick(others, rng);
+  const { items, odd } = place(shuffle(c.items, rng).slice(0, 3), pick(o.items, rng), rng);
+  return { items, odd, plural: c.plural, why: `odd_${c.id}` };
+}
+
+/** Сесія: сходинка гри задає переважну складність, з однією-двома легшими для впевненості. */
 export function buildTasks(d: Difficulty, rng: Rng = Math.random): OddTask[] {
-  const plan: Kind[] =
-    d === 1 ? ['different', 'different', 'different', 'lookalike', 'different', 'lookalike']
-    : d === 2 ? ['lookalike', 'different', 'lookalike', 'category', 'lookalike', 'category']
-    : ['category', 'lookalike', 'category', 'category', 'lookalike', 'category'];
-  return plan.map((k) => makeTask(k, rng));
+  const plan: (1 | 2 | 3)[] = d === 1 ? [1, 1, 1, 1, 2, 1] : d === 2 ? [1, 2, 2, 1, 2, 2] : [2, 3, 2, 3, 3, 3];
+  return plan.map((s) => makeTask(s, rng));
 }
 
-/** Пояснення після правильної відповіді (і ключ аудіо). */
 export function explain(t: OddTask): { key: string; text: string } {
-  if (t.kind === 'category' && t.category) return { key: `odd_${t.category.id}`, text: `Молодець! Решта — ${t.category.plural}.` };
-  return { key: 'odd_same', text: 'Молодець! Решта — однакові.' };
+  return { key: t.why, text: `Молодець! Решта — ${t.plural}.` };
 }
