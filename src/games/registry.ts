@@ -76,6 +76,7 @@ import pzJugs from './pz-jugs';
 import pzSort from './pz-sort';
 import pzScales from './pz-scales';
 import pzShare from './pz-share';
+import pourKids from './pour-kids';
 import pzHanoi from './pz-hanoi';
 import pzLights from './pz-lights';
 import pzMaze from './pz-maze';
@@ -85,7 +86,7 @@ import pzRiver from './pz-river';
 
 export const GAMES: GameDefinition[] = [
   // Математика
-  counting, addition, compare, pzShare, pzScales, pzPath, mathExamples, timesTables, mathCompare,
+  counting, addition, compare, pzShare, pourKids, pzScales, pzPath, mathExamples, timesTables, mathCompare,
   columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
   ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, lettersFind, syllableBuild, readingSpeed, grammarParts,
@@ -123,6 +124,7 @@ const GAME_IMAGES = new Set<string>([
   'recognize-digit',
   'compare',
   'pz-share',
+  'pour-kids',
   'addition',
   'pic-puzzle',
   'colors-find',

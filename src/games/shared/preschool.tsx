@@ -55,7 +55,7 @@ function Speaker({ onClick }: { onClick: () => void }) {
  * Завдання + сцена: біла бульбашка з 🔊, під нею бліда сцена місця на всю вільну висоту
  * з картинкою (children); зайчик визирає з кутка. Без картинки — зайчик по центру «слухає».
  */
-export function TaskBubble({ text, onSay, children, sceneBg = '#FFE9D2', sceneTop }: { text: string; onSay?: () => void; children?: ReactNode; sceneBg?: string; sceneTop?: ReactNode }) {
+export function TaskBubble({ text, onSay, children, sceneBg = '#FFE9D2', sceneTop, peek = true }: { text: string; onSay?: () => void; children?: ReactNode; sceneBg?: string; sceneTop?: ReactNode; /** false — у сцені вже є свої герої, зайчик з кутка зайвий */ peek?: boolean }) {
   return (
     <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -65,7 +65,7 @@ export function TaskBubble({ text, onSay, children, sceneBg = '#FFE9D2', sceneTo
       <div style={{ flex: 1, minHeight: 150, borderRadius: 34, background: sceneBg, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 12 }}>
         {sceneTop && <div style={{ position: 'absolute', top: 10, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>{sceneTop}</div>}
         {children ?? <img src="/creatures/zodiac_rabbit_wood.png" alt="" style={{ height: '70%', maxHeight: 200, objectFit: 'contain' }} />}
-        {children && (
+        {children && peek && (
           <img src="/creatures/zodiac_rabbit_wood.png" alt="" className="pk-anim"
             style={{ position: 'absolute', right: -14, bottom: -18, width: 104, animation: 'pk-peek 3.5s ease-in-out infinite' }} />
         )}

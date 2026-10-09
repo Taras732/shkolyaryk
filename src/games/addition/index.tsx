@@ -3,15 +3,15 @@ import type { GameDefinition, GameComponentProps } from '../types';
 import { PromptCard, ChoiceGrid, numberDecoys } from '../shared/ui';
 import { hasUkAudio, sayUk } from '../shared/uk-audio';
 import { usePreschool } from '../shared/preschool';
-import { Objects, SceneTask } from '../shared/count-ui';
+import { Objects, SceneTask, itemFor, type CountItem } from '../shared/count-ui';
 import { generate, type Payload } from './generate';
 
 /** Обидві купки — ті самі предмети: «3 яблука і ще 2 яблука», а не кольорові кружечки. */
 const EMOJI = ['🍎', '🍓', '🐤', '🎈', '🍪', '🐞'];
 
-const Pile = ({ n, e, white }: { n: number; e: string; white: boolean }) => (
+const Pile = ({ n, e, img, white }: { n: number; e: string; img?: CountItem; white: boolean }) => (
   <div style={white ? { background: '#fff', borderRadius: 28, boxShadow: '0 6px 0 #EED9BF', padding: '14px 12px', minWidth: 96, minHeight: 96, display: 'grid', placeItems: 'center' } : undefined}>
-    <Objects n={n} emoji={e} size={n > 3 ? 30 : 36} />
+    <Objects n={n} emoji={e} img={img} size={img ? (n > 3 ? 34 : 44) : n > 3 ? 30 : 36} />
   </div>
 );
 
@@ -20,6 +20,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   const sum = a + b;
   const preschool = usePreschool();
   const e = EMOJI[(a * 3 + b) % EMOJI.length];
+  const img = preschool ? itemFor(a * 3 + b) : undefined;
   // numberDecoys() кличе Math.random() — рахуємо один раз на round.id, щоб варіанти
   // не тасувались заново при кожному ре-рендері (напр. після невірної відповіді).
   const options = useMemo(() => numberDecoys(sum, 4, 3, 1).sort((x, y) => x - y).map((v) => ({ value: v })), [round.id]);
@@ -30,9 +31,9 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   };
   const scene = (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, position: 'relative', zIndex: 1 }}>
-      <Pile n={a} e={e} white={!!preschool} />
+      <Pile n={a} e={e} img={img} white={!!preschool} />
       <span style={{ fontSize: 40, fontWeight: 900, color: '#F08A24', fontFamily: 'var(--font-round)' }}>+</span>
-      <Pile n={b} e={e} white={!!preschool} />
+      <Pile n={b} e={e} img={img} white={!!preschool} />
     </div>
   );
   return (

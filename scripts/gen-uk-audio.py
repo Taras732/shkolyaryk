@@ -83,6 +83,8 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_more"] = ("Де більше?", RATE_PHRASE)
     out["p_sum"] = ("Скільки разом?", RATE_PHRASE)
     out["p_share"] = ("Розклади порівну!", RATE_PHRASE)
+    out["p_more_who"] = ("У кого більше?", RATE_PHRASE)
+    out["p_pour"] = ("Налий рівно до зірочки!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
         out[f"odd_{cid}"] = (f"Молодець! Решта — {plural}.", RATE_PHRASE)

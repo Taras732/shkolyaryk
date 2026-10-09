@@ -2,11 +2,15 @@ import { useMemo } from 'react';
 import type { GameDefinition, GameComponentProps } from '../types';
 import { PromptCard, ChoiceGrid, numberDecoys } from '../shared/ui';
 import { hasUkAudio, sayUk } from '../shared/uk-audio';
-import { Objects, objSize } from '../shared/count-ui';
+import { Objects, itemFor, objSize } from '../shared/count-ui';
+import { usePreschool } from '../shared/preschool';
 import { generate, type Payload } from './generate';
 
 function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, number>) {
   const { n, emoji } = round.payload;
+  const preschool = usePreschool();
+  // дошкілля — намальовані предмети; кожен раунд інший предмет
+  const img = preschool ? itemFor(Number(round.id.slice(1)) * 3 + n) : undefined;
   // numberDecoys() кличе Math.random() — рахуємо один раз на round.id, щоб варіанти
   // не тасувались заново при кожному ре-рендері (напр. після невірної відповіді).
   const options = useMemo(() => numberDecoys(n, 4, 3, 1).sort((x, y) => x - y).map((v) => ({ value: v })), [round.id]);
@@ -20,7 +24,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   return (
     <>
       <PromptCard question="Скільки тут?" answerState={answerState} say={say} sayKey={round.id}>
-        <Objects n={n} emoji={emoji} size={objSize(n)} />
+        <Objects n={n} emoji={emoji} img={img} size={objSize(n)} />
       </PromptCard>
       <ChoiceGrid options={options} correct={n} disabled={disabled} answerState={answerState} onPick={pick} />
     </>
