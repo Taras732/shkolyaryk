@@ -5,8 +5,11 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import { hasUkAudio, sayUk } from '../shared/uk-audio';
 import { SayButton } from '../shared/ui';
 import { findLetterKey, findLetterText } from '../shared/spoken-names';
-import { LETTERS, introKey, introText, wordKey, type Letter } from './letters';
-import { QUIZ_LEN, buildQuiz, isKnown, nextNewLetter, open, record, type LetterProgress, type Question } from './core';
+import { introKey, introText, wordKey, type Letter } from './letters';
+import {
+  GROUPS, QUICK_PASS, QUIZ_LEN, buildCheck, buildQuiz, currentGroup, isFresh, newLetters, open, passGroup, record, statusOf,
+  type LetterProgress, type Question, type Status,
+} from './core';
 
 interface BoardPayload {
   difficulty: Difficulty;
@@ -187,12 +190,49 @@ function Quiz({
   );
 }
 
+const STATUS_BG: Record<Status, string> = { locked: '#EEF0F5', learning: '#FFE7B3', known: '#CDEFD2', gold: '#FFD95A' };
+const STATUS_INK: Record<Status, string> = { locked: '#B5B9C9', learning: '#8A5A00', known: '#1E7A3A', gold: '#7A5200' };
+
+/** Смужка буквара: 33 букви групами; сірі — ще ні, жовті — вчу, зелені — знаю, золоті — закріплено повтором. */
+function LetterStrip({ progress }: { progress: LetterProgress }) {
+  const cur = currentGroup(progress);
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 6, marginBottom: 10 }}>
+      {GROUPS.map((g, gi) => (
+        <div key={g.title} style={{ display: 'flex', gap: 2, padding: 2, borderRadius: 8, outline: gi === cur ? '2px solid var(--c-primary)' : 'none' }}>
+          {g.letters.map((ch) => {
+            const st = statusOf(progress[ch]);
+            return (
+              <span key={ch} title={ch} style={{ width: 18, height: 22, borderRadius: 5, display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 900, fontFamily: 'var(--font-round)', background: STATUS_BG[st], color: STATUS_INK[st] }}>
+                {st === 'locked' ? '' : ch}
+              </span>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+type Phase = 'check' | 'passed' | 'intro' | 'quiz';
+
 function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPayload, Answer>) {
+  const d = round.payload.difficulty;
   const profileId = useProfileStore((s) => s.activeProfile?.id) ?? 'guest';
   const [progress, setProgress] = useState<LetterProgress>(() => load(profileId));
-  const [fresh] = useState<Letter | null>(() => nextNewLetter(load(profileId)));
-  const [stage, setStage] = useState<'intro' | 'quiz'>(fresh ? 'intro' : 'quiz');
-  const [quiz, setQuiz] = useState<Question[] | null>(() => (fresh ? null : buildQuiz(load(profileId), null, round.payload.difficulty)));
+  const [phase, setPhase] = useState<Phase>(() => {
+    const p = load(profileId);
+    return isFresh(p, currentGroup(p)) ? 'check' : 'intro';
+  });
+  const [check] = useState<Question[]>(() => {
+    const p = load(profileId);
+    const gi = currentGroup(p);
+    return isFresh(p, gi) ? buildCheck(p, gi, d) : [];
+  });
+  const [fresh, setFresh] = useState(() => newLetters(load(profileId)));
+  const [introAt, setIntroAt] = useState(0);
+  const [quiz, setQuiz] = useState<Question[] | null>(null);
+  const [checkRun, setCheckRun] = useState(0); // поспіль правильних з першої спроби в перевірці
 
   const done = useCallback(() => onAnswer(BOARD_DONE), [onAnswer]);
   const update = (fn: (p: LetterProgress) => LetterProgress) =>
@@ -202,27 +242,81 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPaylo
       return next;
     });
 
-  if (stage === 'intro' && fresh) {
+  // нових букв немає (або знайомство скінчилось) — у практику
+  useEffect(() => {
+    if (phase === 'intro' && !fresh[introAt]) {
+      setQuiz(buildQuiz(progress, fresh, d));
+      setPhase('quiz');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, introAt, fresh]);
+
+  // після перевірки: прохід — святкуємо; ні — вчимо, починаючи з нових букв
+  const afterCheck = () => {
+    const gi = currentGroup(progress);
+    if (checkRun >= QUICK_PASS) {
+      update((p) => passGroup(p, gi, Date.now()));
+      setPhase('passed');
+      return;
+    }
+    const nl = newLetters(progress);
+    setFresh(nl);
+    setIntroAt(0);
+    setPhase('intro');
+  };
+
+  if (phase === 'check') {
+    return (
+      <>
+        <LetterStrip progress={progress} />
+        <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 800, color: 'var(--c-mut)', marginBottom: 4 }}>Перевіримо: {GROUPS[currentGroup(progress)]?.title}</div>
+        <Quiz
+          quiz={check}
+          onRecord={(ch, ok) => {
+            update((p) => record(p, ch, ok, Date.now()));
+            setCheckRun((n) => (ok ? n + 1 : 0));
+          }}
+          onMistake={onMistake}
+          onDone={afterCheck}
+        />
+      </>
+    );
+  }
+
+  if (phase === 'passed') {
+    const gi = Math.max(0, currentGroup(progress) - 1);
+    return (
+      <>
+        <LetterStrip progress={progress} />
+        <div className="g-card" style={{ marginBottom: 16, textAlign: 'center' }}>
+          <div style={{ fontSize: 56 }}>⭐</div>
+          <div className="g-question">Ти вже знаєш ці букви!</div>
+          <div style={{ ...BIG_LETTER, fontSize: 44, color: 'var(--c-primary)' }}>{GROUPS[gi].letters.join(' ')}</div>
+        </div>
+        <button className="g-btn primary" onClick={done}>Далі →</button>
+      </>
+    );
+  }
+
+  if (phase === 'intro' && fresh[introAt]) {
+    const letter = fresh[introAt];
     return (
       <Intro
-        letter={fresh}
+        key={letter.ch}
+        letter={letter}
         onDone={() => {
-          const opened = open(progress, fresh.ch, Date.now());
-          update(() => opened);
-          setQuiz(buildQuiz(opened, fresh, round.payload.difficulty));
-          setStage('quiz');
+          update((p) => open(p, letter.ch, Date.now()));
+          setIntroAt(introAt + 1);
         }}
       />
     );
   }
 
-  const known = LETTERS.filter((l) => isKnown(progress[l.ch])).length;
+  if (!quiz) return null;
   return (
     <>
-      <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 800, color: 'var(--c-mut)', marginBottom: 4 }}>
-        Знаю букв: {known} з {LETTERS.length}
-      </div>
-      <Quiz quiz={quiz ?? []} onRecord={(ch, ok) => update((p) => record(p, ch, ok, Date.now()))} onMistake={onMistake} onDone={done} />
+      <LetterStrip progress={progress} />
+      <Quiz quiz={quiz} onRecord={(ch, ok) => update((p) => record(p, ch, ok, Date.now()))} onMistake={onMistake} onDone={done} />
     </>
   );
 }
@@ -233,7 +327,7 @@ const ukLetters: GameDefinition<BoardPayload, Answer> = {
   subject: 'language',
   levels: ['L0', 'L3'],
   icon: '🔤',
-  description: 'Нова буква щодня: почуй звук, знайди букву й картинку.',
+  description: 'Буквар групами: почуй звук, знайди букву й картинку; хто знає — проходить швидко.',
   accent: '#FEF3C7',
   generate,
   Component,
