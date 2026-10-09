@@ -366,9 +366,10 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
   if (preschool) {
     // ті самі 5 зірочок, що вгорі гри: 3 → 5, 2 → 4, 1 → 3
     const five = state.stars === 3 ? 5 : state.stars === 2 ? 4 : 3;
-    const next = onNext ?? (canPlayHarder
+    // ▶: спершу рівні складності цієї гри (6 → 9 → 12 картинок тощо), потім — наступна гра місця
+    const next = canPlayHarder
       ? () => { const d = (state.difficulty + 1) as Difficulty; dispatch({ type: 'RESET', levelData: game.generate(d, level, classLevel), difficulty: d }); }
-      : again);
+      : onNext ?? again;
     const icon = { height: 84, borderRadius: 24, border: 0, background: '#fff', boxShadow: 'var(--c-shadow)', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', gap: 2, fontSize: 34, cursor: 'pointer', fontFamily: 'var(--font-round)', fontWeight: 900 };
     return (
       <div style={{ position: 'relative', width: '100%', height: '100dvh', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>

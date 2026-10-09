@@ -87,25 +87,31 @@ const INK = ['#E25B7A', '#7C3AED', '#16A34A', '#F08A24', '#2563EB', '#DB2777'];
 
 /** Варіанти — білі кружечки з кольоровою буквою. Правильна зеленіє й підстрибує, хибна хитається. */
 export function Balloons<T extends string | number>({
-  options, correct, disabled, answerState, onPick,
+  options, correct, disabled, answerState, onPick, columns,
 }: {
   options: { value: T; node?: ReactNode }[];
   correct: T;
   disabled: boolean;
   answerState: 'idle' | 'correct' | 'incorrect';
   onPick: (v: T) => void;
+  /** Сітка в кілька рядків (ігри на кшталт «Знайди такий самий»: 6 / 9 / 12 картинок). */
+  columns?: number;
 }) {
   const [sel, setSel] = useState<T | null>(null);
   // новий раунд чи повтор після помилки — кружечки знову цілі
   useEffect(() => {
     if (answerState === 'idle') setSel(null);
   }, [answerState]);
-  // завжди в один ряд: що більше варіантів, то менший кружечок
+  // до 5 варіантів — один ряд (що більше, то менший кружечок); більше або задані колонки — сітка
   const n = options.length;
-  const d = n <= 3 ? 90 : n === 4 ? 74 : 60;
+  const grid = n > 5 || (columns !== undefined && columns < n);
+  const cols = columns ?? (n > 9 ? 4 : 3);
+  const d = grid ? (cols >= 4 ? 70 : 84) : n <= 3 ? 90 : n === 4 ? 74 : 60;
   const text = options.some((o) => (typeof o.node === 'string' || o.node === undefined) && String(o.node ?? o.value).length > 2);
   return (
-    <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'center', gap: n <= 3 ? 14 : 8, padding: '4px 0 10px' }}>
+    <div style={grid
+      ? { display: 'grid', gridTemplateColumns: `repeat(${cols}, ${d}px)`, justifyContent: 'center', gap: 10, padding: '4px 0 10px' }
+      : { display: 'flex', flexWrap: 'nowrap', justifyContent: 'center', gap: n <= 3 ? 14 : 8, padding: '4px 0 10px' }}>
       {options.map((o, i) => {
         const picked = sel === o.value;
         const ok = picked && answerState === 'correct';

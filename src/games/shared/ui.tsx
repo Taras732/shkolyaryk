@@ -93,7 +93,7 @@ export function ChoiceGrid<T extends string | number>({
     if (answerState === 'idle') setSelected(null);
   }, [answerState]);
 
-  if (preschool) return <Balloons options={options} correct={correct} disabled={disabled} answerState={answerState} onPick={onPick} />;
+  if (preschool) return <Balloons options={options} correct={correct} disabled={disabled} answerState={answerState} onPick={onPick} columns={columns} />;
 
   const cols = columns ?? (options.length === 3 ? 3 : 2);
   // довгі текстові варіанти не влазять у базові 22px на вузьких екранах
