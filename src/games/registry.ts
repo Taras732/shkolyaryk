@@ -68,6 +68,7 @@ import breathing from './breathing';
 import tapTheDot from './tap-the-dot';
 import findShadow from './find-shadow';
 import findSame from './find-same';
+import oddOneOut from './odd-one-out';
 import picPuzzle from './pic-puzzle';
 import slidePuzzle from './slide-puzzle';
 // --- Головоломки (переливання, зважування, логіка) ---
@@ -101,7 +102,7 @@ export const GAMES: GameDefinition[] = [
   // Життя
   emotionsRecognize, lifeScenarios, breathing,
   // Увага
-  findShadow, findSame, tapTheDot,
+  findShadow, findSame, oddOneOut, tapTheDot,
 ];
 
 /**
@@ -114,6 +115,7 @@ const GAME_IMAGES = new Set<string>([
   'uk-syllables',
   'syllable-words',
   'letters-find-en',
+  'odd-one-out',
   'english-word-picture',
   'syllable-build',
   'english-words',

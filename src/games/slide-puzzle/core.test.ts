@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { LEVELS, isSolved, move, neighbours, shuffleByMoves } from './core';
 import { scramble, swap, isSolved as picSolved } from '../pic-puzzle/core';
 import { LOOK_ALIKE } from '../shared/look-alike';
-import { generate as sameGen } from '../find-same/generate';
+import { buildTasks as buildSameTasks } from '../find-same/generate';
 import { generate as shadowGen, SHADOW_SET } from '../find-shadow/generate';
 
 /** Розв'язати пошуком у ширину — доводить, що розкладка складна в принципі. */
@@ -61,16 +61,16 @@ describe('уважність', () => {
     expect(new Set(all).size).toBe(all.length);
   });
 
-  it('«Знайди такий самий»: зразок у сітці рівно раз, на «Складно» — лише схожі', () => {
+  it('«Знайди всіх таких самих»: зразок сховано рівно count разів; на «Складно» — лише схожі', () => {
     for (const d of [1, 2, 3] as const) {
-      for (const r of sameGen(d).rounds) {
-        expect(r.payload.cells.filter((c) => c === r.payload.target)).toHaveLength(1);
-        expect(r.payload.cells[Number(r.answer)]).toBe(r.payload.target);
+      for (const t of buildSameTasks(d)) {
+        expect(t.cells.filter((c) => c === t.target)).toHaveLength(t.count);
+        expect(t.count).toBe(d + 1);
       }
     }
-    for (const r of sameGen(3).rounds) {
-      const group = LOOK_ALIKE.find((g) => g.includes(r.payload.target))!;
-      for (const c of r.payload.cells) expect(group).toContain(c);
+    for (const t of buildSameTasks(3)) {
+      const group = LOOK_ALIKE.find((g) => g.includes(t.target))!;
+      for (const c of t.cells) expect(group).toContain(c);
     }
   });
 
