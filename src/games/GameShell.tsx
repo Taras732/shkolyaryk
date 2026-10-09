@@ -11,7 +11,6 @@ import { fetchPrereqHint, type PrereqHint } from '@/school/hint';
 import { isWeakResult, buildPrereqHintMessage } from '@/school/hint-core';
 import { encouragementFor } from './shared/encouragement';
 import { CloseButton, FiveStars, PreschoolProvider, SKY, SkyScene } from './shared/preschool';
-import { sayUk } from './shared/uk-audio';
 import {
   type GameDefinition,
   type ProfileLevel,
@@ -233,6 +232,8 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
 
   const GameComponent = game.Component;
   const preschool = classLevel === 'preschool';
+  /** Дев-стенд або localhost — показуємо інструменти перевірки (перемикач рівня). */
+  const DEV_HOST = import.meta.env.DEV || /^(localhost|127\.0\.0\.1|shkolyaryk-dev\.)/.test(window.location.hostname);
 
   if (!state.finished && preschool) {
     const isBoard = round.answer === BOARD_DONE;
@@ -247,7 +248,20 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
             <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
               <FiveStars filled={carrots} size={26} />
             </div>
-            <div style={{ width: 42 }} />
+            {/* для перевірки: перемикач рівня — лише на дев-стенді й localhost, на проді немає */}
+            {DEV_HOST ? (
+              <div style={{ display: 'flex', gap: 3 }}>
+                {([1, 2, 3] as Difficulty[]).map((d) => (
+                  <button key={d} onClick={() => dispatch({ type: 'RESET', levelData: game.generate(d, level, classLevel), difficulty: d })}
+                    title={`Рівень ${d}`}
+                    style={{ width: 22, height: 26, borderRadius: 8, border: 0, fontSize: 12, fontWeight: 900, cursor: 'pointer', background: state.difficulty === d ? '#F08A24' : '#fff', color: state.difficulty === d ? '#fff' : '#B07A3C', boxShadow: '0 2px 0 #F1E3CF' }}>
+                    {d}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div style={{ width: 42 }} />
+            )}
           </div>
           <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 12, paddingBottom: 12 }}>
             <PreschoolProvider onBoardProgress={setBoardFilled}>
@@ -377,7 +391,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
         <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520, margin: '0 auto', padding: '16px 16px 28px' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
             <FiveStars filled={five} size={36} />
-            <img src="/creatures/zodiac_rabbit_wood.png" alt="" onLoad={() => sayUk('pre.done', 'Ура! Гру пройдено!')}
+            <img src="/creatures/zodiac_rabbit_wood.png" alt="" 
               style={{ width: 180, animation: 'pk-float 1.6s ease-in-out infinite' }} />
             <div style={{ fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 32, color: 'var(--c-ink)' }}>Молодець!</div>
           </div>
