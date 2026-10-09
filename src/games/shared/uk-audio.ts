@@ -59,3 +59,31 @@ function speakUk(text: string): void {
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(u);
 }
+
+let seqToken = 0;
+
+/**
+ * Кілька фраз підряд з паузою між ними: «Знайди букву» … «Бе».
+ * Назва букви окремим файлом звучить чітко, а не хвостиком речення (рішення 09.10).
+ */
+export function sayUkSeq(parts: { key: string; text: string }[], gapMs = 450): void {
+  const token = ++seqToken;
+  current?.pause();
+  const playAt = (i: number) => {
+    if (token !== seqToken || i >= parts.length) return;
+    const { key, text } = parts[i];
+    if (!UK_AUDIO_FILES.has(key)) {
+      speakUk(text);
+      window.setTimeout(() => playAt(i + 1), 900 + gapMs);
+      return;
+    }
+    const a = new Audio(`/audio/uk/${key}.mp3`);
+    current = a;
+    a.onended = () => window.setTimeout(() => playAt(i + 1), gapMs);
+    a.play().catch(() => {
+      speakUk(text);
+      window.setTimeout(() => playAt(i + 1), 900 + gapMs);
+    });
+  };
+  playAt(0);
+}

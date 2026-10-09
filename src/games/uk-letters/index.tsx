@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData } from '../types';
 import { BOARD_DONE } from '../types';
 import { useProfileStore } from '@/stores/useProfileStore';
-import { hasUkAudio, sayUk } from '../shared/uk-audio';
+import { hasUkAudio, sayUk, sayUkSeq } from '../shared/uk-audio';
 import { SayButton } from '../shared/ui';
-import { findLetterKey, findLetterText } from '../shared/spoken-names';
+import { findLetterKey, letterParts } from '../shared/spoken-names';
 import { introKey, introText, wordKey, type Letter } from './letters';
 import {
   GROUPS, QUICK_PASS, QUIZ_LEN, buildCheck, buildQuiz, currentGroup, isFresh, newLetters, open, passGroup, record, statusOf,
@@ -104,7 +104,7 @@ function Quiz({
 
   // same: буква лише звучить — намальована, вона була б і серед варіантів
   const sameHeard = q?.mode === 'same' && hasUkAudio(findLetterKey(q.target.ch));
-  const sayFind = (l: Letter) => sayUk(findLetterKey(l.ch), findLetterText(l.ch));
+  const sayFind = (l: Letter, again = false) => sayUkSeq(letterParts(l.ch, again));
 
   useEffect(() => {
     if (q?.mode === 'letter') say(q.target);
@@ -149,7 +149,7 @@ function Quiz({
     ) : sameHeard ? (
       <>
         <div className="g-question">Знайди букву</div>
-        <SayButton onClick={() => sayFind(q.target)} />
+        <SayButton onClick={() => sayFind(q.target, true)} />
       </>
     ) : (
       <>

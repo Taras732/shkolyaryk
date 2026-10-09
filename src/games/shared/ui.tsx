@@ -12,19 +12,20 @@ export function PromptCard({
   question: string;
   answerState: AnswerState;
   children?: ReactNode;
-  /** Озвучити ціль. Є — у картці велика кнопка 🔊, і ціль звучить сама на старті раунду. */
-  say?: () => void;
+  /** Озвучити ціль. Є — у картці велика кнопка 🔊, і ціль звучить сама на старті раунду.
+   *  again=true — повтор з кнопки (можна озвучити лише ціль, без фрази). */
+  say?: (again?: boolean) => void;
   /** Зміна ключа = новий раунд = звучить знову. */
   sayKey?: string | number;
 }) {
   useEffect(() => {
-    say?.();
+    say?.(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sayKey]);
   return (
     <div className={`g-card${answerState === 'incorrect' ? ' shake' : ''}`} style={{ marginBottom: 18 }}>
       <div className="g-question">{question}</div>
-      {say && <SayButton onClick={say} />}
+      {say && <SayButton onClick={() => say(true)} />}
       {children}
     </div>
   );

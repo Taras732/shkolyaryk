@@ -1,9 +1,10 @@
-"""Генерує українські фрази «Знайди букву/цифру …» у public/audio/uk/ через edge-tts
-і переписує src/games/shared/uk-audio-manifest.ts.
+"""Генерує українську озвучку в public/audio/uk/ через edge-tts і переписує uk-audio-manifest.ts.
 
-Тексти беруться з src/games/shared/spoken-names.ts (джерело правди), щоб ключі
-й фрази не розійшлися з кодом.
+Фраза й ціль — ОКРЕМИМИ файлами (рішення 09.10.2026): «Знайди букву» + пауза + «бе».
+Злита фраза «Знайди букву бе» звучала нечітко — назва букви губилася в кінці речення.
+Назви букв і цифр — повільніше, кожна як самостійне слово.
 
+Тексти беруться з src/games/shared/spoken-names.ts (джерело правди).
 Запуск: python scripts/gen-uk-audio.py   (потрібен pip install edge-tts)
 """
 import asyncio
@@ -14,7 +15,8 @@ from pathlib import Path
 import edge_tts
 
 VOICE = "uk-UA-PolinaNeural"
-RATE = "-20%"  # повільніше — малюк має розчути
+RATE_PHRASE = "-15%"
+RATE_NAME = "-35%"  # назва букви/цифри — повільно й чітко
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "public" / "audio" / "uk"
@@ -22,26 +24,28 @@ NAMES = ROOT / "src" / "games" / "shared" / "spoken-names.ts"
 MANIFEST = ROOT / "src" / "games" / "shared" / "uk-audio-manifest.ts"
 
 
-def phrases() -> dict[str, str]:
+def items() -> dict[str, tuple[str, str]]:
     src = NAMES.read_text(encoding="utf-8")
     letters = re.search(r"UK_LETTER_NAMES[^{]*\{(.*?)\};", src, re.S).group(1)
     digits = re.search(r"UK_DIGIT_NAMES = \[(.*?)\];", src, re.S).group(1)
-    out = {}
+    out = {
+        "p_find_letter": ("Знайди букву.", RATE_PHRASE),
+        "p_find_digit": ("Знайди цифру.", RATE_PHRASE),
+    }
     for ch, name in re.findall(r"(\S): '([^']+)'", letters):
-        out[f"find_{ch}"] = f"Знайди букву {name}."
+        out[f"n_{ch}"] = (f"{name.capitalize()}.", RATE_NAME)
     for i, name in enumerate(re.findall(r"'([^']+)'", digits)):
-        out[f"find_d{i}"] = f"Знайди цифру {name}."
+        out[f"d_{i}"] = (f"{name.capitalize()}.", RATE_NAME)
     return out
 
 
 async def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    items = phrases()
-    for key, text in items.items():
+    for key, (text, rate) in items().items():
         path = OUT / f"{key}.mp3"
         if path.exists():
             continue
-        await edge_tts.Communicate(text, VOICE, rate=RATE).save(str(path))
+        await edge_tts.Communicate(text, VOICE, rate=rate).save(str(path))
         print("ok", key)
     keys = sorted(p.stem for p in OUT.glob("*.mp3"))
     body = ",\n".join(f"  '{k}'" for k in keys)

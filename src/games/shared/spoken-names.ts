@@ -20,9 +20,19 @@ export const EN_LETTER_NAMES: Record<string, string> = {
   S: 'ess', T: 'tee', U: 'you', V: 'vee', W: 'double you', X: 'ex', Y: 'why', Z: 'zed',
 };
 
-/** Ключ аудіофайлу і текст для голосу пристрою (якщо файлу немає). */
-export const findLetterKey = (ch: string) => `find_${ch}`;
+/** Ключі аудіофайлів: фраза і назва — окремо, грають підряд з паузою (sayUkSeq). */
+export const findLetterKey = (ch: string) => `n_${ch}`;
 export const findLetterText = (ch: string) => `Знайди букву ${UK_LETTER_NAMES[ch] ?? ch}.`;
-export const findDigitKey = (d: number) => `find_d${d}`;
+export const findDigitKey = (d: number) => `d_${d}`;
 export const findDigitText = (d: number) => `Знайди цифру ${UK_DIGIT_NAMES[d]}.`;
+
+/** Повне завдання: «Знайди букву» … «Бе». again — лише назва (кнопка 🔊 «ще раз»). */
+export function letterParts(ch: string, again = false) {
+  const name = { key: `n_${ch}`, text: UK_LETTER_NAMES[ch] ?? ch };
+  return again ? [name] : [{ key: 'p_find_letter', text: 'Знайди букву' }, name];
+}
+export function digitParts(d: number, again = false) {
+  const name = { key: `d_${d}`, text: UK_DIGIT_NAMES[d] };
+  return again ? [name] : [{ key: 'p_find_digit', text: 'Знайди цифру' }, name];
+}
 export const findEnLetterText = (ch: string) => `Find the letter ${EN_LETTER_NAMES[ch] ?? ch}.`;

@@ -1,7 +1,7 @@
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid, shuffle } from '../shared/ui';
-import { hasUkAudio, sayUk } from '../shared/uk-audio';
-import { findLetterKey, findLetterText } from '../shared/spoken-names';
+import { hasUkAudio, sayUkSeq } from '../shared/uk-audio';
+import { findLetterKey, letterParts } from '../shared/spoken-names';
 
 interface Payload {
   target: string;
@@ -82,7 +82,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
         <PromptCard
           question="Знайди букву"
           answerState={answerState}
-          say={() => sayUk(findLetterKey(target), findLetterText(target))}
+          say={(again) => sayUkSeq(letterParts(target, again))}
           sayKey={`${round.id}-${target}`}
         />
       ) : (

@@ -1,7 +1,7 @@
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid, randInt, shuffle } from '../shared/ui';
-import { hasUkAudio, sayUk } from '../shared/uk-audio';
-import { findDigitKey, findDigitText } from '../shared/spoken-names';
+import { hasUkAudio, sayUkSeq } from '../shared/uk-audio';
+import { digitParts, findDigitKey } from '../shared/spoken-names';
 
 interface Payload {
   digit: number;
@@ -66,7 +66,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
         <PromptCard
           question="Знайди цифру"
           answerState={answerState}
-          say={() => sayUk(findDigitKey(digit), findDigitText(digit))}
+          say={(again) => sayUkSeq(digitParts(digit, again))}
           sayKey={`${round.id}-${digit}`}
         />
       ) : (
