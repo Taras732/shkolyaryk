@@ -29,11 +29,11 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<Payload, A
   const report = useBoardProgress();
   useEffect(() => report(Math.round((idx / tasks.length) * 5)), [idx, tasks.length, report]);
 
-  // завдання звучить на старті кожного раунду
+  // завдання звучить один раз — на старті гри; далі раунди просто змінюються (🔊 — повторити)
   useEffect(() => {
     const t = window.setTimeout(() => sayUk('p_odd', 'Що тут зайве?'), 300);
     return () => window.clearTimeout(t);
-  }, [idx]);
+  }, []);
 
   const done = useCallback(() => onAnswer(BOARD_DONE), [onAnswer]);
 
