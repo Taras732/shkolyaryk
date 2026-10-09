@@ -1,125 +1,173 @@
+import { useCallback, useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
-import { PromptCard, ChoiceGrid, randInt, shuffle } from '../shared/ui';
+import { BOARD_DONE } from '../types';
+import { sayUk } from '../shared/uk-audio';
+import { PictureCard, TaskBubble, useBoardProgress } from '../shared/preschool';
+import { useProfileStore } from '@/stores/useProfileStore';
+import { ROUNDS, buildByLength, nextLength, type Task } from './core';
 
-interface WordEntry {
-  word: string;
-  syllables: string[];
-  hint: string;
+/**
+ * «Склади слово» (переробка 09.10.2026): картинка, слово звучить; внизу перемішані плитки —
+ * тапай по порядку: плитка звучить і летить у свою клітинку; не та — хитається й лишається.
+ * Складено — слово звучить цілим, «бум» і зірочки.
+ */
+interface BoardPayload {
+  difficulty: Difficulty;
+}
+type Answer = typeof BOARD_DONE;
+
+const BIG = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
+const LONG = ['М', 'Н', 'Л', 'Р', 'С', 'З', 'В', 'Ш'];
+const INK = ['#2563EB', '#DC2626', '#16A34A', '#7C3AED'];
+
+const sayWord = (w: string) => sayUk(`w_${w.toLowerCase()}`, w.toLowerCase());
+/** Плитка звучить: склад — складом; буква — протяжно (М, Н…) або назвою. */
+const sayTile = (t: string) =>
+  t.length > 1 ? sayUk(`s_${t}`, t.toLowerCase()) : LONG.includes(t) ? sayUk(`c_${t}`, t.toLowerCase()) : sayUk(`n_${t}`, t.toLowerCase());
+
+function generate(difficulty: Difficulty): LevelData<BoardPayload, Answer> {
+  const round: Round<BoardPayload, Answer> = { id: 'sb-board', payload: { difficulty }, answer: BOARD_DONE };
+  return { difficulty, rounds: Array.from({ length: ROUNDS }, () => round) };
 }
 
-// Прості укр. слова. Односкладові (syllables.length === 1) → відповідь = ціле слово.
-const WORDS: WordEntry[] = [
-  { word: 'МАМА', syllables: ['МА', 'МА'], hint: '👩' },
-  { word: 'ВОДА', syllables: ['ВО', 'ДА'], hint: '💧' },
-  { word: 'РИБА', syllables: ['РИ', 'БА'], hint: '🐟' },
-  { word: 'СОНЦЕ', syllables: ['СОН', 'ЦЕ'], hint: '☀️' },
-  { word: 'ЖАБА', syllables: ['ЖА', 'БА'], hint: '🐸' },
-  { word: 'КАША', syllables: ['КА', 'ША'], hint: '🥣' },
-  { word: 'РУКА', syllables: ['РУ', 'КА'], hint: '✋' },
-  { word: 'НОГА', syllables: ['НО', 'ГА'], hint: '🦶' },
-  { word: 'КОТ', syllables: ['КОТ'], hint: '🐈' },
-  { word: 'СИР', syllables: ['СИР'], hint: '🧀' },
-  { word: 'ДІМ', syllables: ['ДІМ'], hint: '🏠' },
-  { word: 'ЛИСТ', syllables: ['ЛИСТ'], hint: '🍂' },
-];
-
-// Пул складів-відволікачів для слів з кількома складами.
-const SYLLABLE_POOL = [
-  'МА', 'ВО', 'ДА', 'РИ', 'БА', 'СОН', 'ЦЕ', 'ЖА', 'КА', 'ША',
-  'РУ', 'НО', 'ГА', 'ТА', 'НА', 'ЛА', 'РА', 'СА', 'ВА', 'ЗА', 'ПА', 'ФА',
-];
-
-function optionsCountFor(d: Difficulty): number {
-  return d === 1 ? 3 : 4;
+/** Прогрес: скільки букв у словах зараз і скільки чистих слів поспіль. */
+interface SbProgress { len: 3 | 4 | 5; clean: number }
+const keyFor = (id: string) => `shk.sb.v1.${id}`;
+function load(id: string): SbProgress {
+  try {
+    return { len: 3, clean: 0, ...(JSON.parse(localStorage.getItem(keyFor(id)) ?? '{}') as Partial<SbProgress>) };
+  } catch {
+    return { len: 3, clean: 0 };
+  }
+}
+function save(id: string, p: SbProgress) {
+  try {
+    localStorage.setItem(keyFor(id), JSON.stringify(p));
+  } catch {
+    // без памʼяті — почнемо з 3 букв
+  }
 }
 
-/** Два рядки "близькі", якщо збігається перша або остання літера (плутанина на слух). */
-function isClose(a: string, b: string): boolean {
-  return a[0] === b[0] || a[a.length - 1] === b[b.length - 1];
-}
+function Component({ onAnswer, onMistake }: GameComponentProps<BoardPayload, Answer>) {
+  const profileId = useProfileStore((st) => st.activeProfile?.id) ?? 'guest';
+  const [, setProg] = useState<SbProgress>(() => load(profileId));
+  const [tasks] = useState<Task[]>(() => buildByLength(load(profileId).len));
+  const [missed, setMissed] = useState(false); // у цьому слові була помилка
+  const [idx, setIdx] = useState(0);
+  const [placed, setPlaced] = useState<number[]>([]); // індекси плиток, що вже в клітинках
+  const [shake, setShake] = useState<number | null>(null);
+  const [done, setDone] = useState(false);
+  const task = tasks[idx];
+  const report = useBoardProgress();
+  useEffect(() => report(Math.round((idx / tasks.length) * 5)), [idx, tasks.length, report]);
 
-/** Відволікачі: близькі за звучанням (diff3) або свідомо несхожі (diff1/2). */
-function pickDistractors(target: string, pool: string[], count: number, useSimilar: boolean): string[] {
-  const rest = pool.filter((s) => s !== target);
-  const primary = useSimilar ? rest.filter((s) => isClose(s, target)) : rest.filter((s) => !isClose(s, target));
-  const secondary = useSimilar ? rest.filter((s) => !isClose(s, target)) : rest.filter((s) => isClose(s, target));
-  const combined = shuffle(primary).concat(shuffle(secondary));
-  return combined.slice(0, count);
-}
+  // на старті слова — слово звучить
+  useEffect(() => {
+    if (!task) return;
+    const t = window.setTimeout(() => sayWord(task.entry.word), 350);
+    return () => window.clearTimeout(t);
+  }, [idx]); // eslint-disable-line react-hooks/exhaustive-deps
 
-interface Payload {
-  word: string;
-  display: string;
-  hint: string;
-  options: string[];
-}
+  const finish = useCallback(() => onAnswer(BOARD_DONE), [onAnswer]);
 
-function generate(difficulty: Difficulty): LevelData<Payload, string> {
-  const total = optionsCountFor(difficulty);
-  const useSimilar = difficulty === 3;
-  const chosen = shuffle(WORDS).slice(0, 5);
+  // складено — слово звучить, пауза, далі
+  useEffect(() => {
+    if (!done) return;
+    sayWord(task.entry.word);
+    // чисте слово — +1 до серії; 5 поспіль — наступна довжина (з наступної сесії)
+    setProg((p) => {
+      const clean = missed ? 0 : p.clean + 1;
+      const len = nextLength(p.len, clean);
+      const nx = { len, clean: len !== p.len ? 0 : clean };
+      save(profileId, nx);
+      return nx;
+    });
+    const t = window.setTimeout(() => {
+      setDone(false);
+      setMissed(false);
+      setPlaced([]);
+      if (idx + 1 >= tasks.length) finish();
+      else setIdx(idx + 1);
+    }, 1800);
+    return () => window.clearTimeout(t);
+  }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const rounds: Round<Payload, string>[] = chosen.map((entry, i) => {
-    const isMono = entry.syllables.length === 1;
-    const blankIdx = isMono ? 0 : randInt(0, entry.syllables.length - 1);
-    const target = entry.syllables[blankIdx];
+  if (!task) return null;
+  const parts = task.entry.parts;
+  const need = parts[placed.length];
 
-    const pool = isMono
-      ? WORDS.filter((w) => w.syllables.length === 1 && w.word !== entry.word).map((w) => w.word)
-      : SYLLABLE_POOL.filter((s) => s !== target && !entry.syllables.includes(s));
+  const tap = (i: number) => {
+    if (done || placed.includes(i)) return;
+    const t = task.tiles[i];
+    sayTile(t);
+    if (t !== need) {
+      setShake(i);
+      setMissed(true);
+      onMistake();
+      window.setTimeout(() => setShake(null), 450);
+      return;
+    }
+    const nx = [...placed, i];
+    setPlaced(nx);
+    if (nx.length === parts.length) window.setTimeout(() => setDone(true), 500);
+  };
 
-    const distractors = pickDistractors(target, pool, total - 1, useSimilar);
-    const options = shuffle([target, ...distractors]);
-    const display = entry.syllables.map((s, idx) => (idx === blankIdx ? '_'.repeat(s.length) : s)).join('');
+  // що довше слово — то менші плитки, щоб влізли в рядок
+  const tileSize = parts[0].length > 1 ? 92 : parts.length >= 5 ? 60 : parts.length === 4 ? 68 : 78;
 
-    return {
-      id: `r${i}`,
-      payload: { word: entry.word, display, hint: entry.hint, options },
-      answer: target,
-    };
-  });
-
-  return { difficulty, rounds };
-}
-
-function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
-  const { display, hint, options } = round.payload;
-  const choices = options.map((s) => ({
-    value: s,
-    node: <span style={{ fontSize: 26, fontWeight: 800 }}>{s}</span>,
-  }));
   return (
-    <>
-      <PromptCard question="Склади слово" answerState={answerState}>
-        <div style={{ fontSize: 48, margin: '4px auto 10px' }}>{hint}</div>
-        <div
-          style={{
-            fontSize: 40,
-            fontWeight: 800,
-            letterSpacing: 4,
-            color: 'var(--c-primary)',
-            textAlign: 'center',
-          }}
-        >
-          {display}
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <TaskBubble text="Склади слово!" onSay={() => sayWord(task.entry.word)}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <PictureCard><span style={{ fontSize: 96, lineHeight: 1 }}>{task.entry.emoji}</span></PictureCard>
+          {/* клітинки слова */}
+          <div style={{ display: 'flex', gap: 8, position: 'relative' }}>
+            {parts.map((p, k) => {
+              const filled = k < placed.length;
+              return (
+                <motion.div key={k} layout
+                  style={{ ...BIG, width: tileSize, height: 74, borderRadius: 20, display: 'grid', placeItems: 'center', fontSize: parts[0].length > 1 ? 40 : 46,
+                    background: filled ? (done ? '#22C55E' : '#fff') : 'rgba(255,255,255,.55)', color: filled ? (done ? '#fff' : INK[k % INK.length]) : 'transparent',
+                    border: filled ? '0' : '3px dashed #F2C79B', boxShadow: filled ? `0 5px 0 ${done ? '#15803d' : '#EED9BF'}` : 'none',
+                    animation: done ? 'pk-pop .5s ease-out forwards' : undefined }}>
+                  {filled ? p : '·'}
+                </motion.div>
+              );
+            })}
+            {done && ['-60px,-40px', '60px,-40px', '0,-60px', '-50px,40px', '50px,40px'].map((pp, k) => {
+              const [dx, dy] = pp.split(',');
+              return <span key={k} style={{ position: 'absolute', left: '46%', top: '30%', fontSize: 22, ['--dx' as string]: dx, ['--dy' as string]: dy, animation: 'pk-spark .7s ease-out forwards' }}>⭐</span>;
+            })}
+          </div>
         </div>
-      </PromptCard>
-      <ChoiceGrid options={choices} correct={round.answer} disabled={disabled} answerState={answerState} onPick={onAnswer} />
-    </>
+      </TaskBubble>
+
+      {/* плитки внизу */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 10, padding: '4px 0 10px', minHeight: tileSize }}>
+        {task.tiles.map((t, i) => (
+          <motion.button key={`${idx}-${i}`} type="button" onClick={() => tap(i)} whileTap={{ scale: 0.92 }}
+            style={{ ...BIG, width: tileSize, height: tileSize, borderRadius: 24, border: 0, background: '#fff', color: INK[i % INK.length], fontSize: t.length > 1 ? 40 : 48,
+              boxShadow: '0 6px 0 #EED9BF', cursor: 'pointer', visibility: placed.includes(i) ? 'hidden' : 'visible',
+              animation: shake === i ? 'pk-shake .4s ease' : undefined }}>
+            {t}
+          </motion.button>
+        ))}
+      </div>
+    </div>
   );
 }
 
-const syllableBuild: GameDefinition<Payload, string> = {
+const syllableBuild: GameDefinition<BoardPayload, Answer> = {
   id: 'syllable-build',
   title: 'Склади слово',
   subject: 'language',
   levels: ['L0'],
   icon: '🔡',
-  description: 'Склади склад/слово.',
+  description: 'Почуй слово й склади його з плиток по порядку.',
   accent: '#EEEBFF',
   generate,
   Component,
-  // TODO(A2-мова): skills після seed skill-graph мови
 };
 
 export default syllableBuild;

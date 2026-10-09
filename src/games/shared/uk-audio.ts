@@ -37,10 +37,34 @@ export function hasUkAudio(key?: string): boolean {
 }
 
 let current: HTMLAudioElement | null = null;
+let seqToken = 0;
+
+/**
+ * Захист від повторів (09.10): той самий звук, запитаний ще раз протягом 0,7 с, — ігноруємо.
+ * Так подвійний виклик (React StrictMode у dev, кілька подій перетягування, швидкий подвійний тап)
+ * не дає «зациклення» одного й того самого.
+ */
+let lastKey = '';
+let lastAt = 0;
+function isRepeat(key: string): boolean {
+  const now = Date.now();
+  if (key === lastKey && now - lastAt < 700) return true;
+  lastKey = key;
+  lastAt = now;
+  return false;
+}
+
+/** Зупинити все, що звучить або чекає в черзі. */
+export function stopUk(): void {
+  seqToken++;
+  current?.pause();
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+}
 
 /** Озвучити: `key` — ім'я файлу, `text` — що казати голосом пристрою, якщо файлу немає. */
 export function sayUk(key: string, text: string): void {
-  current?.pause();
+  if (isRepeat(key)) return;
+  stopUk(); // новий звук гасить попередній разом із чергою
   if (UK_AUDIO_FILES.has(key)) {
     current = new Audio(`/audio/uk/${key}.mp3`);
     current.play().catch(() => speakUk(text));
@@ -60,15 +84,14 @@ function speakUk(text: string): void {
   window.speechSynthesis.speak(u);
 }
 
-let seqToken = 0;
-
 /**
  * Кілька фраз підряд з паузою між ними: «Знайди букву» … «Бе».
  * Назва букви окремим файлом звучить чітко, а не хвостиком речення (рішення 09.10).
  */
 export function sayUkSeq(parts: { key: string; text: string }[], gapMs = 220): void {
-  const token = ++seqToken;
-  current?.pause();
+  if (isRepeat(parts.map((p) => p.key).join('+'))) return;
+  stopUk();
+  const token = seqToken;
   const playAt = (i: number) => {
     if (token !== seqToken || i >= parts.length) return;
     const { key, text } = parts[i];

@@ -17,6 +17,8 @@ import edge_tts
 VOICE = "uk-UA-PolinaNeural"
 RATE_PHRASE = "-15%"
 RATE_NAME = "-35%"  # назва букви/цифри — повільно й чітко
+# слова — майже звичайний темп: на -35% синтезатор «ковтав» кінець («кіт» звучав як «кін», 09.10)
+RATE_WORD = "-15%"
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "public" / "audio" / "uk"
@@ -40,9 +42,9 @@ def items() -> dict[str, tuple[str, str]]:
     names = dict(re.findall(r"(\S): '([^']+)'", letters))
     lsrc = (ROOT / "src" / "games" / "uk-letters" / "letters.ts").read_text(encoding="utf-8")
     for word in re.findall(r"\['([^']+)', '[^']+'\]", lsrc):
-        out[f"w_{word}"] = (f"{word.capitalize()}.", RATE_NAME)
+        out[f"w_{word}"] = (f"{word.capitalize()}!", RATE_WORD)
     for ch, word in re.findall(r"L\('(.)', '([^']+)'", lsrc):
-        out[f"w_{word}"] = (f"{word.capitalize()}.", RATE_NAME)
+        out[f"w_{word}"] = (f"{word.capitalize()}!", RATE_WORD)
         out[f"l_{ch}"] = (f"Це буква {names.get(ch, ch)}. {word.capitalize()}.", RATE_PHRASE)
     # склади (s_<СКЛАД>), протяжні звуки (c_<БУКВА>) і слова «склад + звук» — для «Зливаємо склади»
     ssrc = (ROOT / "src" / "games" / "uk-syllables" / "core.ts").read_text(encoding="utf-8")
@@ -55,7 +57,18 @@ def items() -> dict[str, tuple[str, str]]:
     for c in long_:
         out[f"c_{c}"] = (f"{c.lower() * 6}.", "-50%")
     for word in re.findall(r"word: '([^']+)'", ssrc):
-        out[f"w_{word.lower()}"] = (f"{word.capitalize()}.", RATE_NAME)
+        out[f"w_{word.lower()}"] = (f"{word.capitalize()}!", RATE_WORD)
+    # «Склади слово»: слова і плитки-склади
+    bsrc = (ROOT / "src" / "games" / "syllable-build" / "core.ts").read_text(encoding="utf-8")
+    for word, parts in re.findall(r"word: '([^']+)', parts: \[([^\]]+)\]", bsrc):
+        out.setdefault(f"w_{word.lower()}", (f"{word.capitalize()}!", RATE_WORD))
+        for p in re.findall(r"'([^']+)'", parts):
+            if len(p) > 1:
+                out.setdefault(f"s_{p}", (f"{p.lower()}.", RATE_NAME))
+    for word in re.findall(r"L\('([^']+)'", bsrc):
+        out.setdefault(f"w_{word.lower()}", (f"{word.capitalize()}!", RATE_WORD))
+    for p in re.findall(r"'([А-ЯІЄЇҐ]{2})'", re.search(r"EXTRA_SYLS = \[(.*?)\]", bsrc).group(1)):
+        out.setdefault(f"s_{p}", (f"{p.lower()}.", RATE_NAME))
     return out
 
 
