@@ -95,7 +95,6 @@ const TILE_BG = ['#FFE9D6', '#DFF7E6', '#EDE7FF', '#FFF3C8', '#FFE3EC', '#E3EEFF
 const big = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 const card = { background: '#fff', borderRadius: 24, boxShadow: 'var(--c-shadow)' } as const;
 const primary = { ...big, border: 0, borderRadius: 20, padding: '15px 0', fontSize: 18, background: 'var(--c-primary)', color: '#fff', cursor: 'pointer' } as const;
-const tile = { ...big, border: 0, borderRadius: 22, padding: '22px 0', fontSize: 18, color: 'var(--c-ink)', cursor: 'pointer', boxShadow: 'var(--c-shadow)' } as const;
 const field = { ...big, fontSize: 16, border: 0, borderRadius: 16, background: 'var(--c-bg)', padding: '13px 16px', color: 'var(--c-ink)', outline: 'none' } as const;
 const label = { ...big, fontSize: 13, color: 'var(--c-mut)', margin: '0 0 6px 4px' } as const;
 const link = { ...big, border: 0, background: 'none', fontSize: 13, color: 'var(--c-mut)', cursor: 'pointer', padding: 4 } as const;
@@ -118,7 +117,7 @@ export default function Start() {
   const [name, setName] = useState('');
   const [level, setLevel] = useState<ClassLevel>('preschool');
   const [friend, setFriend] = useState(FRIENDS[0].id);
-  const [sheet, setSheet] = useState<'signin' | 'signup' | 'signup-adult' | 'mail'>('signin');
+  const [sheet, setSheet] = useState<'signin' | 'signup-adult' | 'mail'>('signin');
   const [code, setCode] = useState('');
   const [codeMsg, setCodeMsg] = useState('');
   const [mailNew, setMailNew] = useState(false);
@@ -223,18 +222,11 @@ export default function Start() {
                   <motion.button whileTap={{ scale: 0.97 }} onClick={google} style={primary}>Увійти через Google</motion.button>
                   <button onClick={() => { setMailNew(false); setSheet('mail'); }} style={link}>або поштою</button>
                   <div style={{ height: 1, background: 'var(--c-line)', margin: '2px 8px' }} />
-                  <button onClick={() => setSheet('signup')} style={{ ...link, fontSize: 15 }}>Немає акаунта? <span style={{ color: 'var(--c-primary)' }}>Зареєструватися</span></button>
-                  <button onClick={guest} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Спробувати без акаунта</button>
-                </>
-              )}
-              {sheet === 'signup' && (
-                <>
-                  <div style={{ ...big, fontSize: 20, color: 'var(--c-ink)', textAlign: 'center' }}>Хто реєструється?</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                    <motion.button whileTap={{ scale: 0.96 }} onClick={() => { pickRole('parent'); setSheet('signup-adult'); }} style={{ ...tile, background: '#FFE9D6' }}>Дорослий</motion.button>
-                    <motion.button whileTap={{ scale: 0.96 }} onClick={() => { pickRole('student'); setStep('code'); }} style={{ ...tile, background: '#DFF7E6' }}>Учень</motion.button>
+                  <button onClick={() => { pickRole('parent'); setSheet('signup-adult'); }} style={{ ...link, fontSize: 15 }}>Немає акаунта? <span style={{ color: 'var(--c-primary)' }}>Зареєструватися</span></button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <button onClick={guest} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Спробувати без акаунта</button>
+                    <button onClick={() => { pickRole('student'); setStep('code'); }} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Є код від батьків?</button>
                   </div>
-                  <button onClick={() => setSheet('signin')} style={link}>← Назад</button>
                 </>
               )}
               {sheet === 'signup-adult' && (
@@ -242,7 +234,7 @@ export default function Start() {
                   <div style={{ ...big, fontSize: 20, color: 'var(--c-ink)', textAlign: 'center' }}>Реєстрація</div>
                   <motion.button whileTap={{ scale: 0.97 }} onClick={google} style={primary}>Продовжити з Google</motion.button>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <button onClick={() => setSheet('signup')} style={link}>← Назад</button>
+                    <button onClick={() => setSheet('signin')} style={link}>← Назад</button>
                     <button onClick={() => { setMailNew(true); setSheet('mail'); }} style={link}>або поштою</button>
                   </div>
                 </>
@@ -273,7 +265,7 @@ export default function Start() {
                 style={{ ...field, width: '100%', textAlign: 'center', fontSize: 30, letterSpacing: 10 }} />
               <motion.button whileTap={{ scale: 0.97 }} onClick={joinFamily} disabled={code.length !== 6} style={{ ...primary, width: '100%', opacity: code.length === 6 ? 1 : 0.5 }}>Далі</motion.button>
               {codeMsg && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{codeMsg}</div>}
-              <button onClick={() => { setStep('hello'); setSheet('signup'); }} style={link}>← Назад</button>
+              <button onClick={() => { setStep('hello'); setSheet('signin'); }} style={link}>← Назад</button>
             </div>
           </>
         )}
