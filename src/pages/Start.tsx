@@ -15,7 +15,7 @@ import type { Face } from '@/pages/poc/Bunny';
  * Старі екрани (Welcome, Auth, RoleSelect, Onboarding, Placement) лишились у коді, але не на шляху.
  */
 type Role = 'parent' | 'student';
-type Step = 'hello' | 'code' | 'child' | 'pick';
+type Step = 'hello' | 'child' | 'pick';
 
 const ROLE_KEY = 'shk.role';
 const FRIENDS = [
@@ -120,6 +120,7 @@ export default function Start() {
   const [sheet, setSheet] = useState<'signin' | 'mail'>('signin');
   const [code, setCode] = useState('');
   const [codeMsg, setCodeMsg] = useState('');
+  const [codeHelp, setCodeHelp] = useState(false);
   const [mailNew, setMailNew] = useState(false);
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
@@ -157,7 +158,8 @@ export default function Start() {
 
   // TODO(supabase): код родини звіряється на сервері (таблиця family_codes); без бази — чесна відмова
   const joinFamily = async () => {
-    setCodeMsg('Поки не працює: потрібна база (Supabase). Попроси батьків додати тебе на їхньому телефоні.');
+    pickRole('student');
+    setCodeMsg('Код поки не перевірити: потрібна база (Supabase).');
   };
 
   const pickRole = (r: Role) => {
@@ -219,13 +221,38 @@ export default function Start() {
             <div style={{ ...card, padding: 14, display: 'flex', flexDirection: 'column', gap: 10, position: 'relative', zIndex: 1 }}>
               {sheet === 'signin' && (
                 <>
+                  {/* дорослий — Google; дитина — код від батьків; обидва на одному аркуші (рішення 09.10) */}
                   <motion.button whileTap={{ scale: 0.97 }} onClick={google} style={primary}>Продовжити з Google</motion.button>
-                  <button onClick={() => { setMailNew(false); setSheet('mail'); }} style={link}>або поштою</button>
+                  <button onClick={() => { setMailNew(false); setSheet('mail'); }} style={{ ...link, marginTop: -4 }}>або поштою</button>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ flex: 1, height: 1, background: 'var(--c-line)' }} />
+                    <span style={{ ...big, fontSize: 13, color: 'var(--c-mut)' }}>або код від батьків</span>
+                    <div style={{ flex: 1, height: 1, background: 'var(--c-line)' }} />
+                  </div>
+                  <input value={code} inputMode="numeric" autoComplete="one-time-code" placeholder="••• •••" aria-label="Код від батьків"
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, '').slice(0, 6);
+                      setCode(v);
+                      setCodeMsg('');
+                      if (v.length === 6) joinFamily(); // шоста цифра — входимо одразу, без кнопки
+                    }}
+                    style={{ ...field, textAlign: 'center', fontSize: 26, letterSpacing: 8, padding: '10px 12px' }} />
+                  {codeMsg && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{codeMsg}</div>}
+                  {codeHelp ? (
+                    <div style={{ ...big, fontSize: 13, color: 'var(--c-ink)', background: '#FFF3C8', borderRadius: 14, padding: '10px 12px', textAlign: 'center', lineHeight: 1.35 }}>
+                      Попроси маму чи тата: <b>Батькам → Підключити пристрій</b>. Або хай вони увійдуть тут через Google.
+                    </div>
+                  ) : (
+                    <button onClick={() => setCodeHelp(true)} style={{ ...link, marginTop: -4 }}>Немає коду?</button>
+                  )}
+
                   <div style={{ height: 1, background: 'var(--c-line)', margin: '2px 8px' }} />
-                  <button onClick={() => { pickRole('parent'); setMailNew(true); setSheet('mail'); }} style={{ ...link, fontSize: 15 }}>Немає акаунта? <span style={{ color: 'var(--c-primary)' }}>Зареєструватися</span></button>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <button onClick={guest} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Спробувати без акаунта</button>
-                    <button onClick={() => { pickRole('student'); setStep('code'); }} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Є код від батьків?</button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <button onClick={() => { pickRole('parent'); setMailNew(true); setSheet('mail'); }} style={{ ...link, fontSize: 14 }}>
+                      <span style={{ color: 'var(--c-primary)' }}>Зареєструватися</span>
+                    </button>
+                    <button onClick={guest} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Без акаунта</button>
                   </div>
                 </>
               )}
@@ -251,21 +278,6 @@ export default function Start() {
                 </>
               )}
               {authError && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{authError}</div>}
-            </div>
-          </>
-        )}
-
-        {step === 'code' && (
-          <>
-            <div style={{ flex: 1 }} />
-            <div style={{ ...card, padding: 18, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-              <div style={{ ...big, fontSize: 22, color: 'var(--c-ink)', textAlign: 'center' }}>Код від батьків</div>
-              <div style={{ ...big, fontSize: 14, color: 'var(--c-mut)', textAlign: 'center' }}>Батьки бачать його в розділі «Батькам»</div>
-              <input value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" placeholder="••••••"
-                style={{ ...field, width: '100%', textAlign: 'center', fontSize: 30, letterSpacing: 10 }} />
-              <motion.button whileTap={{ scale: 0.97 }} onClick={joinFamily} disabled={code.length !== 6} style={{ ...primary, width: '100%', opacity: code.length === 6 ? 1 : 0.5 }}>Далі</motion.button>
-              {codeMsg && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{codeMsg}</div>}
-              <button onClick={() => { setStep('hello'); setSheet('signin'); }} style={link}>← Назад</button>
             </div>
           </>
         )}
