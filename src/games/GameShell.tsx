@@ -11,6 +11,7 @@ import { fetchPrereqHint, type PrereqHint } from '@/school/hint';
 import { isWeakResult, buildPrereqHintMessage } from '@/school/hint-core';
 import { encouragementFor } from './shared/encouragement';
 import { FiveStars, PreschoolProvider, SKY, SkyScene } from './shared/preschool';
+import BottomNav from '@/pages/preschool/BottomNav';
 import { sayUk } from './shared/uk-audio';
 import {
   type GameDefinition,
@@ -269,6 +270,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
             )}
           </div>
         </div>
+        <BottomNav />
       </div>
     );
   }
@@ -383,6 +385,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
             <button onClick={onExit} aria-label="Назад у місце" style={icon}>🏝<small style={{ fontSize: 11, color: 'var(--c-mut)' }}>назад</small></button>
           </div>
         </div>
+        <BottomNav />
       </div>
     );
   }

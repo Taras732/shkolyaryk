@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { LETTERS } from './letters';
+import { LETTERS, MORE } from './letters';
 import {
   GROUPS, KNOWN_STREAK, QUICK_PASS, QUIZ_LEN, buildCheck, buildQuiz, currentGroup, dueLetters, isFresh, isKnown,
   newLetters, open, passGroup, record, statusOf, type LetterProgress,
@@ -22,6 +22,25 @@ describe('uk-letters: буквар групами', () => {
     expect(LETTERS).toHaveLength(33);
     expect(new Set(LETTERS.map((l) => l.ch)).size).toBe(33);
     for (const l of LETTERS) if (l.initial) expect(l.word[0].toUpperCase()).toBe(l.ch);
+  });
+
+  it('банк слів: кожне слово починається зі своєї букви; картинки не повторюються', () => {
+    const em: string[] = LETTERS.map((l) => l.emoji);
+    for (const [ch, list] of Object.entries(MORE)) for (const [w, e] of list) {
+      expect(w[0].toUpperCase()).toBe(ch);
+      em.push(e);
+    }
+    expect(new Set(em).size).toBe(em.length);
+  });
+
+  it('у практиці та сама буква не йде двічі поспіль', () => {
+    let p: LetterProgress = {};
+    for (const ch of ['А', 'О', 'У', 'І', 'Е', 'И']) p = learn(p, ch);
+    for (let s = 1; s < 40; s++) {
+      const q = buildQuiz(p, null, 2, seeded(s), 0);
+      const repeats = q.filter((x, i) => i > 0 && x.target.ch === q[i - 1].target.ch).length;
+      expect(repeats).toBe(0);
+    }
   });
 
   it('групи покривають усі 33 букви рівно по разу', () => {

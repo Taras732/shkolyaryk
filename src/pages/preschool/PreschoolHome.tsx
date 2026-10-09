@@ -9,6 +9,7 @@ import PuppetBunny from '@/pages/poc/PuppetBunny';
 import Companion from '@/pages/poc/Companion';
 import type { Face } from '@/pages/poc/Bunny';
 import { PLACES } from './places';
+import BottomNav from './BottomNav';
 
 /**
  * Головна дошкілля (каркас P2-swipe, рішення 08.10.2026): угорі звірятко-друг,
@@ -29,7 +30,8 @@ const AVATAR: Record<string, string> = {
 export default function PreschoolHome() {
   const navigate = useNavigate();
   const { activeProfile, profiles } = useProfileStore();
-  const [tab, setTab] = useState<Tab>('home');
+  // ?tab=friend — прийшли кнопкою «Друг» з місця чи гри
+  const [tab, setTab] = useState<Tab>(() => (new URLSearchParams(window.location.search).get('tab') === 'friend' ? 'friend' : 'home'));
   const [page, setPage] = useState(0);
   const [face, setFace] = useState<Face>('smile');
   const [bounce, setBounce] = useState(0);
@@ -139,16 +141,7 @@ export default function PreschoolHome() {
         )}
       </div>
 
-      {/* нижнє меню */}
-      <nav style={{ display: 'flex', background: '#fff', borderTop: '1px solid var(--c-line)', padding: '6px 4px calc(8px + env(safe-area-inset-bottom))' }}>
-        {([['home', '🏠', 'Дім'], ['friend', '🐰', 'Друг'], ['parents', '👪', 'Батькам']] as const).map(([k, e, l]) => (
-          <button key={k} onClick={() => (k === 'parents' ? navigate('/parents') : setTab(k))}
-            style={{ ...big, flex: 1, border: 0, background: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, fontSize: 12, padding: '4px 0', color: tab === k ? 'var(--c-primary)' : 'var(--c-mut)', cursor: 'pointer' }}>
-            <span style={{ fontSize: 24, filter: tab === k || k === 'parents' ? 'none' : 'grayscale(1)', opacity: tab === k ? 1 : 0.6 }}>{e}</span>
-            {l}
-          </button>
-        ))}
-      </nav>
+      <BottomNav active={tab} onHome={() => setTab('home')} onFriend={() => setTab('friend')} />
     </div>
   );
 }

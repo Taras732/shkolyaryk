@@ -1,5 +1,5 @@
 import type { Difficulty } from '../types';
-import { LETTERS, type Letter } from './letters';
+import { LETTERS, withRandomWord, type Letter } from './letters';
 
 /**
  * «Буква і звук» — буквар дошкілля як стежка з груп (рішення 09.10.2026, Scope §1.1 станції 7–8).
@@ -185,7 +185,28 @@ function distractors(target: Letter, near: Letter[], mode: Mode, n: number, rng:
 function question(t: Letter, p: LetterProgress, near: Letter[], d: Difficulty, rng: Rng, mode?: Mode): Question {
   const m = mode ?? modeFor(t, p[t.ch], d);
   const n = d === 3 ? 4 : 3;
-  return { target: t, mode: m, options: shuffle([t, ...distractors(t, near, m, n - 1, rng)], rng) };
+  // щоразу інше слово-картинка (банк MORE): «окуляри» більше не на кожне О
+  const target = withRandomWord(t, rng);
+  const others = distractors(t, near, m, n - 1, rng).map((l) => withRandomWord(l, rng));
+  return { target, mode: m, options: shuffle([target, ...others], rng) };
+}
+
+/**
+ * Перемішати так, щоб та сама буква не йшла двічі поспіль (коли це можливо):
+ * жадібно беремо ту, якої лишилось найбільше, але не ту, що щойно була.
+ */
+function spread(targets: Letter[], rng: Rng): Letter[] {
+  const rest = shuffle(targets, rng);
+  const out: Letter[] = [];
+  while (rest.length) {
+    const last = out[out.length - 1]?.ch;
+    const left = (ch: string) => rest.filter((x) => x.ch === ch).length;
+    const cand = rest.filter((x) => x.ch !== last).sort((x, y) => left(y.ch) - left(x.ch));
+    const pick = cand[0] ?? rest[0];
+    rest.splice(rest.indexOf(pick), 1);
+    out.push(pick);
+  }
+  return out;
 }
 
 /** Перевірка свіжої групи: QUICK_PASS питань «почуй і знайди» по її буквах. */
@@ -193,7 +214,7 @@ export function buildCheck(p: LetterProgress, gi: number, d: Difficulty, rng: Rn
   const g = GROUPS[gi].letters.map(letterOf);
   const targets: Letter[] = [];
   while (targets.length < QUICK_PASS) targets.push(...shuffle(g, rng));
-  return targets.slice(0, QUICK_PASS).map((t) => question(t, p, g, d, rng, 'same'));
+  return spread(targets.slice(0, QUICK_PASS), rng).map((t) => question(t, p, g, d, rng, 'same'));
 }
 
 /**
@@ -218,5 +239,5 @@ export function buildQuiz(p: LetterProgress, fresh: Letter[] | Letter | null, d:
     const pool = known.length ? known : weak.length ? weak : freshList;
     targets.push(pool[Math.floor(rng() * pool.length)]);
   }
-  return shuffle(targets.slice(0, QUIZ_LEN), rng).map((t) => question(t, p, near, d, rng));
+  return spread(targets.slice(0, QUIZ_LEN), rng).map((t) => question(t, p, near, d, rng));
 }

@@ -39,6 +39,8 @@ def items() -> dict[str, tuple[str, str]]:
     # буквар: слово-опора (w_<слово>) і знайомство з буквою (l_<буква>)
     names = dict(re.findall(r"(\S): '([^']+)'", letters))
     lsrc = (ROOT / "src" / "games" / "uk-letters" / "letters.ts").read_text(encoding="utf-8")
+    for word in re.findall(r"\['([^']+)', '[^']+'\]", lsrc):
+        out[f"w_{word}"] = (f"{word.capitalize()}.", RATE_NAME)
     for ch, word in re.findall(r"L\('(.)', '([^']+)'", lsrc):
         out[f"w_{word}"] = (f"{word.capitalize()}.", RATE_NAME)
         out[f"l_{ch}"] = (f"Це буква {names.get(ch, ch)}. {word.capitalize()}.", RATE_PHRASE)

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import BottomNav from './BottomNav';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { getGame } from '@/games/registry';
@@ -80,6 +81,7 @@ export default function PlacePage() {
           ))}
         </div>
       )}
+      <BottomNav />
     </div>
   );
 }

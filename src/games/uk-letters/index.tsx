@@ -159,7 +159,8 @@ function Quiz({
             </>
           )}
         </div>
-        <button className="g-btn primary" onClick={next} disabled={!picked || correct} style={{ opacity: picked && !correct ? 1 : 0.35, transition: 'opacity .2s' }}>Далі →</button>
+        {/* «Далі» завжди активна: до відповіді — пропустити питання (у прогрес не пишемо), після помилки — далі */}
+        <button className="g-btn primary" onClick={next} disabled={correct}>Далі →</button>
       </div>
     </div>
   );
