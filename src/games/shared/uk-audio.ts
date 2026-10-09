@@ -66,7 +66,7 @@ let seqToken = 0;
  * Кілька фраз підряд з паузою між ними: «Знайди букву» … «Бе».
  * Назва букви окремим файлом звучить чітко, а не хвостиком речення (рішення 09.10).
  */
-export function sayUkSeq(parts: { key: string; text: string }[], gapMs = 450): void {
+export function sayUkSeq(parts: { key: string; text: string }[], gapMs = 220): void {
   const token = ++seqToken;
   current?.pause();
   const playAt = (i: number) => {

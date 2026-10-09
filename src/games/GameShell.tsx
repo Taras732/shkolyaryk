@@ -246,7 +246,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
             <div style={{ flex: 1 }}>{!isBoard && <FiveStars filled={Math.round((state.roundIndex / total) * 5)} />}</div>
             <div style={{ width: 46 }} />
           </div>
-          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', paddingTop: 10, paddingBottom: 60 }}>
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', paddingTop: 6, paddingBottom: 8 }}>
             <PreschoolProvider>
               <GameComponent
                 key={round.id}

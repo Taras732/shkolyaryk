@@ -27,8 +27,16 @@ export function SkyScene() {
         @keyframes pk-shake { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-8px) } 75% { transform: translateX(8px) } }
         @media (prefers-reduced-motion: reduce) { .pk-anim { animation: none !important } }
       `}</style>
-      {[[24, 120, 96, 30, 0], [210, 190, 76, 24, -3], [130, 60, 56, 18, -6]].map(([x, y, w, h, d], i) => (
-        <div key={i} className="pk-anim" style={{ position: 'absolute', left: x, top: y, width: w, height: h, borderRadius: 40, background: '#fff', opacity: 0.9, animation: `pk-drift ${9 + i * 3}s ease-in-out ${d}s infinite alternate` }} />
+      {[[16, 104, 1, 0], [200, 176, 0.8, -3], [120, 46, 0.6, -6]].map(([x, y, k, d], i) => (
+        <svg key={i} className="pk-anim" viewBox="0 0 120 64" width={120 * k} height={64 * k}
+          style={{ position: 'absolute', left: x, top: y, animation: `pk-drift ${9 + i * 3}s ease-in-out ${d}s infinite alternate`, filter: 'drop-shadow(0 4px 6px rgba(80,120,180,.18))' }}>
+          {/* пухнаста хмаринка: кілька кругів і плаский низ, легка тінь знизу */}
+          <g fill="#fff">
+            <circle cx="34" cy="38" r="20" /><circle cx="58" cy="28" r="24" /><circle cx="84" cy="36" r="18" /><circle cx="100" cy="44" r="12" />
+            <rect x="18" y="40" width="92" height="18" rx="9" />
+          </g>
+          <path d="M22 54 Q60 62 106 54" stroke="#DCEBFA" strokeWidth="4" fill="none" strokeLinecap="round" />
+        </svg>
       ))}
       <div style={{ position: 'absolute', left: -30, right: -30, bottom: -40, height: 150, borderRadius: '50% 50% 0 0', background: '#BDE8C6' }} />
       <div style={{ position: 'absolute', left: -60, right: 40, bottom: -70, height: 130, borderRadius: '50% 50% 0 0', background: '#A9E2B4' }} />
@@ -76,7 +84,7 @@ export function Balloons<T extends string | number>({
   }, [answerState]);
   const wide = options.some((o) => String(o.node ?? o.value).length > 3 && (typeof o.node === 'string' || o.node === undefined));
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-start', gap: '28px 14px', padding: '18px 4px 40px' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-start', gap: '28px 14px', padding: '12px 4px 36px' }}>
       {options.map((o, i) => {
         const picked = sel === o.value;
         const popped = picked && answerState === 'correct';

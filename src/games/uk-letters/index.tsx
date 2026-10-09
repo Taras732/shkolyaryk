@@ -17,7 +17,6 @@ interface BoardPayload {
 type Answer = typeof BOARD_DONE;
 
 const CORRECT_MS = 900;
-const GREEN = 'var(--c-ok-ink)';
 const keyFor = (id: string) => `shk.ukl.v1.${id}`;
 
 function load(id: string): LetterProgress {
@@ -133,7 +132,7 @@ function Quiz({
   const state = !picked ? 'idle' : correct ? 'correct' : 'incorrect';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, height: '100%' }}>
       <FiveStars filled={Math.round((idx / queue.length) * 5)} />
       <TaskBubble text={task} onSay={onSay}>
         {shown && <div style={{ background: '#fff', borderRadius: 28, boxShadow: 'var(--c-shadow)', padding: '10px 26px' }} className={picked && !correct ? 'shake' : ''}>{shown}</div>}
@@ -145,14 +144,21 @@ function Quiz({
         answerState={state}
         onPick={(ch) => pick(q.options.find((o) => o.ch === ch)!)}
       />
-      {picked && !correct && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ background: '#fff', borderRadius: 20, boxShadow: 'var(--c-shadow)', padding: '12px 14px', textAlign: 'center', color: GREEN, fontWeight: 900, fontSize: 24 }}>
-            {q.target.ch} — {q.target.emoji} {q.target.word}
-          </div>
-          <button className="g-btn primary" onClick={next}>Далі →</button>
+      {/* низ завжди однаковий: місце під підказку + «Далі» — нічого не стрибає */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 'auto' }}>
+        <div style={{ minHeight: 58, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: picked && !correct ? '#fff' : 'transparent', borderRadius: 20, boxShadow: picked && !correct ? 'var(--c-shadow)' : 'none', padding: '8px 14px', fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 24, color: 'var(--c-ink)' }}>
+          {picked && !correct && (
+            <>
+              <span style={{ fontSize: 40, color: 'var(--c-primary)', background: 'var(--c-primary-soft)', borderRadius: 14, padding: '0 12px', lineHeight: 1.2 }}>{q.target.ch}</span>
+              <span style={{ fontSize: 34 }}>{q.target.emoji}</span>
+              <span>
+                {q.target.initial ? (<><span style={{ color: 'var(--c-primary)' }}>{q.target.word[0].toUpperCase()}</span>{q.target.word.slice(1)}</>) : q.target.word}
+              </span>
+            </>
+          )}
         </div>
-      )}
+        <button className="g-btn primary" onClick={next} disabled={!picked || correct} style={{ opacity: picked && !correct ? 1 : 0.35, transition: 'opacity .2s' }}>Далі →</button>
+      </div>
     </div>
   );
 }
