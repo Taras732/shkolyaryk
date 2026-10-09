@@ -76,26 +76,29 @@ export default function PreschoolHome() {
               </div>
             </div>
 
-            {/* на сьогодні */}
-            <div style={{ background: 'var(--c-primary)', borderRadius: 22, padding: 10, marginTop: 8 }}>
+            {/* на сьогодні: три картки з картинками; перша — «зараз» з ▶ на ній; тап — назва голосом і гра */}
+            <div style={{ background: 'var(--c-primary)', borderRadius: 22, padding: '8px 10px 10px', marginTop: 8 }}>
+              <div style={{ ...big, fontSize: 13, color: 'rgba(255,255,255,.85)', margin: '0 0 6px 4px' }}>На сьогодні</div>
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.max(1, plan.length)}, 1fr)`, gap: 8 }}>
                 {plan.map((s, i) => {
                   const g = getGame(s.gameId);
+                  const now = i === 0;
                   return (
-                    <motion.button key={s.gameId} whileTap={{ scale: 0.92 }} onClick={() => navigate(`/game/${s.gameId}`)}
-                      style={{ aspectRatio: '1.25', borderRadius: 18, border: 0, background: i === 0 ? '#fff' : 'rgba(255,255,255,.18)', fontSize: 40, cursor: 'pointer', boxShadow: i === 0 ? '0 0 0 4px rgba(255,255,255,.35)' : 'none' }}
+                    <motion.button key={s.gameId} whileTap={{ scale: 0.93 }}
+                      onClick={() => { if (g) sayUk(`pre.game.${g.id}`, g.title); navigate(`/game/${s.gameId}`); }}
+                      animate={now ? { y: [0, -3, 0] } : { y: 0 }} transition={now ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
+                      style={{ position: 'relative', aspectRatio: '1', borderRadius: 18, border: 0, padding: 4, cursor: 'pointer', background: now ? '#fff' : 'rgba(255,255,255,.72)', boxShadow: now ? '0 0 0 4px rgba(255,255,255,.4)' : 'none', display: 'grid', placeItems: 'center', minWidth: 0 }}
                       aria-label={g?.title}>
-                      {g?.icon ?? '⭐'}
+                      {g?.image
+                        ? <img src={g.image} alt="" draggable={false} style={{ width: '88%', height: '88%', objectFit: 'contain', mixBlendMode: 'multiply', opacity: now ? 1 : 0.85 }} />
+                        : <span style={{ fontSize: 40 }}>{g?.icon ?? '⭐'}</span>}
+                      {now && (
+                        <span style={{ position: 'absolute', right: 6, bottom: 6, width: 30, height: 30, borderRadius: '50%', background: 'var(--c-primary)', color: '#fff', display: 'grid', placeItems: 'center', fontSize: 14, boxShadow: '0 2px 6px rgba(0,0,0,.2)' }}>▶</span>
+                      )}
                     </motion.button>
                   );
                 })}
               </div>
-              {plan[0] && (
-                <motion.button whileTap={{ scale: 0.96 }} onClick={() => navigate(`/game/${plan[0].gameId}`)}
-                  style={{ ...big, width: '100%', marginTop: 8, border: 0, borderRadius: 16, padding: '10px 0', background: '#fff', color: 'var(--c-primary)', fontSize: 24, cursor: 'pointer' }}>
-                  ▶
-                </motion.button>
-              )}
             </div>
 
             {/* місця: свайп по 4 */}

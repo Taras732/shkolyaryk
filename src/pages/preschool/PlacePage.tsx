@@ -63,7 +63,9 @@ export default function PlacePage() {
                   <motion.button key={g.id} whileTap={{ scale: 0.94 }} onClick={() => tap(g.id, g.title)}
                     animate={armed === g.id ? { scale: [1, 1.05, 1] } : { scale: 1 }}
                     style={{ border: armed === g.id ? '4px solid var(--c-primary)' : '4px solid transparent', borderRadius: 24, background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, cursor: 'pointer', boxShadow: 'var(--c-shadow)', minHeight: 0 }}>
-                    <span style={{ fontSize: 52, lineHeight: 1 }}>{g.icon}</span>
+                    {g.image
+                      ? <img src={g.image} alt="" draggable={false} style={{ width: '78%', flex: 1, minHeight: 0, objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                      : <span style={{ fontSize: 52, lineHeight: 1 }}>{g.icon}</span>}
                     <span style={{ ...big, fontSize: 13, color: 'var(--c-ink)', opacity: 0.6, textAlign: 'center', padding: '0 6px' }}>{g.title}</span>
                     {armed === g.id && <span style={{ ...big, fontSize: 12, color: 'var(--c-primary)' }}>▶ ще раз — граємо</span>}
                   </motion.button>

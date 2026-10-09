@@ -103,6 +103,49 @@ export const GAMES: GameDefinition[] = [
   findShadow, findSame, tapTheDot,
 ];
 
+/**
+ * Ілюстрації карток ігор дошкілля: public/games/<id>.webp, стиль «дитяча книжка» як у місць
+ * (kuznya-image-gen/gen_shkolyaryk_games.py, 09.10.2026). Замість emoji — щоб було зрозуміло без читання.
+ */
+const GAME_IMAGES = new Set<string>([
+  'uk-letters',
+  'letters-find',
+  'uk-syllables',
+  'syllable-build',
+  'english-words',
+  'counting',
+  'recognize-digit',
+  'compare',
+  'pz-share',
+  'addition',
+  'pic-puzzle',
+  'colors-find',
+  'shapes',
+  'sorting-game',
+  'pz-sort',
+  'logic-sequences',
+  'memory-associations',
+  'pz-maze',
+  'pz-heavier',
+  'command-machine',
+  'find-same',
+  'find-shadow',
+  'memory-pairs',
+  'whats-changed',
+  'tap-the-dot',
+  'animals-habitat',
+  'plant-grow',
+  'seasons-weather',
+  'water-states',
+  'sink-float',
+  'gears',
+  'ua-symbols',
+  'emotions-recognize',
+  'breathing',
+  'life-scenarios',
+]);
+for (const g of GAMES) if (!g.image && GAME_IMAGES.has(g.id)) g.image = `/games/${g.id}.webp`;
+
 const byId = new Map<string, GameDefinition>(GAMES.map((g) => [g.id, g]));
 
 export function getGame(id: string): GameDefinition | undefined {
