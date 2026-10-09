@@ -131,6 +131,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
 
   // EP1: пояснення «чому» для поточної помилки (null — гра його не дає).
   const [explain, setExplain] = useState<GameExplain | null>(null);
+  const [boardFilled, setBoardFilled] = useState(0);
 
   const round = state.levelData.rounds[Math.min(state.roundIndex, state.levelData.rounds.length - 1)];
   const total = state.levelData.rounds.length;
@@ -235,6 +236,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
 
   if (!state.finished && preschool) {
     const isBoard = round.answer === BOARD_DONE;
+    const carrots = isBoard ? boardFilled : Math.round((state.roundIndex / total) * 5);
     return (
       <div style={{ position: 'relative', width: '100%', height: '100dvh', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <SkyScene />
@@ -243,14 +245,12 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <CloseButton onClick={onExit} />
             <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-              {!isBoard && (
-                <FiveStars filled={Math.round((state.roundIndex / total) * 5)} size={26} />
-              )}
+              <FiveStars filled={carrots} size={26} />
             </div>
             <div style={{ width: 42 }} />
           </div>
           <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 12, paddingBottom: 12 }}>
-            <PreschoolProvider>
+            <PreschoolProvider onBoardProgress={setBoardFilled}>
               <GameComponent
                 key={round.id}
                 round={round}

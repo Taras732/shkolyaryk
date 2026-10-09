@@ -3,7 +3,7 @@ import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData }
 import { BOARD_DONE } from '../types';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { hasUkAudio, sayUk, sayUkSeq } from '../shared/uk-audio';
-import { Balloons, FiveStars, PictureCard, TaskBubble } from '../shared/preschool';
+import { Balloons, PictureCard, TaskBubble, useBoardProgress } from '../shared/preschool';
 import { findLetterKey, letterParts } from '../shared/spoken-names';
 import { introKey, introText, wordKey, type Letter } from './letters';
 import {
@@ -17,6 +17,7 @@ interface BoardPayload {
 type Answer = typeof BOARD_DONE;
 
 const CORRECT_MS = 900;
+const WRONG_MS = 2200;
 const keyFor = (id: string) => `shk.ukl.v1.${id}`;
 
 function load(id: string): LetterProgress {
@@ -73,7 +74,9 @@ function Quiz({
   onRecord,
   onMistake,
   onDone,
+  strip,
 }: {
+  strip?: React.ReactNode;
   quiz: Question[];
   onRecord: (ch: string, firstTry: boolean) => void;
   onMistake: () => void;
@@ -101,11 +104,16 @@ function Quiz({
     else setIdx(idx + 1);
   }, [idx, queue.length, onDone]);
 
+  // правильно — далі швидко; помилка — показуємо відповідь у сцені і теж далі (як в інших іграх, без кнопки)
   useEffect(() => {
-    if (!correct) return;
-    const t = window.setTimeout(next, CORRECT_MS);
+    if (!picked) return;
+    const t = window.setTimeout(next, correct ? CORRECT_MS : WRONG_MS);
     return () => window.clearTimeout(t);
-  }, [correct, next]);
+  }, [picked, correct, next]);
+
+  // морквинки в шапці — як у всіх ігор
+  const report = useBoardProgress();
+  useEffect(() => report(Math.round((idx / queue.length) * 5)), [idx, queue.length, report]);
 
   if (!q) return null;
 
@@ -132,12 +140,23 @@ function Quiz({
     : null;
   const state = !picked ? 'idle' : correct ? 'correct' : 'incorrect';
 
+  // після помилки сцена показує відповідь: буква · картинка · слово з виділеною першою буквою
+  const answer = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontFamily: 'var(--font-round)', fontWeight: 900 }}>
+      <span style={{ ...BIG_LETTER, fontSize: 72, color: '#16A34A' }}>{q.target.ch}</span>
+      <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <span style={{ fontSize: 60, lineHeight: 1 }}>{q.target.emoji}</span>
+        <span style={{ fontSize: 20, color: 'var(--c-ink)' }}>
+          {q.target.initial ? (<><span style={{ color: '#16A34A' }}>{q.target.word[0].toUpperCase()}</span>{q.target.word.slice(1)}</>) : q.target.word}
+        </span>
+      </span>
+    </div>
+  );
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <FiveStars filled={Math.round((idx / queue.length) * 5)} size={26} />
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12, marginTop: 10 }}>
-      <TaskBubble text={task} onSay={onSay}>
-        {shown && <div className={picked && !correct ? 'shake' : ''}><PictureCard>{shown}</PictureCard></div>}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
+      <TaskBubble text={task} onSay={onSay} sceneTop={strip}>
+        {picked && !correct ? <PictureCard>{answer}</PictureCard> : shown && <PictureCard>{shown}</PictureCard>}
       </TaskBubble>
       <Balloons
         options={q.options.map((o) => ({ value: o.ch, node: q.mode === 'picture' ? <span style={{ fontSize: 50 }}>{o.emoji}</span> : o.ch }))}
@@ -146,23 +165,6 @@ function Quiz({
         answerState={state}
         onPick={(ch) => pick(q.options.find((o) => o.ch === ch)!)}
       />
-      </div>
-      {/* низ завжди однаковий: місце під підказку + «Далі» — нічого не стрибає */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{ minHeight: 58, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: picked && !correct ? '#fff' : 'transparent', borderRadius: 20, boxShadow: picked && !correct ? 'var(--c-shadow)' : 'none', padding: '8px 14px', fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 24, color: 'var(--c-ink)' }}>
-          {picked && !correct && (
-            <>
-              <span style={{ fontSize: 40, color: 'var(--c-primary)', background: 'var(--c-primary-soft)', borderRadius: 14, padding: '0 12px', lineHeight: 1.2 }}>{q.target.ch}</span>
-              <span style={{ fontSize: 34 }}>{q.target.emoji}</span>
-              <span>
-                {q.target.initial ? (<><span style={{ color: 'var(--c-primary)' }}>{q.target.word[0].toUpperCase()}</span>{q.target.word.slice(1)}</>) : q.target.word}
-              </span>
-            </>
-          )}
-        </div>
-        {/* «Далі» завжди активна: до відповіді — пропустити питання (у прогрес не пишемо), після помилки — далі */}
-        <button className="g-btn primary" onClick={next} disabled={correct}>Далі →</button>
-      </div>
     </div>
   );
 }
@@ -178,7 +180,7 @@ function LetterStrip({ progress }: { progress: LetterProgress }) {
       {GROUPS[gi].letters.map((ch) => {
         const st = statusOf(progress[ch]);
         return (
-          <span key={ch} style={{ width: 40, height: 44, borderRadius: 12, display: 'grid', placeItems: 'center', fontSize: 24, fontWeight: 900, fontFamily: 'var(--font-round)', background: st === 'locked' ? 'rgba(255,255,255,.7)' : STATUS_BG[st], color: st === 'locked' ? '#B5B9C9' : STATUS_INK[st], boxShadow: 'var(--c-shadow)' }}>
+          <span key={ch} style={{ width: 30, height: 34, borderRadius: 10, display: 'grid', placeItems: 'center', fontSize: 18, fontWeight: 900, fontFamily: 'var(--font-round)', background: st === 'locked' ? 'rgba(255,255,255,.7)' : STATUS_BG[st], color: st === 'locked' ? '#B5B9C9' : STATUS_INK[st], boxShadow: '0 3px 0 #F1E3CF' }}>
             {ch}
           </span>
         );
@@ -188,10 +190,9 @@ function LetterStrip({ progress }: { progress: LetterProgress }) {
 }
 
 /** Одна сітка всіх екранів гри: шапка (поточна група) і тіло на всю решту висоти. */
-function Screen({ progress, children }: { progress: LetterProgress; children: React.ReactNode }) {
+function Screen({ children }: { progress?: LetterProgress; children: React.ReactNode }) {
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <LetterStrip progress={progress} />
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, minHeight: 0 }}>{children}</div>
     </div>
   );
@@ -252,6 +253,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPaylo
     return (
       <Screen progress={progress}>
         <Quiz
+          strip={<LetterStrip progress={progress} />}
           quiz={check}
           onRecord={(ch, ok) => {
             update((p) => record(p, ch, ok, Date.now()));
@@ -297,7 +299,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPaylo
   if (!quiz) return null;
   return (
     <Screen progress={progress}>
-      <Quiz quiz={quiz} onRecord={(ch, ok) => update((p) => record(p, ch, ok, Date.now()))} onMistake={onMistake} onDone={done} />
+      <Quiz strip={<LetterStrip progress={progress} />} quiz={quiz} onRecord={(ch, ok) => update((p) => record(p, ch, ok, Date.now()))} onMistake={onMistake} onDone={done} />
     </Screen>
   );
 }

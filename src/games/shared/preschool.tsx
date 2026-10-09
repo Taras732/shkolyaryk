@@ -10,8 +10,15 @@ import { motion } from 'motion/react';
  */
 const PreschoolCtx = createContext(false);
 export const usePreschool = () => useContext(PreschoolCtx);
-export function PreschoolProvider({ children }: { children: ReactNode }) {
-  return <PreschoolCtx.Provider value>{children}</PreschoolCtx.Provider>;
+/** Ігри-дошки (самі ведуть раунди) повідомляють шапці прогрес 0..5 — морквинки завжди в шапці. */
+const BoardProgressCtx = createContext<(filled: number) => void>(() => {});
+export const useBoardProgress = () => useContext(BoardProgressCtx);
+export function PreschoolProvider({ children, onBoardProgress }: { children: ReactNode; onBoardProgress?: (filled: number) => void }) {
+  return (
+    <PreschoolCtx.Provider value>
+      <BoardProgressCtx.Provider value={onBoardProgress ?? (() => {})}>{children}</BoardProgressCtx.Provider>
+    </PreschoolCtx.Provider>
+  );
 }
 
 /** Тло рамки — «сторінка книжки». */
@@ -48,7 +55,7 @@ function Speaker({ onClick }: { onClick: () => void }) {
  * Завдання + сцена: біла бульбашка з 🔊, під нею бліда сцена місця на всю вільну висоту
  * з картинкою (children); зайчик визирає з кутка. Без картинки — зайчик по центру «слухає».
  */
-export function TaskBubble({ text, onSay, children, sceneBg = '#FFE9D2' }: { text: string; onSay?: () => void; children?: ReactNode; sceneBg?: string }) {
+export function TaskBubble({ text, onSay, children, sceneBg = '#FFE9D2', sceneTop }: { text: string; onSay?: () => void; children?: ReactNode; sceneBg?: string; sceneTop?: ReactNode }) {
   return (
     <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -56,6 +63,7 @@ export function TaskBubble({ text, onSay, children, sceneBg = '#FFE9D2' }: { tex
         {onSay && <Speaker onClick={onSay} />}
       </div>
       <div style={{ flex: 1, minHeight: 150, borderRadius: 34, background: sceneBg, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 12 }}>
+        {sceneTop && <div style={{ position: 'absolute', top: 10, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>{sceneTop}</div>}
         {children ?? <img src="/creatures/zodiac_rabbit_wood.png" alt="" style={{ height: '70%', maxHeight: 200, objectFit: 'contain' }} />}
         {children && (
           <img src="/creatures/zodiac_rabbit_wood.png" alt="" className="pk-anim"
