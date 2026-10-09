@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { profileClass } from '@/games/registry';
 import type { ClassLevel } from '@/games/types';
+import { ensureTestFamily } from '@/school/test-family';
 
 /**
  * Панель розробника — КАРТА ЕКРАНІВ по ролях: Вхід · Батьки · Дитина.
@@ -41,14 +42,6 @@ const MAP: { title: string; items: Item[] }[] = [
   },
 ];
 
-/** Тестова родина під склад сімʼї Тараса. */
-const FAMILY: [string, ClassLevel, '5-6' | '6-7' | '7-8', string][] = [
-  ['Дарина', 'preschool', '5-6', 'rabbit'],
-  ['Марія', 'grade1', '6-7', 'tiger'],
-  ['Соломія', 'grade2', '7-8', 'dragon'],
-  ['Емілія', 'grade3', '7-8', 'horse'],
-];
-
 const btn = { border: 0, borderRadius: 10, padding: '7px 10px', fontSize: 13, fontWeight: 800, cursor: 'pointer', background: '#F1EEFF', color: '#4c1d95', textAlign: 'left' } as const;
 const head = { fontSize: 11, fontWeight: 900, color: '#999', margin: '6px 2px 0', textTransform: 'uppercase', letterSpacing: 0.5 } as const;
 
@@ -80,20 +73,14 @@ export default function DevNav() {
     location.href = '/?login=1';
   };
 
-  const ensureFamily = async () => {
-    const st = useProfileStore.getState();
-    for (const [name, cl, age, av] of FAMILY) {
-      if (!useProfileStore.getState().profiles.some((p) => p.nickname === name)) await st.createProfile(name, age, av, undefined, cl);
-    }
-  };
   const seed = async () => {
-    await ensureFamily();
+    await ensureTestFamily();
     setOpen(false);
     navigate('/onboarding?pick=1');
   };
   // без реєстрації — одразу головна Дарини (для тесту на дев-стенді)
   const quickHome = async () => {
-    await ensureFamily();
+    await ensureTestFamily();
     const st = useProfileStore.getState();
     const kid = st.profiles.find((p) => p.nickname === 'Дарина') ?? st.profiles.find((p) => profileClass(p) === 'preschool');
     if (kid) st.selectProfile(kid.id);

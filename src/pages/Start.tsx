@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { CLASS_LEVELS, type ClassLevel } from '@/games/types';
 import PuppetBunny from '@/pages/poc/PuppetBunny';
+import { ensureTestFamily } from '@/school/test-family';
 import { deviceChild, redeemCode, setDeviceChild } from '@/school/device-code';
 import type { Face } from '@/pages/poc/Bunny';
 
@@ -187,6 +188,14 @@ export default function Start() {
     setStep('child');
   };
 
+  // спробувати без реєстрації: гість + тестова родина → одразу дашборд батьків
+  const tryDemo = async () => {
+    pickRole('parent');
+    await signInGuest();
+    await ensureTestFamily();
+    navigate('/parents');
+  };
+
   // TODO(supabase): код родини звіряється на сервері (таблиця family_codes); без бази — чесна відмова
   const joinFamily = async (value: string) => {
     const id = redeemCode(value);
@@ -296,6 +305,7 @@ export default function Start() {
                     </button>
                     <button onClick={guest} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Без акаунта</button>
                   </div>
+                  <button onClick={tryDemo} style={{ ...link, fontSize: 13, color: '#C2620A', marginTop: -2 }}>Спробувати без реєстрації →</button>
                 </>
               )}
               {sheet === 'mail' && (
