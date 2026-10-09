@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Концепт v2 за референсами</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:'Nunito',system-ui,sans-serif; background:#EEF0F6; padding:24px; color:#1F2138; }
+  h1 { font-size:22px; font-weight:900; margin-bottom:4px; }
+  .lead { font-size:14px; font-weight:800; color:#8A8FA8; margin-bottom:18px; max-width:1100px; }
+  .wrap { display:flex; gap:26px; flex-wrap:wrap; align-items:flex-start; }
+  .v h2 { font-size:17px; font-weight:900; margin-bottom:4px; }
+  .v p { font-size:13px; font-weight:800; color:#8A8FA8; width:340px; margin-bottom:8px; min-height:54px; }
+  .phone { width:340px; height:700px; border-radius:38px; overflow:hidden; position:relative; box-shadow:0 12px 34px #0003; display:flex; flex-direction:column; }
+
+  /* --- ГРА: один яскравий фон місця, вгорі ✕ + товста смуга прогресу --- */
+  .game { background:linear-gradient(180deg,#FFB86B 0%,#FF9F5A 100%); }
+  .top { display:flex; align-items:center; gap:12px; padding:18px 18px 0; }
+  .x { width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.35); color:#fff; display:grid; place-items:center; font-size:20px; font-weight:900; }
+  .bar { flex:1; height:16px; border-radius:99px; background:rgba(255,255,255,.35); overflow:hidden; }
+  .bar i { display:block; height:100%; width:40%; background:#fff; border-radius:99px; }
+  .ask { margin:22px 18px 0; display:flex; align-items:center; gap:10px; }
+  .ask .t { flex:1; color:#fff; font-size:24px; font-weight:900; line-height:1.15; text-shadow:0 2px 0 rgba(0,0,0,.12); }
+  .ask .s { width:52px; height:52px; border-radius:50%; background:#fff; display:grid; place-items:center; font-size:24px; box-shadow:0 4px 0 rgba(0,0,0,.12); }
+  .stage { flex:1; position:relative; }
+  .pic { position:absolute; left:50%; top:26px; transform:translateX(-50%); width:190px; height:190px; border-radius:40px; background:#fff; display:grid; place-items:center; font-size:120px; box-shadow:0 10px 0 rgba(0,0,0,.10); }
+  .tile { position:absolute; width:96px; height:104px; border-radius:26px; display:grid; place-items:center; font-size:66px; font-weight:900; color:#fff;
+          box-shadow:0 8px 0 rgba(0,0,0,.18), inset 0 -6px 0 rgba(0,0,0,.08); }
+  .bunny { position:absolute; left:-6px; bottom:-8px; width:150px; filter:drop-shadow(0 6px 8px rgba(0,0,0,.15)); }
+  .hint { position:absolute; left:120px; bottom:70px; background:#fff; border-radius:18px 18px 18px 4px; padding:10px 14px; font-weight:900; font-size:15px; box-shadow:0 4px 0 rgba(0,0,0,.08); }
+
+  /* --- ГОЛОВНА: один фон, великий персонаж, великі картки, нижнє меню з картинками --- */
+  .home { background:linear-gradient(180deg,#8FD3FF 0%,#C6EBFF 55%,#E9F7FF 100%); }
+  .hello { display:flex; align-items:flex-end; gap:6px; padding:18px 16px 0; }
+  .hello img { width:96px; }
+  .hello .b { background:#fff; border-radius:20px 20px 20px 4px; padding:12px 14px; font-weight:900; font-size:18px; box-shadow:0 4px 0 rgba(0,0,0,.08); }
+  .today { margin:14px 16px 0; background:#7c3aed; border-radius:28px; padding:12px; box-shadow:0 8px 0 #5b21b6; }
+  .today .lbl { color:#fff; font-weight:900; font-size:15px; margin:0 0 8px 4px; }
+  .today .go { display:flex; align-items:center; gap:12px; background:#fff; border-radius:20px; padding:10px; }
+  .today .go img { width:72px; height:72px; object-fit:contain; mix-blend-mode:multiply; }
+  .today .go .n { flex:1; font-weight:900; font-size:18px; }
+  .today .go .p { width:54px; height:54px; border-radius:50%; background:#22C55E; color:#fff; display:grid; place-items:center; font-size:24px; box-shadow:0 4px 0 #15803d; }
+  .places { margin:14px 16px 0; display:grid; grid-template-columns:1fr 1fr; gap:12px; flex:1; }
+  .pl { border-radius:26px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:8px; font-weight:900; font-size:14px; box-shadow:0 6px 0 rgba(0,0,0,.08); }
+  .pl img { width:84%; flex:1; object-fit:contain; mix-blend-mode:multiply; min-height:0; }
+  .nav { margin:12px 14px 14px; display:flex; justify-content:space-around; background:#fff; border-radius:30px; padding:8px 6px; box-shadow:0 6px 0 rgba(0,0,0,.08); }
+  .nav .it { display:flex; flex-direction:column; align-items:center; gap:2px; font-weight:900; font-size:12px; color:#8A8FA8; width:84px; }
+  .nav .it .c { width:54px; height:54px; border-radius:50%; display:grid; place-items:center; overflow:hidden; }
+  .nav .it .c img { width:48px; height:48px; object-fit:contain; }
+  .nav .it.on { color:#7c3aed; } .nav .it.on .c { box-shadow:0 0 0 3px #7c3aed; }
+</style>
+</head>
+<body>
+  <h1>Концепт v2 — референси + наші напрацювання</h1>
+  <div class="lead">Що взяли з Duolingo ABC і Khan Kids: один яскравий фон на весь екран; у грі вгорі лише ✕ і товста смуга прогресу (без нижнього меню — як у них); завдання великим білим текстом; одна велика картинка; букви — великі «іграшкові» плитки з обʼємом, трохи розкидані й повернуті; зайчик внизу з підказкою. На головній — одна велика дія «грати зараз» і меню з картинками однакового розміру.</div>
+  <div class="wrap">
+
+    <div class="v">
+      <h2>Гра · «З якої букви починається?»</h2>
+      <p>Фон — колір місця (Острів Слів = помаранчевий). Тап по плитці — вона підстрибує; правильна летить до картинки.</p>
+      <div class="phone game">
+        <div class="top"><div class="x">✕</div><div class="bar"><i></i></div></div>
+        <div class="ask"><div class="t">З якої букви починається?</div><div class="s">🔊</div></div>
+        <div class="stage">
+          <div class="pic">🦊</div>
+          <div class="tile" style="left:22px;top:262px;background:#5AB7FF;transform:rotate(-8deg)">Л</div>
+          <div class="tile" style="left:122px;top:290px;background:#7C3AED;transform:rotate(4deg)">М</div>
+          <div class="tile" style="left:222px;top:258px;background:#22C55E;transform:rotate(-3deg)">К</div>
+          <img class="bunny" src="/creatures/zodiac_rabbit_wood.png" alt="">
+          <div class="hint">Послухай! 🔊</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="v">
+      <h2>Гра · правильно</h2>
+      <p>Плитка зеленіє й підлітає, смуга прогресу росте, зайчик радіє. Без окремої кнопки «Далі» — наступне питання саме.</p>
+      <div class="phone game">
+        <div class="top"><div class="x">✕</div><div class="bar"><i style="width:55%"></i></div></div>
+        <div class="ask"><div class="t">Так! Лисиця — Л!</div><div class="s">🔊</div></div>
+        <div class="stage">
+          <div class="pic">🦊</div>
+          <div class="tile" style="left:122px;top:206px;background:#22C55E;transform:rotate(0) scale(1.15);box-shadow:0 0 0 6px #fff,0 8px 0 rgba(0,0,0,.18)">Л</div>
+          <div class="tile" style="left:122px;top:300px;background:#7C3AED;opacity:.35;transform:rotate(4deg)">М</div>
+          <div class="tile" style="left:222px;top:268px;background:#22C55E;opacity:.35;transform:rotate(-3deg)">К</div>
+          <img class="bunny" src="/creatures/zodiac_rabbit_wood.png" alt="" style="transform:translateY(-14px) rotate(-6deg)">
+          <div class="hint">Молодець! ⭐</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="v">
+      <h2>Головна</h2>
+      <p>Одна велика дія «грати зараз» із зеленою ▶. Місця — великі картки. Меню — три картинки однакового розміру з підписами.</p>
+      <div class="phone home">
+        <div class="hello"><img src="/creatures/zodiac_rabbit_wood.png" alt=""><div class="b">Привіт, Дарино! Пограємо?</div></div>
+        <div class="today"><div class="lbl">Зараз</div>
+          <div class="go"><img src="/games/uk-letters.webp" alt=""><div class="n">Буква і звук</div><div class="p">▶</div></div>
+        </div>
+        <div class="places">
+          <div class="pl" style="background:#FFE9D6"><img src="/places/letters.webp" alt="">Острів Слів</div>
+          <div class="pl" style="background:#EDE7FF"><img src="/places/numbers.webp" alt="">Лічильна Гора</div>
+          <div class="pl" style="background:#FFF3C8"><img src="/places/pictures.webp" alt="">Ліс Загадок</div>
+          <div class="pl" style="background:#FFE3EC"><img src="/places/memory.webp" alt="">Печера Скарбів</div>
+        </div>
+        <div class="nav">
+          <div class="it on"><div class="c" style="background:#FFE9D6"><img src="/places/world.webp" alt=""></div>Дім</div>
+          <div class="it"><div class="c" style="background:#DFF7E6"><img src="/creatures/zodiac_rabbit_wood.png" alt=""></div>Друг</div>
+          <div class="it"><div class="c" style="background:#EDE7FF"><img src="/creatures/zodiac_ox_earth.png" alt=""></div>Батькам</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
