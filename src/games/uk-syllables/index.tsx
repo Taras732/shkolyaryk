@@ -3,7 +3,11 @@ import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData }
 import { BOARD_DONE } from '../types';
 import { sayUk } from '../shared/uk-audio';
 import { Balloons, PictureCard, TaskBubble, useBoardProgress } from '../shared/preschool';
-import { ROUNDS, buildQuiz, isLong, type Question } from './core';
+import { useProfileStore } from '@/stores/useProfileStore';
+import {
+  QUICK_PASS, ROUNDS, buildSession, isLong, open, passGroup, record, statusOf, sylsOf,
+  type Status, type SylProgress,
+} from './core';
 
 /**
  * «Зливаємо склади» — «буква біжить до букви» (рішення 09.10.2026).
@@ -20,7 +24,6 @@ const AFTER_MERGE_MS = 1600;
 const BIG = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 
 const saySyl = (s: string) => sayUk(`s_${s}`, s.toLowerCase());
-const sayWord = (w: string) => sayUk(`w_${w.toLowerCase()}`, w.toLowerCase());
 
 function generate(difficulty: Difficulty): LevelData<BoardPayload, Answer> {
   const round: Round<BoardPayload, Answer> = { id: 'uks-board', payload: { difficulty }, answer: BOARD_DONE };
@@ -121,31 +124,95 @@ function Track({ left, right, onTapLeft, onTapRight, onMerge }: { left: string; 
   );
 }
 
-function Game({ quiz, onMistake, onDone }: { quiz: Question[]; onMistake: () => void; onDone: () => void }) {
+const STATUS_BG: Record<Status, string> = { locked: 'rgba(255,255,255,.7)', learning: '#FFE7B3', known: '#CDEFD2', gold: '#FFD95A' };
+const STATUS_INK: Record<Status, string> = { locked: '#B5B9C9', learning: '#8A5A00', known: '#1E7A3A', gold: '#7A5200' };
+
+/** Смужка складів поточної групи — у сцені вгорі, як смужка букв у букварі. */
+function SylStrip({ progress, group }: { progress: SylProgress; group: number }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 4, padding: '0 10px' }}>
+      {sylsOf(group).map((sy) => {
+        const st = statusOf(progress[sy]);
+        return (
+          <span key={sy} style={{ ...BIG, minWidth: 34, height: 26, padding: '0 4px', borderRadius: 9, display: 'grid', placeItems: 'center', fontSize: 13, background: STATUS_BG[st], color: STATUS_INK[st], boxShadow: '0 2px 0 #F1E3CF' }}>{sy}</span>
+        );
+      })}
+    </div>
+  );
+}
+
+const keyFor = (id: string) => `shk.uks.v1.${id}`;
+function load(id: string): SylProgress {
+  try {
+    return JSON.parse(localStorage.getItem(keyFor(id)) ?? '{}') as SylProgress;
+  } catch {
+    return {};
+  }
+}
+function save(id: string, p: SylProgress) {
+  try {
+    localStorage.setItem(keyFor(id), JSON.stringify(p));
+  } catch {
+    // без памʼяті — не біда
+  }
+}
+
+// звук букви: протяжний приголосний — тягнемо («мммм»), короткий і голосний — назва
+const sayLetter = (ch: string) => (isLong(ch) ? sayUk(`c_${ch}`, ch.toLowerCase()) : sayUk(`n_${ch}`, ch.toLowerCase()));
+
+function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPayload, Answer>) {
+  const d = round.payload.difficulty;
+  const profileId = useProfileStore((st) => st.activeProfile?.id) ?? 'guest';
+  const [progress, setProgress] = useState<SylProgress>(() => load(profileId));
+  const [session] = useState(() => buildSession(load(profileId), d));
   const [idx, setIdx] = useState(0);
-  const [phase, setPhase] = useState<'slide' | 'find'>('slide');
+  const [wordFind, setWordFind] = useState(false); // слово: після доріжки — вибір картинки
   const [picked, setPicked] = useState<string | null>(null);
-  const q = quiz[idx];
+  const [tried, setTried] = useState(false); // у цьому кроці вже була помилка
+  const [run, setRun] = useState(0); // поспіль правильних з першої спроби (для перевірки групи)
+  const [passed, setPassed] = useState(false);
+  const step = session.steps[idx];
   const report = useBoardProgress();
-  useEffect(() => report(Math.round((idx / quiz.length) * 5)), [idx, quiz.length, report]);
+  useEffect(() => report(Math.round((idx / session.steps.length) * 5)), [idx, session.steps.length, report]);
 
-  const target = q ? (q.mode === 'word' ? q.item.word : q.answer) : '';
-  const hear = useCallback(() => (q?.mode === 'word' ? sayWord(q.item.word) : saySyl(target)), [q, target]);
+  const update = (fn: (p: SylProgress) => SylProgress) =>
+    setProgress((prev) => {
+      const nx = fn(prev);
+      save(profileId, nx);
+      return nx;
+    });
 
-  // «знайди»: ціль звучить рівно раз на вході; далі — лише 🔊
-  useEffect(() => {
-    if (phase !== 'find') return;
-    const t = window.setTimeout(hear, 300);
-    return () => window.clearTimeout(t);
-  }, [phase, idx]); // eslint-disable-line react-hooks/exhaustive-deps
-
+  const done = useCallback(() => onAnswer(BOARD_DONE), [onAnswer]);
   const next = useCallback(() => {
     setPicked(null);
-    setPhase('slide');
-    if (idx + 1 >= quiz.length) onDone();
-    else setIdx(idx + 1);
-  }, [idx, quiz.length, onDone]);
+    setTried(false);
+    setWordFind(false);
+    if (idx + 1 < session.steps.length) { setIdx(idx + 1); return; }
+    // кінець перевірки: 5 поспіль — група зарахована
+    if (session.check && run >= QUICK_PASS) {
+      update((p) => passGroup(p, session.group, Date.now()));
+      setPassed(true);
+      return;
+    }
+    done();
+  }, [idx, session, run, done]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const target = !step ? '' : step.kind === 'find' ? step.target : step.kind === 'word' ? step.item.word : step.syl;
+  const hear = useCallback(() => {
+    if (!step) return;
+    if (step.kind === 'word') sayUk(`w_${step.item.word.toLowerCase()}`, step.item.word.toLowerCase());
+    else saySyl(target);
+  }, [step, target]);
+
+  // «знайди»: ціль звучить рівно раз на вході; далі — лише 🔊
+  const finding = step?.kind === 'find' || (step?.kind === 'word' && wordFind);
+  useEffect(() => {
+    if (!finding) return;
+    const t = window.setTimeout(hear, 300);
+    return () => window.clearTimeout(t);
+  }, [finding, idx]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // відповідь: правильно — далі; помилка — показали підказку, пробуємо ще
   useEffect(() => {
     if (!picked) return;
     const ok = picked === target;
@@ -153,27 +220,36 @@ function Game({ quiz, onMistake, onDone }: { quiz: Question[]; onMistake: () => 
     return () => window.clearTimeout(t);
   }, [picked, target, next]);
 
-  if (!q) return null;
+  if (passed) {
+    return (
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <TaskBubble text="Ти вже вмієш ці склади!" sceneTop={<SylStrip progress={progress} group={session.group} />}>
+          <PictureCard><span style={{ fontSize: 80 }}>⭐</span></PictureCard>
+        </TaskBubble>
+        <button className="g-btn primary" onClick={done}>Далі →</button>
+      </div>
+    );
+  }
+  if (!step) return null;
+  const strip = <SylStrip progress={progress} group={session.group} />;
 
-  const left = q.mode === 'word' ? q.item.syl : q.left;
-  const right = q.mode === 'word' ? q.item.end : q.right;
-
-  // звук букви: протяжний приголосний — тягнемо («мммм»), короткий і голосний — назва
-  const sayLetter = (ch: string) => (isLong(ch) ? sayUk(`c_${ch}`, ch.toLowerCase()) : sayUk(`n_${ch}`, ch.toLowerCase()));
-
-  if (phase === 'slide') {
+  // ДОРІЖКА (новий склад або слово)
+  if (step.kind === 'slide' || (step.kind === 'word' && !wordFind)) {
+    const left = step.kind === 'word' ? step.item.syl : step.left;
+    const right = step.kind === 'word' ? step.item.end : step.right;
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <TaskBubble text={q.mode === 'word' ? 'Дотягни звук до складу!' : 'Натисни букви, а потім дотягни одну до одної!'} onSay={hear}>
+        <TaskBubble text={step.kind === 'word' ? 'Дотягни звук до складу!' : 'Натисни букви, а потім дотягни одну до одної!'} onSay={hear} sceneTop={strip}>
           <Track
             key={idx}
             left={left}
             right={right}
-            onTapLeft={() => (q.mode === 'word' ? saySyl(left) : sayLetter(left))}
+            onTapLeft={() => (step.kind === 'word' ? saySyl(left) : sayLetter(left))}
             onTapRight={() => sayLetter(right)}
             onMerge={() => {
               hear();
-              window.setTimeout(() => setPhase('find'), AFTER_MERGE_MS);
+              if (step.kind === 'slide') update((p) => open(p, step.syl, Date.now()));
+              window.setTimeout(() => (step.kind === 'word' ? setWordFind(true) : next()), AFTER_MERGE_MS);
             }}
           />
         </TaskBubble>
@@ -183,35 +259,34 @@ function Game({ quiz, onMistake, onDone }: { quiz: Question[]; onMistake: () => 
   }
 
   const state = !picked ? 'idle' : picked === target ? 'correct' : 'incorrect';
-  const pick = (v: string) => {
+  const pickIt = (v: string) => {
     if (picked) return;
     setPicked(v);
-    if (v !== target) onMistake();
+    const ok = v === target;
+    if (step.kind === 'find' && !tried) {
+      update((p) => record(p, target, ok, Date.now()));
+      setRun((n) => (ok ? n + 1 : 0));
+    }
+    if (!ok) { setTried(true); onMistake(); }
   };
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {q.mode === 'word' ? (
+      {step.kind === 'word' ? (
         <>
-          <TaskBubble text="Що це за слово?" onSay={hear}>
-            <PictureCard><span style={{ ...BIG, fontSize: 56, color: 'var(--c-ink)', letterSpacing: 2 }}>{q.item.word}</span></PictureCard>
+          <TaskBubble text="Що це за слово?" onSay={hear} sceneTop={strip}>
+            <PictureCard><span style={{ ...BIG, fontSize: 56, color: 'var(--c-ink)', letterSpacing: 2 }}>{step.item.word}</span></PictureCard>
           </TaskBubble>
-          <Balloons options={q.options.map((o) => ({ value: o.word, node: <span style={{ fontSize: 46 }}>{o.emoji}</span> }))} correct={q.item.word} disabled={!!picked} answerState={state} onPick={pick} />
+          <Balloons options={step.options.map((o) => ({ value: o.word, node: <span style={{ fontSize: 46 }}>{o.emoji}</span> }))} correct={step.item.word} disabled={!!picked} answerState={state} onPick={pickIt} />
         </>
       ) : (
         <>
-          <TaskBubble text="Знайди склад, який я скажу!" onSay={hear} />
-          <Balloons options={q.options.map((o) => ({ value: o, node: o }))} correct={q.answer} disabled={!!picked} answerState={state} onPick={pick} />
+          <TaskBubble text="Знайди склад, який я скажу!" onSay={hear} sceneTop={strip} />
+          <Balloons options={step.options.map((o) => ({ value: o, node: o }))} correct={step.target} disabled={!!picked} answerState={state} onPick={pickIt} />
         </>
       )}
     </div>
   );
-}
-
-function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPayload, Answer>) {
-  const [quiz] = useState(() => buildQuiz(round.payload.difficulty));
-  const done = useCallback(() => onAnswer(BOARD_DONE), [onAnswer]);
-  return <Game quiz={quiz} onMistake={onMistake} onDone={done} />;
 }
 
 const ukSyllables: GameDefinition<BoardPayload, Answer> = {
