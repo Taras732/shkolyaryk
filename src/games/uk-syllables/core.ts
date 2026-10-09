@@ -10,7 +10,7 @@ import type { Difficulty } from '../types';
  *    потім ПРАКТИКА — 6 питань «знайди, який чуєш» вперемішку (нові, слабкі, повтор, відомі).
  *    Ціль ніколи не йде одразу після своєї доріжки — знання перевіряється, а не повторюється.
  *  - Склад «знає» після 2 правильних з першої спроби поспіль; повтор 1 · 3 · 7 днів → «золотий».
- *  - Після 2-ї групи — слова «склад + звук» (КІ + Т = КІТ).
+ *  - Слова (склад + склад) — окрема гра «Склади → слово» (рішення 09.10: не змішувати два вміння).
  * «И» поки не беремо: синтезатор читає її як «І».
  */
 
@@ -133,7 +133,6 @@ export interface Session {
 }
 
 type Rng = () => number;
-const pick = <T,>(arr: readonly T[], rng: Rng): T => arr[Math.floor(rng() * arr.length)];
 function shuffle<T>(arr: readonly T[], rng: Rng): T[] {
   const out = [...arr];
   for (let i = out.length - 1; i > 0; i--) {
@@ -183,14 +182,6 @@ function findStep(target: string, gi: number, d: Difficulty, rng: Rng): Step {
   return { kind: 'find', target, options: syllableOptions(target[0], target[1], n, rng, cs, vs) };
 }
 
-function wordStep(p: SylProgress, rng: Rng): Step | null {
-  const ok = CVC_WORDS.filter((w) => isSeen(p[w.syl]));
-  if (!ok.length) return null;
-  const item = pick(ok, rng);
-  const others = shuffle(CVC_WORDS.filter((w) => w.word !== item.word && w.emoji !== item.emoji), rng).slice(0, 2);
-  return { kind: 'word', item, options: shuffle([item, ...others], rng) };
-}
-
 export function buildSession(p: SylProgress, d: Difficulty, rng: Rng = Math.random, now = Date.now()): Session {
   const gi = Math.min(currentGroup(p), SGROUPS.length - 1);
   const syls = sylsOf(gi);
@@ -226,9 +217,5 @@ export function buildSession(p: SylProgress, d: Difficulty, rng: Rng = Math.rand
     ...fresh.map((s) => ({ kind: 'slide' as const, left: s[0], right: s[1], syl: s })),
     ...practice.map((t) => findStep(t, gi, d, rng)),
   ];
-  if (gi >= 2 || d === 3) {
-    const w = wordStep(p, rng);
-    if (w) steps.push(w);
-  }
   return { check: false, group: gi, steps };
 }

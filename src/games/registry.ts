@@ -28,6 +28,7 @@ import readingSpeed from './reading-speed';
 import grammarParts from './grammar-parts';
 import ukLetters from './uk-letters';
 import ukSyllables from './uk-syllables';
+import syllableWords from './syllable-words';
 import ukReading from './uk-reading';
 import ukSpelling from './uk-spelling';
 // --- Англійська ---
@@ -86,7 +87,7 @@ export const GAMES: GameDefinition[] = [
   counting, addition, compare, pzShare, pzScales, pzPath, mathExamples, timesTables, mathCompare,
   columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
-  ukLetters, ukSyllables, ukReading, ukSpelling, lettersFind, syllableBuild, readingSpeed, grammarParts,
+  ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
   englishWords, enReading, enInstructions, lettersFindEn, englishWordPicture,
   // Наука
@@ -111,6 +112,7 @@ const GAME_IMAGES = new Set<string>([
   'uk-letters',
   'letters-find',
   'uk-syllables',
+  'syllable-words',
   'syllable-build',
   'english-words',
   'counting',
