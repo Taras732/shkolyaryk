@@ -238,6 +238,12 @@ export default function Start() {
                     style={{ ...primary, opacity: email && pw.length >= 6 ? 1 : 0.5 }}>
                     {mailNew ? 'Створити акаунт' : 'Увійти'}
                   </motion.button>
+                  {mailNew && (
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={google}
+                      style={{ ...big, border: '2px solid var(--c-line)', borderRadius: 20, padding: '13px 0', fontSize: 16, background: '#fff', color: 'var(--c-ink)', cursor: 'pointer' }}>
+                      <span style={{ color: '#4285F4' }}>G</span>&nbsp; або через Google
+                    </motion.button>
+                  )}
                   <button onClick={() => setSheet('signin')} style={link}>← Назад</button>
                 </>
               )}
