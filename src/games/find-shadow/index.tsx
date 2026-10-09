@@ -1,6 +1,6 @@
 import type { GameDefinition, GameComponentProps } from '../types';
 import { PromptCard, ChoiceGrid } from '../shared/ui';
-import { generate, type Payload } from './generate';
+import { emojiOf, generate, mirrored, type Payload } from './generate';
 
 function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
   const { target, options } = round.payload;
@@ -13,13 +13,14 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
         options={options.map((o) => ({
           value: o,
           // після відповіді тінь «оживає» — дитина бачить, чия вона була
-          node: <span style={{ fontSize: options.length > 4 ? 52 : 64, filter: answerState === 'idle' ? 'brightness(0)' : 'none', transition: 'filter .3s' }}>{o}</span>,
+          // дзеркальна тінь — та сама картинка, віддзеркалена (сходинка 3)
+          node: <span style={{ display: 'inline-block', fontSize: options.length > 4 ? 52 : 56, transform: mirrored(o) ? 'scaleX(-1)' : 'none', filter: answerState === 'idle' ? 'brightness(0)' : 'none', transition: 'filter .3s' }}>{emojiOf(o)}</span>,
         }))}
         correct={target}
         disabled={disabled}
         answerState={answerState}
         onPick={onAnswer}
-        columns={options.length === 4 ? 2 : 3}
+        columns={options.length === 4 ? 4 : 3}
       />
     </>
   );
