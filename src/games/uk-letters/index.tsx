@@ -132,8 +132,9 @@ function Quiz({
   const state = !picked ? 'idle' : correct ? 'correct' : 'incorrect';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <FiveStars filled={Math.round((idx / queue.length) * 5)} />
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly' }}>
       <TaskBubble text={task} onSay={onSay}>
         {shown && <div style={{ background: '#fff', borderRadius: 28, boxShadow: 'var(--c-shadow)', padding: '10px 26px' }} className={picked && !correct ? 'shake' : ''}>{shown}</div>}
       </TaskBubble>
@@ -144,8 +145,9 @@ function Quiz({
         answerState={state}
         onPick={(ch) => pick(q.options.find((o) => o.ch === ch)!)}
       />
+      </div>
       {/* низ завжди однаковий: місце під підказку + «Далі» — нічого не стрибає */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 'auto' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div style={{ minHeight: 58, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: picked && !correct ? '#fff' : 'transparent', borderRadius: 20, boxShadow: picked && !correct ? 'var(--c-shadow)' : 'none', padding: '8px 14px', fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 24, color: 'var(--c-ink)' }}>
           {picked && !correct && (
             <>
@@ -170,7 +172,7 @@ const STATUS_INK: Record<Status, string> = { locked: '#B5B9C9', learning: '#8A5A
 function LetterStrip({ progress }: { progress: LetterProgress }) {
   const gi = Math.min(currentGroup(progress), GROUPS.length - 1);
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
       {GROUPS[gi].letters.map((ch) => {
         const st = statusOf(progress[ch]);
         return (
@@ -179,6 +181,16 @@ function LetterStrip({ progress }: { progress: LetterProgress }) {
           </span>
         );
       })}
+    </div>
+  );
+}
+
+/** Одна сітка всіх екранів гри: шапка (поточна група) і тіло на всю решту висоти. */
+function Screen({ progress, children }: { progress: LetterProgress; children: React.ReactNode }) {
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <LetterStrip progress={progress} />
+      <div style={{ flex: 1, minHeight: 0 }}>{children}</div>
     </div>
   );
 }
@@ -236,9 +248,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPaylo
 
   if (phase === 'check') {
     return (
-      <>
-        <LetterStrip progress={progress} />
-        <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 800, color: 'var(--c-mut)', marginBottom: 4 }}>Перевіримо: {GROUPS[currentGroup(progress)]?.title}</div>
+      <Screen progress={progress}>
         <Quiz
           quiz={check}
           onRecord={(ch, ok) => {
@@ -248,22 +258,23 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPaylo
           onMistake={onMistake}
           onDone={afterCheck}
         />
-      </>
+      </Screen>
     );
   }
 
   if (phase === 'passed') {
     const gi = Math.max(0, currentGroup(progress) - 1);
     return (
-      <>
-        <LetterStrip progress={progress} />
-        <div className="g-card" style={{ marginBottom: 16, textAlign: 'center' }}>
-          <div style={{ fontSize: 56 }}>⭐</div>
-          <div className="g-question">Ти вже знаєш ці букви!</div>
-          <div style={{ ...BIG_LETTER, fontSize: 44, color: 'var(--c-primary)' }}>{GROUPS[gi].letters.join(' ')}</div>
+      <Screen progress={progress}>
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <TaskBubble text="Ти вже знаєш ці букви!">
+              <div style={{ background: '#fff', borderRadius: 28, boxShadow: 'var(--c-shadow)', padding: '10px 22px', ...BIG_LETTER, fontSize: 44, color: 'var(--c-primary)' }}>{GROUPS[gi].letters.join(' ')}</div>
+            </TaskBubble>
+          </div>
+          <button className="g-btn primary" onClick={done}>Далі →</button>
         </div>
-        <button className="g-btn primary" onClick={done}>Далі →</button>
-      </>
+      </Screen>
     );
   }
 
@@ -283,10 +294,9 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPaylo
 
   if (!quiz) return null;
   return (
-    <>
-      <LetterStrip progress={progress} />
+    <Screen progress={progress}>
       <Quiz quiz={quiz} onRecord={(ch, ok) => update((p) => record(p, ch, ok, Date.now()))} onMistake={onMistake} onDone={done} />
-    </>
+    </Screen>
   );
 }
 
