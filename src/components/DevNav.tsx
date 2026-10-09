@@ -26,7 +26,6 @@ const MAP: { title: string; items: Item[] }[] = [
     items: [
       { label: 'Батькам — дашборд', to: '/parents' },
       { label: 'Додати дитину', to: '/?add=1' },
-      { label: 'Для батьків (старе)', to: '/family' },
     ],
   },
   {
@@ -91,9 +90,9 @@ export default function DevNav() {
   };
 
   return (
-    <div style={{ position: 'fixed', right: 8, top: 8, zIndex: 9999, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ position: 'fixed', left: 8, bottom: 78, zIndex: 9999, fontFamily: 'system-ui, sans-serif' }}>
       {open && (
-        <div style={{ position: 'absolute', right: 0, top: 44, width: 240, maxHeight: '80dvh', overflowY: 'auto', background: '#fff', borderRadius: 14, boxShadow: '0 8px 30px #0003', padding: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ position: 'absolute', left: 0, bottom: 44, width: 240, maxHeight: '80dvh', overflowY: 'auto', background: '#fff', borderRadius: 14, boxShadow: '0 8px 30px #0003', padding: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             <button style={{ ...btn, background: '#FFE3EC', color: '#9d174d' }} onClick={reset}>⟲ Скинути все</button>
             <button style={{ ...btn, background: '#DFF7E6', color: '#166534' }} onClick={seed}>👪 Тестова родина</button>

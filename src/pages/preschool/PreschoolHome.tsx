@@ -17,10 +17,18 @@ import { PLACES } from './places';
  */
 type Tab = 'home' | 'friend';
 const PER_PAGE = 4;
+const AVATAR: Record<string, string> = {
+  rabbit: '/creatures/zodiac_rabbit_wood.png',
+  tiger: '/creatures/zodiac_tiger_metal.png',
+  dragon: '/creatures/zodiac_dragon_fire.png',
+  horse: '/creatures/zodiac_horse_water.png',
+  ox: '/creatures/zodiac_ox_earth.png',
+  monkey: '/creatures/zodiac_monkey_fire.png',
+};
 
 export default function PreschoolHome() {
   const navigate = useNavigate();
-  const { activeProfile } = useProfileStore();
+  const { activeProfile, profiles } = useProfileStore();
   const [tab, setTab] = useState<Tab>('home');
   const [page, setPage] = useState(0);
   const [face, setFace] = useState<Face>('smile');
@@ -57,7 +65,15 @@ export default function PreschoolHome() {
               <div style={{ ...big, flex: 1, background: '#fff', borderRadius: 18, padding: '10px 12px', fontSize: 16, color: 'var(--c-ink)', boxShadow: 'var(--c-shadow)', position: 'relative' }}>
                 {hello}
               </div>
-              <div style={{ ...big, background: '#fff', borderRadius: 99, padding: '6px 10px', fontSize: 15, boxShadow: 'var(--c-shadow)' }}>⭐ {activeProfile.total_stars}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                {/* хто грає: аватарка дитини; кілька дітей — тап змінює, одна — просто показ */}
+                <button onClick={profiles.length > 1 ? () => navigate('/onboarding?pick=1') : undefined} disabled={profiles.length < 2}
+                  aria-label={profiles.length > 1 ? 'Змінити, хто грає' : activeProfile.nickname}
+                  style={{ width: 46, height: 46, borderRadius: '50%', border: 0, padding: 2, background: '#fff', boxShadow: profiles.length > 1 ? '0 0 0 2px var(--c-primary), var(--c-shadow)' : 'var(--c-shadow)', cursor: profiles.length > 1 ? 'pointer' : 'default' }}>
+                  <img src={AVATAR[activeProfile.avatar_id] ?? AVATAR.rabbit} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </button>
+                <div style={{ ...big, background: '#fff', borderRadius: 99, padding: '3px 8px', fontSize: 13, boxShadow: 'var(--c-shadow)' }}>⭐ {activeProfile.total_stars}</div>
+              </div>
             </div>
 
             {/* на сьогодні */}
@@ -123,7 +139,7 @@ export default function PreschoolHome() {
       {/* нижнє меню */}
       <nav style={{ display: 'flex', background: '#fff', borderTop: '1px solid var(--c-line)', padding: '6px 4px calc(8px + env(safe-area-inset-bottom))' }}>
         {([['home', '🏠', 'Дім'], ['friend', '🐰', 'Друг'], ['parents', '👪', 'Батькам']] as const).map(([k, e, l]) => (
-          <button key={k} onClick={() => (k === 'parents' ? navigate('/family') : setTab(k))}
+          <button key={k} onClick={() => (k === 'parents' ? navigate('/parents') : setTab(k))}
             style={{ ...big, flex: 1, border: 0, background: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, fontSize: 12, padding: '4px 0', color: tab === k ? 'var(--c-primary)' : 'var(--c-mut)', cursor: 'pointer' }}>
             <span style={{ fontSize: 24, filter: tab === k || k === 'parents' ? 'none' : 'grayscale(1)', opacity: tab === k ? 1 : 0.6 }}>{e}</span>
             {l}

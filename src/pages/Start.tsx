@@ -165,7 +165,12 @@ export default function Start() {
     else if (profiles.length === 1) {
       selectProfile(profiles[0].id);
       navigate('/hub', { replace: true });
-    } else if (profiles.length > 1) setStep('pick');
+    } else if (profiles.length > 1) {
+      // кілька дітей — одразу головна того, хто грав останнім; змінити — тапом по аватарці на головній
+      const last = useProfileStore.getState().activeProfile;
+      if (last) navigate('/hub', { replace: true });
+      else setStep('pick');
+    }
     else if (user && readRole() !== 'student') navigate('/parents', { replace: true }); // батьки без дітей — дашборд з підсвіченим «Додай дитину»
     else setStep(user ? 'child' : 'hello');
   }, [loading, profiles, step, wantPick, wantAdd, wantLogin, user, selectProfile, navigate]);
