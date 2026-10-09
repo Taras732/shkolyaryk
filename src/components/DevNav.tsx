@@ -1,54 +1,112 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PLACES } from '@/pages/preschool/places';
+import { useProfileStore } from '@/stores/useProfileStore';
+import { profileClass } from '@/games/registry';
+import type { ClassLevel } from '@/games/types';
 
 /**
- * Панель розробника: перехід на будь-який екран і скидання стану одним кліком.
- * Живе лише в `vite dev` (import.meta.env.DEV) — у збірку для проду не потрапляє.
+ * Панель розробника — КАРТА ЕКРАНІВ по ролях: Вхід · Батьки · Дитина.
+ * Кожен пункт відкриває екран у потрібному стані (з потрібною дитиною).
+ * Правило: зʼявився новий екран — додаємо сюди рядок.
+ * Живе лише в `vite dev` (import.meta.env.DEV) — у прод не збирається.
  */
-const LINKS: [string, string][] = [
-  ['Старт', '/'],
-  ['Хто грає', '/onboarding?pick=1'],
-  ['Батькам (дашборд)', '/parents'],
-  ['Додати дитину', '/?add=1'],
-  ['Вхід як новий пристрій', '/?login=1'],
-  ['Головна', '/hub'],
-  ['Для батьків', '/family'],
-  ['Мій день', '/day'],
-  ['Гра: знайди букву', '/game/letters-find'],
-  ['Гра: знайди цифру', '/game/recognize-digit'],
-  ['PoC', '/poc'],
+type Item = { label: string; to: string; kid?: ClassLevel };
+const MAP: { title: string; items: Item[] }[] = [
+  {
+    title: 'Вхід',
+    items: [
+      { label: 'Вхід (Google · код · без акаунта)', to: '/?login=1' },
+      { label: 'Вхід поштою', to: '/?login=1&sheet=mail' },
+      { label: 'Реєстрація', to: '/?login=1&sheet=signup' },
+    ],
+  },
+  {
+    title: 'Батьки',
+    items: [
+      { label: 'Батькам — дашборд', to: '/parents' },
+      { label: 'Додати дитину', to: '/?add=1' },
+      { label: 'Для батьків (старе)', to: '/family' },
+    ],
+  },
+  {
+    title: 'Дитина',
+    items: [
+      { label: 'Хто грає?', to: '/onboarding?pick=1' },
+      { label: 'Головна дошкілля (Дарина)', to: '/hub', kid: 'preschool' },
+      { label: 'Головна 2 клас (Соломія)', to: '/hub', kid: 'grade2' },
+      ...PLACES.map((p) => ({ label: `${p.emoji} ${p.title}`, to: `/place/${p.id}`, kid: 'preschool' as ClassLevel })),
+      { label: 'Гра: знайди букву', to: '/game/letters-find', kid: 'preschool' },
+      { label: 'Гра: знайди цифру', to: '/game/recognize-digit', kid: 'preschool' },
+    ],
+  },
+];
+
+/** Тестова родина під склад сімʼї Тараса. */
+const FAMILY: [string, ClassLevel, '5-6' | '6-7' | '7-8', string][] = [
+  ['Дарина', 'preschool', '5-6', 'rabbit'],
+  ['Марія', 'grade1', '6-7', 'tiger'],
+  ['Соломія', 'grade2', '7-8', 'dragon'],
+  ['Емілія', 'grade3', '7-8', 'horse'],
 ];
 
 const btn = { border: 0, borderRadius: 10, padding: '7px 10px', fontSize: 13, fontWeight: 800, cursor: 'pointer', background: '#F1EEFF', color: '#4c1d95', textAlign: 'left' } as const;
+const head = { fontSize: 11, fontWeight: 900, color: '#999', margin: '6px 2px 0', textTransform: 'uppercase', letterSpacing: 0.5 } as const;
 
 export default function DevNav() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const go = (to: string) => {
+
+  const go = (it: Item) => {
     setOpen(false);
-    navigate(to);
+    if (it.kid) {
+      // потрібна дитина цього віку — обираємо її (або підказуємо створити родину)
+      const st = useProfileStore.getState();
+      const p = st.profiles.find((x) => profileClass(x) === it.kid);
+      if (!p) {
+        alert('Немає дитини цього віку — натисни «Тестова родина»');
+        return;
+      }
+      st.selectProfile(p.id);
+    }
+    navigate(it.to);
   };
+
   const reset = () => {
     try {
       localStorage.clear();
     } catch {
       // нема доступу — не страшно
     }
-    location.href = '/';
+    location.href = '/?login=1';
+  };
+
+  const seed = async () => {
+    const st = useProfileStore.getState();
+    for (const [name, cl, age, av] of FAMILY) {
+      if (!useProfileStore.getState().profiles.some((p) => p.nickname === name)) await st.createProfile(name, age, av, undefined, cl);
+    }
+    setOpen(false);
+    navigate('/onboarding?pick=1');
   };
 
   return (
     <div style={{ position: 'fixed', right: 8, top: 8, zIndex: 9999, fontFamily: 'system-ui, sans-serif' }}>
       {open && (
-        <div style={{ position: 'absolute', right: 0, top: 44, width: 210, maxHeight: '70dvh', overflowY: 'auto', background: '#fff', borderRadius: 14, boxShadow: '0 8px 30px #0003', padding: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <button style={{ ...btn, background: '#FFE3EC', color: '#9d174d' }} onClick={reset}>⟲ Скинути все (перший вхід)</button>
-          {LINKS.map(([l, to]) => <button key={to} style={btn} onClick={() => go(to)}>{l}</button>)}
-          <div style={{ fontSize: 11, fontWeight: 800, color: '#999', margin: '4px 2px 0' }}>Місця</div>
-          {PLACES.map((p) => <button key={p.id} style={btn} onClick={() => go(`/place/${p.id}`)}>{p.emoji} {p.title}</button>)}
+        <div style={{ position: 'absolute', right: 0, top: 44, width: 240, maxHeight: '80dvh', overflowY: 'auto', background: '#fff', borderRadius: 14, boxShadow: '0 8px 30px #0003', padding: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+            <button style={{ ...btn, background: '#FFE3EC', color: '#9d174d' }} onClick={reset}>⟲ Скинути все</button>
+            <button style={{ ...btn, background: '#DFF7E6', color: '#166534' }} onClick={seed}>👪 Тестова родина</button>
+          </div>
+          {MAP.map((g) => (
+            <div key={g.title} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={head}>{g.title}</div>
+              {g.items.map((it) => <button key={it.label} style={btn} onClick={() => go(it)}>{it.label}</button>)}
+            </div>
+          ))}
         </div>
       )}
-      <button onClick={() => setOpen(!open)} aria-label="Панель розробника"
+      <button onClick={() => setOpen(!open)} aria-label="Карта екранів"
         style={{ width: 38, height: 38, borderRadius: '50%', border: 0, background: '#1F2138', color: '#fff', fontSize: 12, fontWeight: 900, cursor: 'pointer', opacity: open ? 1 : 0.55 }}>
         DEV
       </button>

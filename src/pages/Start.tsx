@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
@@ -111,6 +111,7 @@ function readRole(): Role | null {
 
 export default function Start() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, signInGuest, signInWithGoogle, signIn, signUp, error: authError } = useAuthStore();
   const { profiles, loading, loadProfiles, createProfile, selectProfile } = useProfileStore();
   const [step, setStep] = useState<Step | null>(null);
@@ -118,11 +119,13 @@ export default function Start() {
   const [name, setName] = useState('');
   const [level, setLevel] = useState<ClassLevel>('preschool');
   const [friend, setFriend] = useState(FRIENDS[0].id);
-  const [sheet, setSheet] = useState<'signin' | 'mail'>('signin');
+  // ?sheet=mail | signup — відкрити одразу вхід поштою чи реєстрацію (карта екранів у DEV)
+  const sheetParam = new URLSearchParams(location.search).get('sheet');
+  const [sheet, setSheet] = useState<'signin' | 'mail'>(sheetParam === 'mail' || sheetParam === 'signup' ? 'mail' : 'signin');
   const [code, setCode] = useState('');
   const [codeMsg, setCodeMsg] = useState('');
   const [codeHelp, setCodeHelp] = useState(false);
-  const [mailNew, setMailNew] = useState(false);
+  const [mailNew, setMailNew] = useState(sheetParam === 'signup');
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
   const [face, setFace] = useState<Face>('smile');
@@ -132,13 +135,21 @@ export default function Start() {
     loadProfiles(user?.id);
   }, [user, loadProfiles]);
 
+  // перехід у межах того самого екрана (/, /onboarding з іншими параметрами) — вирішуємо маршрут заново
+  useEffect(() => {
+    setStep(null);
+    const sp = new URLSearchParams(location.search).get('sheet');
+    setSheet(sp === 'mail' || sp === 'signup' ? 'mail' : 'signin');
+    setMailNew(sp === 'signup');
+  }, [location.pathname, location.search]);
+
   // куди вести: вирішуємо, коли профілі підвантажились
   // ?pick — свідомо прийшли змінити профіль: не перекидати назад на головну
-  const wantPick = new URLSearchParams(window.location.search).has('pick');
+  const wantPick = new URLSearchParams(location.search).has('pick');
   // ?add=1 — батьки додають дитину з «Батькам»; після «Готово» повертаємось туди з кодом
-  const wantAdd = new URLSearchParams(window.location.search).has('add');
+  const wantAdd = new URLSearchParams(location.search).has('add');
   // ?login=1 — показати вхід, як на новому пристрої (для перевірки коду на одному браузері)
-  const wantLogin = new URLSearchParams(window.location.search).has('login');
+  const wantLogin = new URLSearchParams(location.search).has('login');
   useEffect(() => {
     if (loading || step !== null) return;
     const mine = deviceChild();
