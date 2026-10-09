@@ -97,12 +97,10 @@ function Rainbow() {
 const AGE_GROUP: Record<ClassLevel, '5-6' | '6-7' | '7-8'> = { preschool: '5-6', grade1: '6-7', grade2: '7-8', grade3: '7-8', grade4: '7-8' };
 const TILE_BG = ['#FFE9D6', '#DFF7E6', '#EDE7FF', '#FFF3C8', '#FFE3EC', '#E3EEFF'];
 
-/** Тло екранів входу: мʼякий пастельний градієнт замість сірого (як небо над головною). */
-const BG = 'radial-gradient(120% 60% at 50% 0%, #EFE9FF 0%, transparent 70%), radial-gradient(90% 50% at 0% 100%, #FFE9D6 0%, transparent 70%), radial-gradient(90% 50% at 100% 100%, #DFF7E6 0%, transparent 70%), #FBFAFF';
-
 const big = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 const card = { background: '#fff', borderRadius: 24, boxShadow: 'var(--c-shadow)' } as const;
-const outline = { ...big, border: '2px solid var(--c-line)', borderRadius: 18, padding: '12px 0', fontSize: 16, background: '#fff', color: 'var(--c-ink)', cursor: 'pointer' } as const;
+const primary = { ...big, border: 0, borderRadius: 20, padding: '15px 0', fontSize: 18, background: 'var(--c-primary)', color: '#fff', cursor: 'pointer' } as const;
+const outline = { ...big, border: '2px solid var(--c-line)', borderRadius: 20, padding: '14px 0', fontSize: 17, background: '#fff', color: 'var(--c-ink)', cursor: 'pointer' } as const;
 const field = { ...big, fontSize: 16, border: 0, borderRadius: 16, background: 'var(--c-bg)', padding: '13px 16px', color: 'var(--c-ink)', outline: 'none' } as const;
 const link = { ...big, border: 0, background: 'none', fontSize: 13, color: 'var(--c-mut)', cursor: 'pointer', padding: 4 } as const;
 
@@ -124,7 +122,7 @@ export default function Start() {
   const [name, setName] = useState('');
   const [level, setLevel] = useState<ClassLevel>('preschool');
   const [friend, setFriend] = useState(FRIENDS[0].id);
-  const [mailOpen, setMailOpen] = useState(false);
+  const [sheet, setSheet] = useState<'start' | 'signin' | 'mail'>('start');
   const [mailNew, setMailNew] = useState(false);
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
@@ -163,6 +161,16 @@ export default function Start() {
     setStep('child');
   };
 
+  const pickRole = (r: Role) => {
+    setRole(r);
+    try {
+      localStorage.setItem(ROLE_KEY, r);
+    } catch {
+      // без пам'яті — не біда
+    }
+    if (r === 'student' && level === 'preschool') setLevel('grade1');
+  };
+
   const byMail = async () => {
     try {
       localStorage.setItem(ROLE_KEY, role);
@@ -191,12 +199,12 @@ export default function Start() {
   const levels = role === 'student' ? CLASS_LEVELS.filter((l) => l !== 'preschool') : CLASS_LEVELS;
 
   return (
-    <div style={{ width: '100%', height: '100dvh', background: step === 'hello' ? SKY : BG, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-      {step === 'hello' && <Meadow />}
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px calc(16px + env(safe-area-inset-bottom))', maxWidth: 520, width: '100%', margin: '0 auto' }}>
+    <div style={{ width: '100%', height: '100dvh', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <style>{SCENE_CSS}</style>
+      <Meadow />
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12, position: 'relative', zIndex: 1, padding: '14px 16px calc(56px + env(safe-area-inset-bottom))', maxWidth: 520, width: '100%', margin: '0 auto' }}>
         {step === 'hello' && (
           <>
-            <style>{SCENE_CSS}</style>
             {/* сцена по центру вільного місця: веселка, зайчик, назва */}
             <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
               <div style={{ position: 'relative', width: 300, paddingTop: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -208,38 +216,37 @@ export default function Start() {
               </div>
             </div>
 
-            {/* аркуш: роль перемикачем, «Почати», вхід Google або поштою */}
+            {/* аркуш: одна головна дія «Почати»; вхід для тих, хто вже має акаунт — дрібно */}
             <div style={{ ...card, padding: 14, display: 'flex', flexDirection: 'column', gap: 10, position: 'relative', zIndex: 1 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: 'var(--c-bg)', borderRadius: 18, padding: 4 }}>
-                {ROLES.map((r) => (
-                  <button key={r.id} onClick={() => setRole(r.id)}
-                    style={{ ...big, border: 0, borderRadius: 14, padding: '11px 0', fontSize: 16, cursor: 'pointer', background: role === r.id ? '#fff' : 'transparent', color: role === r.id ? 'var(--c-primary)' : 'var(--c-mut)', boxShadow: role === r.id ? 'var(--c-shadow)' : 'none', transition: 'all .2s' }}>
-                    {r.title}
-                  </button>
-                ))}
-              </div>
-              {mailOpen ? (
+              {sheet === 'start' && (
+                <>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('guest')} style={primary}>Почати</motion.button>
+                  <button onClick={() => setSheet('signin')} style={link}>Вже є акаунт? <span style={{ color: 'var(--c-primary)' }}>Увійти</span></button>
+                </>
+              )}
+              {sheet === 'signin' && (
+                <>
+                  <div style={{ ...big, fontSize: 20, color: 'var(--c-ink)', textAlign: 'center' }}>Увійти</div>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('google')} style={outline}>
+                    <span style={{ color: '#4285F4' }}>G</span>&nbsp; Увійти через Google
+                  </motion.button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <button onClick={() => setSheet('start')} style={link}>← Назад</button>
+                    <button onClick={() => setSheet('mail')} style={link}>або поштою</button>
+                  </div>
+                </>
+              )}
+              {sheet === 'mail' && (
                 <>
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Пошта" autoComplete="email" style={field} />
                   <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Пароль" autoComplete={mailNew ? 'new-password' : 'current-password'} style={field} />
                   <motion.button whileTap={{ scale: 0.97 }} onClick={byMail} disabled={!email || pw.length < 6}
-                    style={{ ...big, border: 0, borderRadius: 20, padding: '15px 0', fontSize: 18, background: 'var(--c-primary)', color: '#fff', cursor: 'pointer', opacity: email && pw.length >= 6 ? 1 : 0.5 }}>
+                    style={{ ...primary, opacity: email && pw.length >= 6 ? 1 : 0.5 }}>
                     {mailNew ? 'Створити акаунт' : 'Увійти'}
                   </motion.button>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <button onClick={() => setMailOpen(false)} style={link}>← Назад</button>
-                    <button onClick={() => setMailNew(!mailNew)} style={link}>{mailNew ? 'Вже є акаунт' : 'Немає акаунта?'}</button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('guest')}
-                    style={{ ...big, border: 0, borderRadius: 20, padding: '15px 0', fontSize: 18, background: 'var(--c-primary)', color: '#fff', cursor: 'pointer' }}>
-                    Почати
-                  </motion.button>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('google')} style={outline}>Google</motion.button>
-                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => setMailOpen(true)} style={outline}>Пошта</motion.button>
+                    <button onClick={() => setSheet('signin')} style={link}>← Назад</button>
+                    <button onClick={() => setMailNew(!mailNew)} style={link}>{mailNew ? 'Вже є акаунт' : 'Немає акаунта? Створити'}</button>
                   </div>
                 </>
               )}
@@ -250,7 +257,15 @@ export default function Start() {
 
         {step === 'child' && (
           <>
-            <div style={{ ...big, fontSize: 26, color: 'var(--c-ink)', textAlign: 'center', marginTop: 8 }}>{role === 'student' ? 'Про тебе' : 'Додай дитину'}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#fff', borderRadius: 18, padding: 4, boxShadow: 'var(--c-shadow)', marginTop: 4 }}>
+              {ROLES.map((r) => (
+                <button key={r.id} onClick={() => pickRole(r.id)}
+                  style={{ ...big, border: 0, borderRadius: 14, padding: '10px 0', fontSize: 15, cursor: 'pointer', background: role === r.id ? 'var(--c-primary)' : 'transparent', color: role === r.id ? '#fff' : 'var(--c-mut)', transition: 'all .2s' }}>
+                  {r.title}
+                </button>
+              ))}
+            </div>
+            <div style={{ ...big, fontSize: 26, color: 'var(--c-ink)', textAlign: 'center' }}>{role === 'student' ? 'Про тебе' : 'Додай дитину'}</div>
             <div style={{ ...card, padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder={role === 'student' ? 'Як тебе звати?' : "Ім'я дитини"} maxLength={20}
                 style={{ ...big, fontSize: 18, border: 0, borderRadius: 16, background: 'var(--c-bg)', padding: '14px 16px', color: 'var(--c-ink)', outline: 'none' }} />
