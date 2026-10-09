@@ -44,6 +44,18 @@ def items() -> dict[str, tuple[str, str]]:
     for ch, word in re.findall(r"L\('(.)', '([^']+)'", lsrc):
         out[f"w_{word}"] = (f"{word.capitalize()}.", RATE_NAME)
         out[f"l_{ch}"] = (f"Це буква {names.get(ch, ch)}. {word.capitalize()}.", RATE_PHRASE)
+    # склади (s_<СКЛАД>), протяжні звуки (c_<БУКВА>) і слова «склад + звук» — для «Зливаємо склади»
+    ssrc = (ROOT / "src" / "games" / "uk-syllables" / "core.ts").read_text(encoding="utf-8")
+    long_ = re.findall(r"'(.)'", re.search(r"LONG = \[(.*?)\]", ssrc).group(1))
+    short_ = re.findall(r"'(.)'", re.search(r"SHORT = \[(.*?)\]", ssrc).group(1))
+    vowels = re.findall(r"'(.)'", re.search(r"VOWELS = \[(.*?)\]", ssrc).group(1))
+    for c in long_ + short_:
+        for v in vowels:
+            out[f"s_{c}{v}"] = (f"{(c + v).lower()}.", RATE_NAME)
+    for c in long_:
+        out[f"c_{c}"] = (f"{c.lower() * 6}.", "-50%")
+    for word in re.findall(r"word: '([^']+)'", ssrc):
+        out[f"w_{word.lower()}"] = (f"{word.capitalize()}.", RATE_NAME)
     return out
 
 

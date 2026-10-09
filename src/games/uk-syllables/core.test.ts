@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { CVC_WORDS, ROUNDS, buildQuiz, syllableOptions } from './core';
+import { CVC_WORDS, LONG, ROUNDS, VOWELS, buildQuiz, syllableOptions } from './core';
 
 const seeded = (seed: number) => () => {
   seed = (seed * 1664525 + 1013904223) % 4294967296;
   return seed / 4294967296;
 };
 
-describe('uk-syllables', () => {
+describe('uk-syllables: буква біжить до букви', () => {
   it('слово = склад + звук', () => {
     for (const w of CVC_WORDS) expect(w.syl + w.end).toBe(w.word);
   });
@@ -21,20 +21,33 @@ describe('uk-syllables', () => {
     }
   });
 
-  it('«Легко» — лише злиття з найлегших звуків; без голосу немає питань «почуй»', () => {
+  it('«Легко» — лише протяжні приголосні й А О У; без «И»', () => {
     for (let s = 1; s < 20; s++) {
-      const easy = buildQuiz(1, true, seeded(s));
+      const easy = buildQuiz(1, seeded(s));
       expect(easy).toHaveLength(ROUNDS);
       for (const q of easy) {
-        expect(q.mode).toBe('merge');
-        if (q.mode !== 'word') expect(['М', 'Н', 'Л', 'Т']).toContain(q.c);
+        expect(q.mode).toBe('syl');
+        if (q.mode === 'syl') {
+          expect(LONG as readonly string[]).toContain(q.left);
+          expect(['А', 'О', 'У']).toContain(q.right);
+        }
       }
-      for (const q of buildQuiz(2, false, seeded(s))) expect(q.mode).not.toBe('hear');
+    }
+    expect(VOWELS as readonly string[]).not.toContain('И');
+  });
+
+  it('той самий склад двічі поспіль не йде', () => {
+    for (let s = 1; s < 40; s++) {
+      const qs = buildQuiz(2, seeded(s));
+      for (let i = 1; i < qs.length; i++) {
+        const a = qs[i - 1], b = qs[i];
+        if (a.mode === 'syl' && b.mode === 'syl') expect(a.answer).not.toBe(b.answer);
+      }
     }
   });
 
   it('«Складно» — є слова; правильна картинка серед варіантів', () => {
-    const qs = buildQuiz(3, true, seeded(3));
+    const qs = buildQuiz(3, seeded(3));
     const words = qs.filter((q) => q.mode === 'word');
     expect(words.length).toBeGreaterThan(0);
     for (const q of words) if (q.mode === 'word') expect(q.options.map((o) => o.word)).toContain(q.item.word);
