@@ -1,5 +1,7 @@
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid, randInt, shuffle } from '../shared/ui';
+import { hasUkAudio, sayUk } from '../shared/uk-audio';
+import { findDigitKey, findDigitText } from '../shared/spoken-names';
 
 interface Payload {
   digit: number;
@@ -59,27 +61,37 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   const choices = options.map((v) => ({ value: v }));
   return (
     <>
-      <PromptCard question="Яка це цифра?" answerState={answerState}>
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '8px auto' }}>
-          <div
-            style={{
-              width: 160,
-              height: 160,
-              borderRadius: 32,
-              background: 'var(--c-primary-soft)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 112,
-              fontWeight: 900,
-              color: 'var(--c-primary)',
-              fontFamily: 'var(--font-round)',
-            }}
-          >
-            {digit}
+      {hasUkAudio(findDigitKey(digit)) ? (
+        // цифра лише звучить: намальована, вона була б і серед варіантів — відповідь у завданні
+        <PromptCard
+          question="Знайди цифру"
+          answerState={answerState}
+          say={() => sayUk(findDigitKey(digit), findDigitText(digit))}
+          sayKey={`${round.id}-${digit}`}
+        />
+      ) : (
+        <PromptCard question="Яка це цифра?" answerState={answerState}>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '8px auto' }}>
+            <div
+              style={{
+                width: 160,
+                height: 160,
+                borderRadius: 32,
+                background: 'var(--c-primary-soft)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 112,
+                fontWeight: 900,
+                color: 'var(--c-primary)',
+                fontFamily: 'var(--font-round)',
+              }}
+            >
+              {digit}
+            </div>
           </div>
-        </div>
-      </PromptCard>
+        </PromptCard>
+      )}
       <ChoiceGrid
         options={choices}
         correct={digit}
@@ -98,7 +110,7 @@ const recognizeDigit: GameDefinition<Payload, number> = {
   subject: 'math',
   levels: ['L0'],
   icon: '🔢',
-  description: 'Яка це цифра?',
+  description: 'Послухай і знайди цифру.',
   accent: '#EEEBFF',
   // Немає seed-skill "розпізнавання цифр 0-9" повністю — гра покриває 0-9,
   // а digits-1-5 (L0) обмежено діапазоном 1-5; numeral-writing (L1) додається

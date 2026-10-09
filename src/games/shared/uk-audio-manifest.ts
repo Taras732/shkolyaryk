@@ -1,6 +1,49 @@
 /**
  * Перелік готових аудіофайлів у `public/audio/uk/` (без розширення).
- * Порожній — файлів ще немає, звучить голос пристрою. Коли файли згенеровані
- * чи записані, сюди додаються їхні ключі (див. keys у letters.ts / syllables.ts).
+ * Генерується scripts/gen-uk-audio.py — руками не правити.
  */
-export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([]);
+export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
+  'find_d0',
+  'find_d1',
+  'find_d2',
+  'find_d3',
+  'find_d4',
+  'find_d5',
+  'find_d6',
+  'find_d7',
+  'find_d8',
+  'find_d9',
+  'find_Є',
+  'find_І',
+  'find_Ї',
+  'find_А',
+  'find_Б',
+  'find_В',
+  'find_Г',
+  'find_Д',
+  'find_Е',
+  'find_Ж',
+  'find_З',
+  'find_И',
+  'find_Й',
+  'find_К',
+  'find_Л',
+  'find_М',
+  'find_Н',
+  'find_О',
+  'find_П',
+  'find_Р',
+  'find_С',
+  'find_Т',
+  'find_У',
+  'find_Ф',
+  'find_Х',
+  'find_Ц',
+  'find_Ч',
+  'find_Ш',
+  'find_Щ',
+  'find_Ь',
+  'find_Ю',
+  'find_Я',
+  'find_Ґ',
+]);

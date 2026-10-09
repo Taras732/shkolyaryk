@@ -1,5 +1,7 @@
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid, shuffle } from '../shared/ui';
+import { hasUkAudio, sayUk } from '../shared/uk-audio';
+import { findLetterKey, findLetterText } from '../shared/spoken-names';
 
 interface Payload {
   target: string;
@@ -75,19 +77,20 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   }));
   return (
     <>
-      <PromptCard question="Знайди таку саму букву" answerState={answerState}>
-        <div
-          style={{
-            fontSize: 72,
-            fontWeight: 700,
-            color: 'var(--c-primary)',
-            textAlign: 'center',
-            margin: '8px auto',
-          }}
-        >
-          {target}
-        </div>
-      </PromptCard>
+      {hasUkAudio(findLetterKey(target)) ? (
+        // ціль лише звучить: намальована, вона була б і серед варіантів — відповідь у завданні
+        <PromptCard
+          question="Знайди букву"
+          answerState={answerState}
+          say={() => sayUk(findLetterKey(target), findLetterText(target))}
+          sayKey={`${round.id}-${target}`}
+        />
+      ) : (
+        // звуку немає зовсім — показуємо, щоб гра лишалась прохідною
+        <PromptCard question="Знайди таку саму букву" answerState={answerState}>
+          <div style={{ fontSize: 72, fontWeight: 700, color: 'var(--c-primary)', textAlign: 'center', margin: '8px auto' }}>{target}</div>
+        </PromptCard>
+      )}
       <ChoiceGrid options={choices} correct={target} disabled={disabled} answerState={answerState} onPick={onAnswer} />
     </>
   );
@@ -99,7 +102,7 @@ const lettersFind: GameDefinition<Payload, string> = {
   subject: 'language',
   levels: ['L0'],
   icon: '🔤',
-  description: 'Знайди таку саму букву.',
+  description: 'Послухай і знайди букву.',
   accent: '#EEEBFF',
   generate,
   Component,

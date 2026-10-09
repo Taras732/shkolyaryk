@@ -6,16 +6,41 @@ export function PromptCard({
   question,
   answerState,
   children,
+  say,
+  sayKey,
 }: {
   question: string;
   answerState: AnswerState;
-  children: ReactNode;
+  children?: ReactNode;
+  /** Озвучити ціль. Є — у картці велика кнопка 🔊, і ціль звучить сама на старті раунду. */
+  say?: () => void;
+  /** Зміна ключа = новий раунд = звучить знову. */
+  sayKey?: string | number;
 }) {
+  useEffect(() => {
+    say?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sayKey]);
   return (
     <div className={`g-card${answerState === 'incorrect' ? ' shake' : ''}`} style={{ marginBottom: 18 }}>
       <div className="g-question">{question}</div>
+      {say && <SayButton onClick={say} />}
       {children}
     </div>
+  );
+}
+
+/** Велика кругла 🔊 — дитина, що не читає, тисне й чує завдання ще раз. */
+export function SayButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Послухати ще раз"
+      style={{ display: 'block', margin: '8px auto', width: 120, height: 120, borderRadius: '50%', border: 0, background: 'var(--c-primary-soft)', fontSize: 56, cursor: 'pointer' }}
+    >
+      🔊
+    </button>
   );
 }
 

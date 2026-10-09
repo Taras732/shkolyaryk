@@ -3,6 +3,8 @@ import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData }
 import { BOARD_DONE } from '../types';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { hasUkAudio, sayUk } from '../shared/uk-audio';
+import { SayButton } from '../shared/ui';
+import { findLetterKey, findLetterText } from '../shared/spoken-names';
 import { LETTERS, introKey, introText, wordKey, type Letter } from './letters';
 import { QUIZ_LEN, buildQuiz, isKnown, nextNewLetter, open, record, type LetterProgress, type Question } from './core';
 
@@ -97,8 +99,14 @@ function Quiz({
   const q = queue[idx];
   const correct = picked === q?.target.ch;
 
+  // same: буква лише звучить — намальована, вона була б і серед варіантів
+  const sameHeard = q?.mode === 'same' && hasUkAudio(findLetterKey(q.target.ch));
+  const sayFind = (l: Letter) => sayUk(findLetterKey(l.ch), findLetterText(l.ch));
+
   useEffect(() => {
     if (q?.mode === 'letter') say(q.target);
+    else if (q && sameHeard) sayFind(q.target);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
 
   const next = useCallback(() => {
@@ -134,6 +142,11 @@ function Quiz({
         <div className="g-question">З якої букви починається?</div>
         <div style={{ fontSize: 96 }}>{q.target.emoji}</div>
         <SayBtn onClick={() => say(q.target)} />
+      </>
+    ) : sameHeard ? (
+      <>
+        <div className="g-question">Знайди букву</div>
+        <SayButton onClick={() => sayFind(q.target)} />
       </>
     ) : (
       <>
