@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, ProfileLevel, LevelData, Round } from '../types';
 import { BOARD_DONE } from '../types';
+import { TaskBubble, useBoardProgress } from '../shared/preschool';
 import { shuffle } from '../shared/ui';
 
 interface MemoryCard {
@@ -62,15 +63,15 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
   const { cards } = round.payload;
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<Set<number>>(new Set());
-  const [moves, setMoves] = useState(0);
-  const [busy, setBusy] = useState(false);
+    const [busy, setBusy] = useState(false);
   const doneRef = useRef(false);
+  const report = useBoardProgress();
+  useEffect(() => report(Math.round((matched.size / cards.length) * 5)), [matched, cards.length, report]);
 
   // Порівняти дві відкриті картки, коли обидві показані.
   useEffect(() => {
     if (flipped.length !== 2) return;
     const [a, b] = flipped;
-    setMoves((m) => m + 1);
 
     if (cards[a].pairKey === cards[b].pairKey) {
       setMatched((prev) => new Set(prev).add(a).add(b));
@@ -105,26 +106,19 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
   const cols = columnsFor(cards.length);
 
   return (
-    <div>
-      <div
-        style={{
-          textAlign: 'center',
-          fontFamily: 'var(--font-round)',
-          fontWeight: 800,
-          color: 'var(--c-mut)',
-          marginBottom: 14,
-        }}
-      >
-        Ходи: {moves}
-      </div>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <TaskBubble text="Знайди однакові картки!">
 
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${cols}, 1fr)`,
-          gap: 8,
+          gap: 10,
+          width: '100%',
           maxWidth: 320,
           margin: '0 auto',
+          position: 'relative',
+          zIndex: 1,
         }}
       >
         {cards.map((card, i) => {
@@ -167,17 +161,15 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
                     right: 0,
                     bottom: 0,
                     backfaceVisibility: 'hidden',
-                    borderRadius: 'var(--c-r-sm)',
-                    background: 'linear-gradient(135deg, var(--c-primary), #8B7CF6)',
-                    boxShadow: 'var(--c-shadow)',
+                    borderRadius: 22,
+                    background: 'linear-gradient(135deg, #FFC98F, #FFAE6B)',
+                    boxShadow: '0 5px 0 #E8975A',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <span style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'var(--font-round)' }}>
-                    ?
-                  </span>
+                  <span style={{ fontSize: 26, color: '#fff' }}>★</span>
                 </div>
 
                 {/* Відкрита сторона */}
@@ -190,22 +182,22 @@ function Component({ round, disabled, onAnswer, onMistake }: GameComponentProps<
                     bottom: 0,
                     backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)',
-                    borderRadius: 'var(--c-r-sm)',
-                    background: 'var(--c-card)',
-                    border: `2px solid ${isMatched ? 'var(--c-green)' : 'var(--c-line)'}`,
-                    boxShadow: 'var(--c-shadow)',
+                    borderRadius: 22,
+                    background: isMatched ? '#DCF7E3' : '#fff',
+                    boxShadow: `0 5px 0 ${isMatched ? '#9FDDB0' : '#EED9BF'}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <span style={{ fontSize: 28 }}>{card.emoji}</span>
+                  <span style={{ fontSize: cards.length > 12 ? 34 : 42 }}>{card.emoji}</span>
                 </div>
               </div>
             </button>
           );
         })}
       </div>
+      </TaskBubble>
     </div>
   );
 }
