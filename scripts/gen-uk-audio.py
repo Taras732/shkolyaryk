@@ -72,6 +72,8 @@ def items() -> dict[str, tuple[str, str]]:
     # «Що тут зайве?»: завдання і пояснення («Решта — фрукти»)
     osrc = (ROOT / "src" / "games" / "odd-one-out" / "core.ts").read_text(encoding="utf-8")
     out["p_odd"] = ("Що тут зайве?", RATE_PHRASE)
+    out["p_remember"] = ("Запамʼятай!", RATE_PHRASE)
+    out["p_changed"] = ("Що змінилось?", RATE_PHRASE)
     out["pre.done"] = ("Ура! Гру пройдено!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

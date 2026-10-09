@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, ProfileLevel, LevelData, Round } from '../types';
+import { motion } from 'motion/react';
 import { shuffle } from '../shared/ui';
+import { TaskBubble } from '../shared/preschool';
+import { sayUk } from '../shared/uk-audio';
 
 interface Cell {
   id: string;
@@ -19,13 +22,12 @@ const EMOJI_POOL = [
 ];
 
 const MEMORIZE_MS = 2500;
-const DOT_TICK_MS = 400;
 const ROUNDS_PER_LEVEL = 5;
 
 /** Розмір сітки (к-сть клітинок) за рівнем профілю і складністю. */
 function gridSizeFor(level: ProfileLevel, difficulty: Difficulty): number {
   if (level === 'L0') {
-    return difficulty === 1 ? 4 : 6; // diff1=4, diff2=6, diff3=6
+    return difficulty === 1 ? 4 : difficulty === 2 ? 6 : 9; // дошкілля: 4 → 6 → 9
   }
   return difficulty === 1 ? 6 : difficulty === 2 ? 9 : 12; // diff1=6, diff2=9, diff3=12
 }
@@ -64,97 +66,60 @@ function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payloa
   return { difficulty, rounds };
 }
 
-type Phase = 'memorize' | 'answer';
+type Phase = 'memorize' | 'flip' | 'answer';
 
-function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
+const FLIP_MS = 700;
+
+/**
+ * Вигляд B2 (09.10.2026): картки в сцені; запамʼятовування — смужка-таймер; далі картки
+ * перевертаються на сорочку й розкриваються вже зі зміною — дитина бачить «момент зміни».
+ * Завдання звучить лише в першому раунді.
+ */
+function Component({ round, roundIndex, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
   const { initial, changed } = round.payload;
   const [phase, setPhase] = useState<Phase>('memorize');
-  const [activeDot, setActiveDot] = useState(0);
 
-  // Показати початкову сітку MEMORIZE_MS, тоді перейти до фази відповіді.
-  // Фаза скидається на 'memorize' автоматично: round.id змінюється -> GameShell
-  // перемонтовує Component через key={round.id} -> useState ініціалізується заново.
   useEffect(() => {
-    const timer = window.setTimeout(() => setPhase('answer'), MEMORIZE_MS);
-    return () => window.clearTimeout(timer);
-  }, []);
+    if (roundIndex === 0) sayUk('p_remember', 'Запамʼятай!');
+    const t1 = window.setTimeout(() => setPhase('flip'), MEMORIZE_MS);
+    const t2 = window.setTimeout(() => {
+      setPhase('answer');
+      if (roundIndex === 0) sayUk('p_changed', 'Що змінилось?');
+    }, MEMORIZE_MS + FLIP_MS);
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Крапки-таймер під час запам'ятовування.
-  useEffect(() => {
-    if (phase !== 'memorize') return;
-    const interval = window.setInterval(() => setActiveDot((d) => (d + 1) % 3), DOT_TICK_MS);
-    return () => window.clearInterval(interval);
-  }, [phase]);
-
-  const isAnswerPhase = phase === 'answer';
-  const cells = isAnswerPhase ? changed : initial;
+  const cells = phase === 'answer' ? changed : initial;
   const cols = columnsFor(cells.length);
+  const size = cols === 2 ? 110 : 86;
 
   return (
-    <div className={`g-card${answerState === 'incorrect' ? ' shake' : ''}`}>
-      <div
-        style={{
-          fontFamily: 'var(--font-round)',
-          fontWeight: 800,
-          fontSize: 16,
-          color: isAnswerPhase ? 'var(--c-ink)' : 'var(--c-primary)',
-          marginBottom: 14,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 8,
-        }}
-      >
-        <span>{isAnswerPhase ? 'Що змінилось? Тапни клітинку' : "Запам'ятай!"}</span>
-        {!isAnswerPhase && (
-          <span style={{ display: 'inline-flex', gap: 4 }}>
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  background: 'var(--c-primary)',
-                  opacity: i === activeDot ? 1 : 0.25,
-                  transition: 'opacity .2s',
-                }}
-              />
-            ))}
-          </span>
-        )}
+    <TaskBubble text={phase === 'answer' ? 'Що змінилось? Натисни!' : 'Запамʼятай!'}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+        {/* таймер запамʼятовування — смужка, що зменшується */}
+        <div style={{ width: 180, height: 10, borderRadius: 10, background: 'rgba(255,255,255,.7)', overflow: 'hidden', visibility: phase === 'memorize' ? 'visible' : 'hidden' }}>
+          <div style={{ height: '100%', background: '#F08A24', borderRadius: 10, animation: `wc-shrink ${MEMORIZE_MS}ms linear forwards` }} />
+        </div>
+        <style>{'@keyframes wc-shrink { from { width: 100% } to { width: 0% } }'}</style>
+        <div className={answerState === 'incorrect' ? 'shake' : ''} style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, ${size}px)`, gap: 12 }}>
+          {cells.map((cell) => {
+            const win = phase === 'answer' && answerState !== 'idle' && cell.id === round.answer;
+            const back = phase === 'flip';
+            return (
+              <motion.button key={cell.id} type="button" disabled={disabled || phase !== 'answer'} onClick={() => phase === 'answer' && onAnswer(cell.id)}
+                whileTap={{ scale: 0.93 }} animate={{ rotateY: back ? 180 : 0 }} transition={{ duration: FLIP_MS / 2000 }}
+                style={{ width: size, height: size, borderRadius: 26, border: 0, cursor: phase === 'answer' ? 'pointer' : 'default', display: 'grid', placeItems: 'center',
+                  fontSize: cols === 2 ? 62 : 48,
+                  background: back ? 'linear-gradient(135deg, #FFC98F, #FFAE6B)' : win ? '#DCF7E3' : '#fff',
+                  boxShadow: `0 6px 0 ${back ? '#E8975A' : win ? '#9FDDB0' : '#EED9BF'}${win ? ', 0 0 0 4px #22C55E' : ''}`,
+                  color: '#fff' }}>
+                {back ? '★' : cell.emoji}
+              </motion.button>
+            );
+          })}
+        </div>
       </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${cols}, 1fr)`,
-          gap: 8,
-          margin: '0 auto',
-          maxWidth: 320,
-        }}
-      >
-        {cells.map((cell) => {
-          // На фідбеку (правильно/неправильно) підсвічуємо клітинку зі зміною зеленим;
-          // решта лишаються нейтральними (без сентінела "яку саме клітинку клікнула дитина").
-          const cls = isAnswerPhase && answerState !== 'idle' && cell.id === round.answer
-            ? 'g-choice correct'
-            : 'g-choice';
-          return (
-            <button
-              key={cell.id}
-              type="button"
-              className={cls}
-              disabled={disabled || !isAnswerPhase}
-              onClick={() => isAnswerPhase && onAnswer(cell.id)}
-              style={{ aspectRatio: '1', fontSize: 32, padding: 4 }}
-            >
-              {cell.emoji}
-            </button>
-          );
-        })}
-      </div>
-    </div>
+    </TaskBubble>
   );
 }
 
