@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData } from '../types';
 import { BOARD_DONE } from '../types';
-import { sayUk, sayUkSeq } from '../shared/uk-audio';
+import { sayUk } from '../shared/uk-audio';
 import { Balloons, PictureCard, TaskBubble, useBoardProgress } from '../shared/preschool';
 import { ROUNDS, buildQuiz, isLong, type Question } from './core';
 
@@ -16,7 +16,7 @@ interface BoardPayload {
 type Answer = typeof BOARD_DONE;
 
 const CORRECT_MS = 1000;
-const AFTER_MERGE_MS = 1300;
+const AFTER_MERGE_MS = 1600;
 const BIG = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 
 const saySyl = (s: string) => sayUk(`s_${s}`, s.toLowerCase());
@@ -44,79 +44,76 @@ const TILE = (color: string) => ({
 });
 
 /**
- * Доріжка: ліва картка їде до правої — пальцем або тапом (тоді їде сама).
- * Протяжний приголосний звучить «мммм…» поки їде; на зустрічі картки зливаються в одну.
+ * Доріжка: дві букви. Тап по букві — вона звучить. Тягни ліву до правої — на зустрічі
+ * картки зливаються з «бум» і зірочками, і лише тоді звучить склад (рішення 09.10).
+ * Злиття спрацьовує рівно раз (запобіжник arrived) — інакше звук і перехід множились.
  */
-function Track({ left, right, long, onStart, onArrive }: { left: string; right: string; long: boolean; onStart: () => void; onArrive: () => void }) {
+function Track({ left, right, onTapLeft, onTapRight, onMerge }: { left: string; right: string; onTapLeft: () => void; onTapRight: () => void; onMerge: () => void }) {
   const rail = useRef<HTMLDivElement>(null);
   const [x, setX] = useState(0);
   const [max, setMax] = useState(180);
   const [merged, setMerged] = useState(false);
-  const drag = useRef<{ x0: number; moved: boolean } | null>(null);
-  const started = useRef(false);
+  const [dragging, setDragging] = useState(false);
+  const drag = useRef<{ x0: number; startX: number; moved: boolean } | null>(null);
+  const arrived = useRef(false);
 
   useEffect(() => {
     const w = rail.current?.clientWidth ?? 280;
-    setMax(Math.max(80, w - 78 - 78 - 8));
+    setMax(Math.max(80, w - 86 - 86 - 8));
   }, []);
 
-  const start = () => {
-    if (started.current) return;
-    started.current = true;
-    onStart();
-  };
-  const arrive = useCallback(() => {
-    if (merged) return;
+  const merge = () => {
+    if (arrived.current) return;
+    arrived.current = true;
+    drag.current = null;
+    setDragging(false);
     setX(max);
-    setMerged(true);
-    onArrive();
-  }, [merged, max, onArrive]);
-
-  // тап без перетягування — буква їде сама (протяжна — повільно, коротка — «стрибає»)
-  const auto = () => {
-    start();
-    const dur = long ? 1100 : 350;
-    const t0 = performance.now();
-    const step = (t: number) => {
-      const k = Math.min(1, (t - t0) / dur);
-      setX(k * max);
-      if (k < 1) requestAnimationFrame(step);
-      else arrive();
-    };
-    requestAnimationFrame(step);
+    window.setTimeout(() => setMerged(true), 120);
+    onMerge();
   };
+
+  const sparks = ['-70px,-50px', '70px,-46px', '-60px,48px', '64px,52px', '0,-74px', '0,70px'];
 
   return (
-    <div ref={rail} style={{ width: '100%', maxWidth: 320, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', height: 120 }}>
+    <div ref={rail} style={{ width: '100%', maxWidth: 320, position: 'relative', height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       {merged ? (
-        <div style={{ ...TILE('#16A34A'), fontSize: 60, minWidth: 140, animation: 'pk-pop .45s ease-out forwards' }}>{left + right}</div>
+        <div style={{ position: 'relative' }}>
+          <div style={{ ...TILE('#16A34A'), fontSize: 64, minWidth: 150, height: 96, animation: 'pk-pop .5s ease-out forwards' }}>{left + right}</div>
+          {sparks.map((p, k) => {
+            const [dx, dy] = p.split(',');
+            return <span key={k} style={{ position: 'absolute', left: '44%', top: '36%', fontSize: 24, ['--dx' as string]: dx, ['--dy' as string]: dy, animation: 'pk-spark .7s ease-out forwards' }}>⭐</span>;
+          })}
+        </div>
       ) : (
         <>
-          {/* доріжка-пунктир */}
-          <div style={{ position: 'absolute', left: 60, right: 60, top: '50%', height: 6, marginTop: -3, borderRadius: 6, background: 'repeating-linear-gradient(90deg,#F2C79B 0 10px,transparent 10px 20px)' }} />
+          <div style={{ position: 'absolute', left: 64, right: 64, top: '50%', height: 6, marginTop: -3, borderRadius: 6, background: 'repeating-linear-gradient(90deg,#F2C79B 0 10px,transparent 10px 20px)' }} />
           <div
-            onPointerDown={(e) => { (e.target as HTMLElement).setPointerCapture(e.pointerId); drag.current = { x0: e.clientX - x, moved: false }; start(); }}
+            onPointerDown={(e) => { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); drag.current = { x0: e.clientX, startX: x, moved: false }; }}
             onPointerMove={(e) => {
-              if (!drag.current) return;
-              const nx = Math.max(0, Math.min(max, e.clientX - drag.current.x0));
-              if (Math.abs(nx - x) > 3) drag.current.moved = true;
+              const d = drag.current;
+              if (!d) return;
+              const dx = e.clientX - d.x0;
+              if (Math.abs(dx) > 6) { d.moved = true; setDragging(true); }
+              if (!d.moved) return;
+              const nx = Math.max(0, Math.min(max, d.startX + dx));
               setX(nx);
-              if (nx >= max * 0.85) { drag.current = null; arrive(); }
+              if (nx >= max * 0.85) merge();
             }}
             onPointerUp={() => {
               const d = drag.current;
               drag.current = null;
-              if (!d) return;
-              if (!d.moved) auto();
-              else if (x < max * 0.85) setX(0);
+              setDragging(false);
+              if (!d || arrived.current) return;
+              if (!d.moved) onTapLeft();
+              else setX(0); // не дотягнули — буква повертається
             }}
-            style={{ ...TILE('#2563EB'), position: 'absolute', left: 4, transform: `translateX(${x}px)`, cursor: 'grab', zIndex: 2, transition: drag.current ? 'none' : 'transform .2s' }}
+            style={{ ...TILE('#2563EB'), position: 'absolute', left: 0, transform: `translateX(${x}px) scale(${dragging ? 1.08 : 1})`, cursor: 'grab', zIndex: 2, transition: dragging ? 'none' : 'transform .25s ease' }}
           >
             {left}
           </div>
-          <div style={{ ...TILE('#DC2626'), position: 'absolute', right: 4 }}>{right}</div>
-          {x === 0 && (
-            <div className="pk-anim" style={{ position: 'absolute', left: 60, top: 92, fontSize: 30, animation: 'pk-float 1.4s ease-in-out infinite' }}>👆</div>
+          <div onClick={onTapRight} style={{ ...TILE('#DC2626'), position: 'absolute', right: 0, cursor: 'pointer' }}>{right}</div>
+          {x === 0 && !dragging && (
+            <div className="pk-anim" style={{ position: 'absolute', left: 64, top: 104, fontSize: 30, animation: 'pk-float 1.4s ease-in-out infinite', pointerEvents: 'none' }}>👆</div>
           )}
         </>
       )}
@@ -134,6 +131,13 @@ function Game({ quiz, onMistake, onDone }: { quiz: Question[]; onMistake: () => 
 
   const target = q ? (q.mode === 'word' ? q.item.word : q.answer) : '';
   const hear = useCallback(() => (q?.mode === 'word' ? sayWord(q.item.word) : saySyl(target)), [q, target]);
+
+  // «знайди»: ціль звучить рівно раз на вході; далі — лише 🔊
+  useEffect(() => {
+    if (phase !== 'find') return;
+    const t = window.setTimeout(hear, 300);
+    return () => window.clearTimeout(t);
+  }, [phase, idx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const next = useCallback(() => {
     setPicked(null);
@@ -153,21 +157,23 @@ function Game({ quiz, onMistake, onDone }: { quiz: Question[]; onMistake: () => 
 
   const left = q.mode === 'word' ? q.item.syl : q.left;
   const right = q.mode === 'word' ? q.item.end : q.right;
-  const long = q.mode === 'syl' && isLong(q.left);
+
+  // звук букви: протяжний приголосний — тягнемо («мммм»), короткий і голосний — назва
+  const sayLetter = (ch: string) => (isLong(ch) ? sayUk(`c_${ch}`, ch.toLowerCase()) : sayUk(`n_${ch}`, ch.toLowerCase()));
 
   if (phase === 'slide') {
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <TaskBubble text="Веди букву до букви!" onSay={() => (long ? sayUkSeq([{ key: `c_${left}`, text: left }, { key: `s_${left + right}`, text: left + right }], 0) : hear())}>
+        <TaskBubble text={q.mode === 'word' ? 'Дотягни звук до складу!' : 'Натисни букви, а потім дотягни одну до одної!'} onSay={hear}>
           <Track
             key={idx}
             left={left}
             right={right}
-            long={long}
-            onStart={() => { if (long) sayUk(`c_${left}`, left.toLowerCase()); }}
-            onArrive={() => {
+            onTapLeft={() => (q.mode === 'word' ? saySyl(left) : sayLetter(left))}
+            onTapRight={() => sayLetter(right)}
+            onMerge={() => {
               hear();
-              window.setTimeout(() => { setPhase('find'); window.setTimeout(hear, 250); }, AFTER_MERGE_MS);
+              window.setTimeout(() => setPhase('find'), AFTER_MERGE_MS);
             }}
           />
         </TaskBubble>

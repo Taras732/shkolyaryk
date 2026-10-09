@@ -69,7 +69,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   const { target, options } = round.payload;
   const choices = options.map((letter) => ({
     value: letter,
-    node: <span style={{ fontSize: 32, fontWeight: 700 }}>{letter}</span>,
+    node: letter,
   }));
   return (
     <>
