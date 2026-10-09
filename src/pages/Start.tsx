@@ -232,18 +232,21 @@ export default function Start() {
               {sheet === 'mail' && (
                 <>
                   <div style={{ ...big, fontSize: 20, color: 'var(--c-ink)', textAlign: 'center' }}>{mailNew ? 'Реєстрація' : 'Вхід поштою'}</div>
+                  {/* реєстрація дзеркальна до входу: та сама кнопка Google зверху, пошта — другорядно */}
+                  {mailNew && (
+                    <>
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={google} style={primary}>Продовжити з Google</motion.button>
+                      <div style={{ ...big, fontSize: 13, color: 'var(--c-mut)', textAlign: 'center' }}>або поштою</div>
+                    </>
+                  )}
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Пошта" autoComplete="email" style={field} />
                   <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Пароль" autoComplete={mailNew ? 'new-password' : 'current-password'} style={field} />
                   <motion.button whileTap={{ scale: 0.97 }} onClick={byMail} disabled={!email || pw.length < 6}
-                    style={{ ...primary, opacity: email && pw.length >= 6 ? 1 : 0.5 }}>
+                    style={mailNew
+                      ? { ...big, border: '2px solid var(--c-line)', borderRadius: 20, padding: '13px 0', fontSize: 16, background: '#fff', color: 'var(--c-ink)', cursor: 'pointer', opacity: email && pw.length >= 6 ? 1 : 0.5 }
+                      : { ...primary, opacity: email && pw.length >= 6 ? 1 : 0.5 }}>
                     {mailNew ? 'Створити акаунт' : 'Увійти'}
                   </motion.button>
-                  {mailNew && (
-                    <motion.button whileTap={{ scale: 0.97 }} onClick={google}
-                      style={{ ...big, border: '2px solid var(--c-line)', borderRadius: 20, padding: '13px 0', fontSize: 16, background: '#fff', color: 'var(--c-ink)', cursor: 'pointer' }}>
-                      <span style={{ color: '#4285F4' }}>G</span>&nbsp; або через Google
-                    </motion.button>
-                  )}
                   <button onClick={() => setSheet('signin')} style={link}>← Назад</button>
                 </>
               )}
