@@ -1,72 +1,103 @@
+import { useCallback, useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
-import { PromptCard, ChoiceGrid, randInt, shuffle } from '../shared/ui';
-import { ALL_LOOK_ALIKE, LOOK_ALIKE } from '../shared/look-alike';
+import { BOARD_DONE } from '../types';
+import { sayUk } from '../shared/uk-audio';
+import { TaskBubble, useBoardProgress } from '../shared/preschool';
+import { ROUNDS, buildTasks, explain, type OddTask } from './core';
 
-/**
- * «Що тут зайве?» (09.10.2026): ряд картинок, одна не така — знайди її.
- *  1 — три однакові + одна зовсім інша (🍎🍎🍎🐶) — уважність;
- *  2 — три однакові + одна схожа (🍎🍎🍅🍎) — уважність до деталей;
- *  3 — три з однієї групи + одна з іншої (🐶🐺🦊 + 🚗) — класифікація, «що не підходить».
- * Відповідь — номер зайвої картинки.
- */
+/** «Що тут зайве?»: чотири великі картки в сцені; знайшов — зайчик пояснює, чому зайва (див. core.ts). */
 interface Payload {
-  items: string[];
+  difficulty: Difficulty;
+}
+type Answer = typeof BOARD_DONE;
+
+const NEXT_MS = 2300;
+
+function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
+  const round: Round<Payload, Answer> = { id: 'odd-board', payload: { difficulty }, answer: BOARD_DONE };
+  return { difficulty, rounds: Array.from({ length: ROUNDS }, () => round) };
 }
 
-const ROUNDS = 6;
+function Component({ round, onAnswer, onMistake }: GameComponentProps<Payload, Answer>) {
+  const [tasks] = useState<OddTask[]>(() => buildTasks(round.payload.difficulty));
+  const [idx, setIdx] = useState(0);
+  const [solved, setSolved] = useState(false);
+  const [misses, setMisses] = useState(0);
+  const [shake, setShake] = useState<number | null>(null);
+  const task = tasks[idx];
+  const report = useBoardProgress();
+  useEffect(() => report(Math.round((idx / tasks.length) * 5)), [idx, tasks.length, report]);
 
-function makeRound(d: Difficulty): { items: string[]; odd: number } {
-  const groups = shuffle(LOOK_ALIKE);
-  const g = groups[0];
-  let items: string[];
-  let oddItem: string;
-  if (d === 3) {
-    const three = shuffle(g).slice(0, 3);
-    oddItem = groups[1][randInt(0, groups[1].length - 1)];
-    items = three;
-  } else {
-    const main = g[randInt(0, g.length - 1)];
-    items = [main, main, main];
-    oddItem = d === 2
-      ? g.filter((e) => e !== main)[randInt(0, g.length - 2)]
-      : ALL_LOOK_ALIKE.filter((e) => !g.includes(e))[randInt(0, ALL_LOOK_ALIKE.length - g.length - 1)];
-  }
-  const odd = randInt(0, 3);
-  items.splice(odd, 0, oddItem);
-  return { items, odd };
-}
+  // завдання звучить на старті кожного раунду
+  useEffect(() => {
+    const t = window.setTimeout(() => sayUk('p_odd', 'Що тут зайве?'), 300);
+    return () => window.clearTimeout(t);
+  }, [idx]);
 
-function generate(difficulty: Difficulty): LevelData<Payload, string> {
-  const rounds: Round<Payload, string>[] = Array.from({ length: ROUNDS }, (_, i) => {
-    const { items, odd } = makeRound(difficulty);
-    return { id: `r${i}`, payload: { items }, answer: String(odd) };
-  });
-  return { difficulty, rounds };
-}
+  const done = useCallback(() => onAnswer(BOARD_DONE), [onAnswer]);
 
-function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
+  useEffect(() => {
+    if (!solved) return;
+    const t = window.setTimeout(() => {
+      setSolved(false);
+      setMisses(0);
+      if (idx + 1 >= tasks.length) done();
+      else setIdx(idx + 1);
+    }, NEXT_MS);
+    return () => window.clearTimeout(t);
+  }, [solved]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!task) return null;
+  const why = explain(task);
+
+  const tap = (i: number) => {
+    if (solved) return;
+    if (i === task.odd) {
+      setSolved(true);
+      sayUk(why.key, why.text);
+      return;
+    }
+    setShake(i);
+    setMisses((m) => m + 1);
+    onMistake();
+    window.setTimeout(() => setShake(null), 450);
+  };
+
   return (
-    <>
-      <PromptCard question="Що тут зайве?" answerState={answerState} />
-      <ChoiceGrid
-        options={round.payload.items.map((e, i) => ({ value: String(i), node: <span style={{ fontSize: 44 }}>{e}</span> }))}
-        correct={round.answer}
-        disabled={disabled}
-        answerState={answerState}
-        onPick={onAnswer}
-        columns={4}
-      />
-    </>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <TaskBubble text={solved ? why.text : 'Що тут зайве?'} onSay={() => (solved ? sayUk(why.key, why.text) : sayUk('p_odd', 'Що тут зайве?'))}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 120px)', gap: 16, position: 'relative', zIndex: 1 }}>
+          {task.items.map((e, i) => {
+            const isOdd = i === task.odd;
+            const win = solved && isOdd;
+            // після двох помилок зайва картка «підморгує» — підказка
+            const hint = !solved && misses >= 2 && isOdd;
+            return (
+              <motion.button key={`${idx}-${i}`} type="button" onClick={() => tap(i)} whileTap={{ scale: 0.93 }}
+                animate={hint ? { rotate: [0, -6, 6, 0] } : { rotate: 0 }}
+                transition={hint ? { duration: 0.6, repeat: Infinity, repeatDelay: 0.8 } : undefined}
+                style={{ width: 120, height: 120, borderRadius: 30, border: 0, cursor: 'pointer', display: 'grid', placeItems: 'center', fontSize: 70,
+                  background: win ? '#DCF7E3' : '#fff', boxShadow: `0 7px 0 ${win ? '#9FDDB0' : '#EED9BF'}${win ? ', 0 0 0 4px #22C55E' : ''}`,
+                  opacity: solved && !isOdd ? 0.45 : 1, animation: shake === i ? 'pk-shake .4s ease' : win ? 'pk-pop .5s ease-out forwards' : undefined }}>
+                {e}
+              </motion.button>
+            );
+          })}
+        </div>
+      </TaskBubble>
+      <div style={{ height: 24 }} />
+    </div>
   );
 }
 
-const oddOneOut: GameDefinition<Payload, string> = {
+const oddOneOut: GameDefinition<Payload, Answer> = {
   id: 'odd-one-out',
   title: 'Що тут зайве?',
   subject: 'attention',
   levels: ['L0'],
   icon: '🤔',
-  description: 'Одна картинка не така, як інші — знайди її.',
+  description: 'Одна картинка не така, як інші — знайди її і дізнайся чому.',
   accent: '#FFE3EC',
   generate,
   Component,

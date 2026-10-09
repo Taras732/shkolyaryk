@@ -18,7 +18,7 @@ export const POOLS: Record<ClassLevel, Partial<Record<Subject, string[]>>> = {
   preschool: {
     language: ['uk-letters', 'uk-syllables'],
     math: ['counting', 'addition', 'compare', 'pz-share'],
-    fun: ['find-same', 'find-shadow', 'pic-puzzle', 'pz-maze', 'memory-pairs', 'pz-sort'],
+    fun: ['odd-one-out', 'find-shadow', 'pic-puzzle', 'pz-maze', 'memory-pairs', 'pz-sort'],
   },
   grade1: {
     math: ['math-examples', 'word-problems', 'column-arithmetic', 'math-compare', 'clock-time'],

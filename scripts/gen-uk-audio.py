@@ -69,6 +69,12 @@ def items() -> dict[str, tuple[str, str]]:
         out.setdefault(f"w_{word.lower()}", (f"{word.capitalize()}!", RATE_WORD))
     for p in re.findall(r"'([А-ЯІЄЇҐ]{2})'", re.search(r"EXTRA_SYLS = \[(.*?)\]", bsrc).group(1)):
         out.setdefault(f"s_{p}", (f"{p.lower()}.", RATE_NAME))
+    # «Що тут зайве?»: завдання і пояснення («Решта — фрукти»)
+    osrc = (ROOT / "src" / "games" / "odd-one-out" / "core.ts").read_text(encoding="utf-8")
+    out["p_odd"] = ("Що тут зайве?", RATE_PHRASE)
+    out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
+    for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
+        out[f"odd_{cid}"] = (f"Молодець! Решта — {plural}.", RATE_PHRASE)
     return out
 
 
