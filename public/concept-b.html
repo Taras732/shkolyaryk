@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Концепт B — спрощення</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:'Nunito',system-ui,sans-serif; background:#EEF0F6; padding:24px; color:#1F2138; }
+  h1 { font-size:22px; font-weight:900; margin-bottom:4px; }
+  .lead { font-size:14px; font-weight:800; color:#8A8FA8; margin-bottom:20px; }
+  .wrap { display:flex; gap:26px; flex-wrap:wrap; }
+  .v h2 { font-size:18px; font-weight:900; margin-bottom:4px; }
+  .v p { font-size:13px; font-weight:800; color:#8A8FA8; width:320px; margin-bottom:10px; min-height:54px; }
+  .phone { width:320px; height:660px; border-radius:36px; overflow:hidden; position:relative; box-shadow:0 12px 34px #0003; display:flex; flex-direction:column; background:#FFF8EE; }
+  .top { display:flex; align-items:center; gap:10px; padding:16px 16px 0; }
+  .x { width:38px; height:38px; border-radius:14px; background:#fff; box-shadow:0 3px 0 #F1E3CF; display:grid; place-items:center; font-size:18px; color:#B07A3C; }
+  .carrots { flex:1; display:flex; justify-content:center; gap:4px; font-size:22px; } .carrots .off { filter:grayscale(1); opacity:.3; }
+  .ask { display:flex; align-items:center; gap:8px; margin:18px 16px 0; }
+  .ask img { width:58px; }
+  .ask .t { flex:1; background:#fff; border-radius:20px 20px 20px 6px; padding:12px 14px; font-weight:900; font-size:18px; line-height:1.15; box-shadow:0 3px 0 #F1E3CF; }
+  .ask .s { width:46px; height:46px; border-radius:50%; background:#FFE7CF; display:grid; place-items:center; font-size:20px; }
+  .mid { flex:1; display:flex; align-items:center; justify-content:center; }
+  .pic { width:210px; height:210px; border-radius:44px; background:#fff; display:grid; place-items:center; font-size:136px; box-shadow:0 8px 0 #F1E3CF; }
+  .opts { display:flex; justify-content:center; gap:14px; padding:0 0 40px; }
+  .o { width:88px; height:88px; border-radius:50%; background:#fff; display:grid; place-items:center; font-size:50px; font-weight:900; box-shadow:0 6px 0 #EED9BF; }
+  .o:nth-child(1){color:#E25B7A} .o:nth-child(2){color:#7C3AED} .o:nth-child(3){color:#16A34A}
+  /* B2 */
+  .stage { margin:16px 16px 0; flex:1; border-radius:36px; background:#FFE9D2; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  .stage .peek { position:absolute; right:-14px; bottom:-18px; width:110px; transform:rotate(-12deg); }
+  .B2 .opts { padding:22px 0 36px; }
+</style>
+</head>
+<body>
+  <h1>Концепт B — менше перенасичення</h1>
+  <div class="lead">Прибрали «оранжева сцена + великий зайчик + картинка». Тепер на екрані одна головна річ — картинка; зайчик лише підказує.</div>
+  <div class="wrap">
+
+    <div class="v">
+      <h2>B1 · Без сцени</h2>
+      <p>Кремова «сторінка книжки», зайчик маленький біля завдання, по центру — лише картинка в білій картці, внизу — три кружечки-букви.</p>
+      <div class="phone">
+        <div class="top"><div class="x">✕</div><div class="carrots"><span>🥕</span><span>🥕</span><span class="off">🥕</span><span class="off">🥕</span><span class="off">🥕</span></div><div style="width:38px"></div></div>
+        <div class="ask"><img src="/creatures/zodiac_rabbit_wood.png" alt=""><div class="t">З якої букви починається?</div><div class="s">🔊</div></div>
+        <div class="mid"><div class="pic">🦊</div></div>
+        <div class="opts"><div class="o">Л</div><div class="o">М</div><div class="o">К</div></div>
+      </div>
+    </div>
+
+    <div class="v">
+      <h2>B2 · Бліда сцена</h2>
+      <p>Мʼяка персикова сцена місця, у ній — лише картинка; зайчик визирає з кутка. Трохи більше «світу», але без перевантаження.</p>
+      <div class="phone B2">
+        <div class="top"><div class="x">✕</div><div class="carrots"><span>🥕</span><span>🥕</span><span class="off">🥕</span><span class="off">🥕</span><span class="off">🥕</span></div><div style="width:38px"></div></div>
+        <div class="ask" style="margin-top:16px"><div class="t" style="border-radius:20px">З якої букви починається?</div><div class="s">🔊</div></div>
+        <div class="stage"><div class="pic">🦊</div><img class="peek" src="/creatures/zodiac_rabbit_wood.png" alt=""></div>
+        <div class="opts"><div class="o">Л</div><div class="o">М</div><div class="o">К</div></div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
