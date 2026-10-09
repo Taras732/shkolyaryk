@@ -24,11 +24,34 @@ const FRIENDS = [
   { id: 'dragon', img: '/creatures/zodiac_dragon_fire.png', bg: '#FFE9D6' },
   { id: 'horse', img: '/creatures/zodiac_horse_water.png', bg: '#EDE7FF' },
 ];
-// ролі звірятами, не емодзі: дорослий — великий бичок із зайченям, учень — тигреня
-const ROLES: { id: Role; title: string; hint: string; bg: string; imgs: string[] }[] = [
-  { id: 'parent', title: 'Я дорослий', hint: 'додам дитину', bg: '#FFE9D6', imgs: ['/creatures/zodiac_ox_earth.png', '/creatures/zodiac_rabbit_wood.png'] },
-  { id: 'student', title: 'Я учень', hint: 'граю сам', bg: '#DFF7E6', imgs: ['/creatures/zodiac_tiger_metal.png'] },
+const ROLES: { id: Role; title: string }[] = [
+  { id: 'parent', title: 'Я дорослий' },
+  { id: 'student', title: 'Я учень' },
 ];
+
+/**
+ * Два варіанти сцени знайомства на вибір (?v=a | ?v=b), зміст однаковий:
+ *  a — галявина: небо, хмаринки, пагорб, зайчик стоїть на траві;
+ *  b — фіолетова сцена, як блок «на сьогодні» на головній.
+ */
+const SKY = 'linear-gradient(180deg, #BFE3FF 0%, #DDEFFF 45%, #F3EEFF 100%)';
+const VIOLET = 'radial-gradient(80% 50% at 20% 10%, #9B6BFF 0%, transparent 60%), radial-gradient(70% 45% at 90% 40%, #6D28D9 0%, transparent 60%), #7C3AED';
+
+function Meadow() {
+  return (
+    <svg viewBox="0 0 400 860" preserveAspectRatio="xMidYMax slice" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
+      <g fill="#fff" opacity=".9">
+        <ellipse cx="80" cy="120" rx="46" ry="18" /><ellipse cx="110" cy="108" rx="30" ry="20" />
+        <ellipse cx="310" cy="190" rx="52" ry="18" /><ellipse cx="290" cy="178" rx="28" ry="18" />
+        <ellipse cx="200" cy="70" rx="30" ry="11" />
+      </g>
+      <path d="M0 560 Q120 500 220 540 T400 520 V860 H0Z" fill="#CDEFD2" />
+      <path d="M0 610 Q140 560 260 600 T400 590 V860 H0Z" fill="#A9E2B4" />
+      <g fill="#FFD1DC"><circle cx="60" cy="640" r="5" /><circle cx="340" cy="625" r="5" /><circle cx="300" cy="660" r="4" /></g>
+      <g fill="#FFE58A"><circle cx="90" cy="660" r="4" /><circle cx="250" cy="640" r="4" /></g>
+    </svg>
+  );
+}
 const AGE_GROUP: Record<ClassLevel, '5-6' | '6-7' | '7-8'> = { preschool: '5-6', grade1: '6-7', grade2: '7-8', grade3: '7-8', grade4: '7-8' };
 const TILE_BG = ['#FFE9D6', '#DFF7E6', '#EDE7FF', '#FFF3C8', '#FFE3EC', '#E3EEFF'];
 
@@ -105,49 +128,43 @@ export default function Start() {
   };
 
   if (step === null) return null;
+  const variant = new URLSearchParams(window.location.search).get('v') === 'b' ? 'b' : 'a';
   const levels = role === 'student' ? CLASS_LEVELS.filter((l) => l !== 'preschool') : CLASS_LEVELS;
 
   return (
-    <div style={{ width: '100%', height: '100dvh', background: BG, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: '100%', height: '100dvh', background: step === 'hello' ? (variant === 'b' ? VIOLET : SKY) : BG, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {step === 'hello' && variant === 'a' && <Meadow />}
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px calc(16px + env(safe-area-inset-bottom))', maxWidth: 520, width: '100%', margin: '0 auto' }}>
         {step === 'hello' && (
           <>
-            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-              <div style={{ width: 150 }}>
+            {/* сцена: зайчик + назва, без підзаголовків */}
+            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: variant === 'b' ? 'center' : 'flex-end', gap: 4, paddingBottom: variant === 'b' ? 0 : '8dvh', position: 'relative', zIndex: 1 }}>
+              <div style={{ width: 160 }}>
                 <PuppetBunny face={face} bounce={bounce} onZone={() => { setFace('happy'); setBounce((b) => b + 1); setTimeout(() => setFace('smile'), 1200); }} />
               </div>
-              <div style={{ ...big, fontSize: 32, color: 'var(--c-ink)' }}>Школярик</div>
-              <div style={{ ...big, fontSize: 15, color: 'var(--c-mut)' }}>Граємося та вчимося</div>
+              <div style={{ ...big, fontSize: 34, color: variant === 'b' ? '#fff' : 'var(--c-ink)' }}>Школярик</div>
             </div>
 
-            <div style={{ ...big, fontSize: 15, color: 'var(--c-mut)', textAlign: 'center' }}>Хто тут?</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {ROLES.map((r) => (
-                <motion.button key={r.id} whileTap={{ scale: 0.95 }} onClick={() => setRole(r.id)}
-                  style={{ ...big, border: 0, borderRadius: 22, background: r.bg, padding: '10px 8px 12px', fontSize: 16, color: 'var(--c-ink)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, boxShadow: role === r.id ? '0 0 0 3px var(--c-primary)' : 'var(--c-shadow)' }}>
-                  <span style={{ height: 70, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-                    {r.imgs.map((src, i) => (
-                      <img key={src} src={src} alt="" style={{ height: i === 0 ? 70 : 46, marginLeft: i ? -14 : 0, objectFit: 'contain' }} />
-                    ))}
-                  </span>
-                  {r.title}
-                  <span style={{ fontSize: 12, color: 'var(--c-mut)' }}>{r.hint}</span>
-                </motion.button>
-              ))}
+            {/* аркуш з вибором: роль перемикачем, два входи */}
+            <div style={{ ...card, padding: 14, display: 'flex', flexDirection: 'column', gap: 10, position: 'relative', zIndex: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: 'var(--c-bg)', borderRadius: 18, padding: 4 }}>
+                {ROLES.map((r) => (
+                  <button key={r.id} onClick={() => setRole(r.id)}
+                    style={{ ...big, border: 0, borderRadius: 14, padding: '11px 0', fontSize: 16, cursor: 'pointer', background: role === r.id ? '#fff' : 'transparent', color: role === r.id ? 'var(--c-primary)' : 'var(--c-mut)', boxShadow: role === r.id ? 'var(--c-shadow)' : 'none', transition: 'all .2s' }}>
+                    {r.title}
+                  </button>
+                ))}
+              </div>
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('guest')}
+                style={{ ...big, border: 0, borderRadius: 20, padding: '15px 0', fontSize: 18, background: 'var(--c-primary)', color: '#fff', cursor: 'pointer' }}>
+                Почати
+              </motion.button>
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('google')}
+                style={{ ...big, border: '2px solid var(--c-line)', borderRadius: 20, padding: '13px 0', fontSize: 16, background: '#fff', color: 'var(--c-ink)', cursor: 'pointer' }}>
+                Увійти через Google
+              </motion.button>
+              {authError && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{authError}</div>}
             </div>
-
-            <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('google')}
-              style={{ ...big, ...card, border: 0, padding: '14px 0', fontSize: 17, color: 'var(--c-ink)', cursor: 'pointer' }}>
-              Увійти через Google
-            </motion.button>
-            <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('guest')}
-              style={{ ...big, border: 0, borderRadius: 24, padding: '14px 0', fontSize: 17, background: 'var(--c-primary)', color: '#fff', cursor: 'pointer' }}>
-              Почати без акаунта
-            </motion.button>
-            {authError && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{authError}</div>}
-            <button onClick={() => navigate('/auth')} style={{ ...big, border: 0, background: 'none', fontSize: 13, color: 'var(--c-mut)', cursor: 'pointer' }}>
-              Увійти поштою
-            </button>
           </>
         )}
 
