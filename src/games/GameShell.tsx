@@ -246,9 +246,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
               style={{ width: 46, height: 46, borderRadius: '50%', border: 0, background: 'var(--c-primary)', boxShadow: '0 4px 12px rgba(124,58,237,.35)', fontSize: 22, color: '#fff', cursor: 'pointer', fontWeight: 900 }}>←</button>
             <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
               {!isBoard && (
-                <div style={{ background: 'rgba(255,255,255,.92)', borderRadius: 99, padding: '6px 14px', boxShadow: 'var(--c-shadow)' }}>
-                  <FiveStars filled={Math.round((state.roundIndex / total) * 5)} />
-                </div>
+                <FiveStars filled={Math.round((state.roundIndex / total) * 5)} size={26} />
               )}
             </div>
             <div style={{ width: 46 }} />

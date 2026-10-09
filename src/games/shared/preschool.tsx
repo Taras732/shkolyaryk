@@ -82,9 +82,13 @@ export function Balloons<T extends string | number>({
   useEffect(() => {
     if (answerState === 'idle') setSel(null);
   }, [answerState]);
+  // кульки завжди в один ряд: що більше варіантів, то менша кулька
+  const n = options.length;
+  const bw = n <= 3 ? 108 : n === 4 ? 82 : 66;
+  const bh = Math.round(bw * 1.17);
   const wide = options.some((o) => String(o.node ?? o.value).length > 3 && (typeof o.node === 'string' || o.node === undefined));
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-start', gap: '28px 14px', padding: '12px 4px 36px' }}>
+    <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'flex-start', gap: n <= 3 ? 14 : 8, padding: '12px 0 36px' }}>
       {options.map((o, i) => {
         const picked = sel === o.value;
         const popped = picked && answerState === 'correct';
@@ -101,14 +105,14 @@ export function Balloons<T extends string | number>({
               style={{
                 ...BIG,
                 position: 'relative',
-                minWidth: wide ? 128 : 108,
-                height: 126,
+                minWidth: wide ? Math.max(bw, 96) : bw,
+                height: bh,
                 padding: '0 14px',
                 border: 0,
                 borderRadius: wide ? 56 : '50% 50% 48% 48%',
                 background: BALLOON[i % BALLOON.length],
                 color: '#fff',
-                fontSize: wide ? 26 : 52,
+                fontSize: wide ? 22 : Math.round(bw * 0.48),
                 textShadow: '0 2px 0 rgba(0,0,0,.15)',
                 boxShadow: `inset -10px -12px 0 rgba(0,0,0,.08), inset 10px 10px 0 rgba(255,255,255,.25)${hint ? ', 0 0 0 4px #fff' : ''}`,
                 cursor: 'pointer',
@@ -121,7 +125,7 @@ export function Balloons<T extends string | number>({
               {o.node ?? o.value}
             </motion.button>
             {/* ниточка */}
-            <div style={{ position: 'absolute', left: '50%', top: 126, width: 2, height: 38, background: 'rgba(31,33,56,.22)', opacity: popped ? 0 : 1 }} />
+            <div style={{ position: 'absolute', left: '50%', top: bh, width: 2, height: 34, background: 'rgba(31,33,56,.22)', opacity: popped ? 0 : 1 }} />
             {popped && ['-50px,-40px', '50px,-36px', '-40px,40px', '44px,44px', '0,-60px'].map((d, k) => {
               const [dx, dy] = d.split(',');
               return <span key={k} style={{ position: 'absolute', left: '42%', top: '38%', fontSize: 22, ['--dx' as string]: dx, ['--dy' as string]: dy, animation: 'pk-spark .6s ease-out forwards' }}>⭐</span>;
@@ -138,7 +142,7 @@ export function FiveStars({ filled, size = 22 }: { filled: number; size?: number
   return (
     <div style={{ display: 'flex', justifyContent: 'center', gap: 4, fontSize: size }}>
       {[0, 1, 2, 3, 4].map((i) => (
-        <span key={i} style={{ filter: i < filled ? 'none' : 'grayscale(1)', opacity: i < filled ? 1 : 0.35, transition: 'all .3s' }}>⭐</span>
+        <span key={i} style={{ filter: i < filled ? 'none' : 'grayscale(1)', opacity: i < filled ? 1 : 0.45, transition: 'all .3s' }}>⭐</span>
       ))}
     </div>
   );
