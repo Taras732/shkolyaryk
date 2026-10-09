@@ -15,7 +15,7 @@ import type { Face } from '@/pages/poc/Bunny';
  * Старі екрани (Welcome, Auth, RoleSelect, Onboarding, Placement) лишились у коді, але не на шляху.
  */
 type Role = 'parent' | 'student';
-type Step = 'hello' | 'child' | 'pick';
+type Step = 'hello' | 'code' | 'child' | 'pick';
 
 const ROLE_KEY = 'shk.role';
 const FRIENDS = [
@@ -24,11 +24,6 @@ const FRIENDS = [
   { id: 'dragon', img: '/creatures/zodiac_dragon_fire.png', bg: '#FFE9D6' },
   { id: 'horse', img: '/creatures/zodiac_horse_water.png', bg: '#EDE7FF' },
 ];
-const ROLES: { id: Role; title: string }[] = [
-  { id: 'parent', title: 'Я дорослий' },
-  { id: 'student', title: 'Я учень' },
-];
-
 /** Небо галявини (рішення 09.10: галявина замість фіолетової сцени). */
 const SKY = 'linear-gradient(180deg, #BFE3FF 0%, #DDEFFF 50%, #F3EEFF 100%)';
 
@@ -100,7 +95,7 @@ const TILE_BG = ['#FFE9D6', '#DFF7E6', '#EDE7FF', '#FFF3C8', '#FFE3EC', '#E3EEFF
 const big = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 const card = { background: '#fff', borderRadius: 24, boxShadow: 'var(--c-shadow)' } as const;
 const primary = { ...big, border: 0, borderRadius: 20, padding: '15px 0', fontSize: 18, background: 'var(--c-primary)', color: '#fff', cursor: 'pointer' } as const;
-const outline = { ...big, border: '2px solid var(--c-line)', borderRadius: 20, padding: '14px 0', fontSize: 17, background: '#fff', color: 'var(--c-ink)', cursor: 'pointer' } as const;
+const tile = { ...big, border: 0, borderRadius: 22, padding: '22px 0', fontSize: 18, color: 'var(--c-ink)', cursor: 'pointer', boxShadow: 'var(--c-shadow)' } as const;
 const field = { ...big, fontSize: 16, border: 0, borderRadius: 16, background: 'var(--c-bg)', padding: '13px 16px', color: 'var(--c-ink)', outline: 'none' } as const;
 const link = { ...big, border: 0, background: 'none', fontSize: 13, color: 'var(--c-mut)', cursor: 'pointer', padding: 4 } as const;
 
@@ -122,7 +117,9 @@ export default function Start() {
   const [name, setName] = useState('');
   const [level, setLevel] = useState<ClassLevel>('preschool');
   const [friend, setFriend] = useState(FRIENDS[0].id);
-  const [sheet, setSheet] = useState<'start' | 'signin' | 'mail'>('start');
+  const [sheet, setSheet] = useState<'signin' | 'signup' | 'signup-adult' | 'mail'>('signin');
+  const [code, setCode] = useState('');
+  const [codeMsg, setCodeMsg] = useState('');
   const [mailNew, setMailNew] = useState(false);
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
@@ -143,22 +140,24 @@ export default function Start() {
       selectProfile(profiles[0].id);
       navigate('/hub', { replace: true });
     } else if (profiles.length > 1) setStep('pick');
-    else setStep(readRole() ? 'child' : 'hello');
-  }, [loading, profiles, step, wantPick, selectProfile, navigate]);
+    else setStep(user ? 'child' : 'hello');
+  }, [loading, profiles, step, wantPick, user, selectProfile, navigate]);
 
-  const begin = async (how: 'guest' | 'google') => {
-    try {
-      localStorage.setItem(ROLE_KEY, role);
-    } catch {
-      // без пам'яті — спитаємо ще раз, не біда
-    }
-    if (role === 'student' && level === 'preschool') setLevel('grade1');
-    if (how === 'google') {
-      await signInWithGoogle(); // повернення з Google веде на /onboarding = цей самий екран
-      return;
-    }
+  // повернення з Google веде на /onboarding = цей самий екран; далі вирішує ефект маршруту
+  const google = async () => {
+    await signInWithGoogle();
+  };
+
+  // гість: локальний режим без акаунта, профіль дитини створює дорослий
+  const guest = async () => {
+    pickRole('parent');
     await signInGuest();
     setStep('child');
+  };
+
+  // TODO(supabase): код родини звіряється на сервері (таблиця family_codes); без бази — чесна відмова
+  const joinFamily = async () => {
+    setCodeMsg('Поки не працює: потрібна база (Supabase). Попроси батьків додати тебе на їхньому телефоні.');
   };
 
   const pickRole = (r: Role) => {
@@ -216,23 +215,34 @@ export default function Start() {
               </div>
             </div>
 
-            {/* аркуш: одна головна дія «Почати»; вхід для тих, хто вже має акаунт — дрібно */}
+            {/* аркуш: вхід — основний; реєстрація і гість — дрібно знизу */}
             <div style={{ ...card, padding: 14, display: 'flex', flexDirection: 'column', gap: 10, position: 'relative', zIndex: 1 }}>
-              {sheet === 'start' && (
-                <>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('guest')} style={primary}>Почати</motion.button>
-                  <button onClick={() => setSheet('signin')} style={link}>Вже є акаунт? <span style={{ color: 'var(--c-primary)' }}>Увійти</span></button>
-                </>
-              )}
               {sheet === 'signin' && (
                 <>
-                  <div style={{ ...big, fontSize: 20, color: 'var(--c-ink)', textAlign: 'center' }}>Увійти</div>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => begin('google')} style={outline}>
-                    <span style={{ color: '#4285F4' }}>G</span>&nbsp; Увійти через Google
-                  </motion.button>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={google} style={primary}>Увійти через Google</motion.button>
+                  <button onClick={() => { setMailNew(false); setSheet('mail'); }} style={link}>або поштою</button>
+                  <div style={{ height: 1, background: 'var(--c-line)', margin: '2px 8px' }} />
+                  <button onClick={() => setSheet('signup')} style={{ ...link, fontSize: 15 }}>Немає акаунта? <span style={{ color: 'var(--c-primary)' }}>Зареєструватися</span></button>
+                  <button onClick={guest} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Спробувати без акаунта</button>
+                </>
+              )}
+              {sheet === 'signup' && (
+                <>
+                  <div style={{ ...big, fontSize: 20, color: 'var(--c-ink)', textAlign: 'center' }}>Хто реєструється?</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                    <motion.button whileTap={{ scale: 0.96 }} onClick={() => { pickRole('parent'); setSheet('signup-adult'); }} style={{ ...tile, background: '#FFE9D6' }}>Дорослий</motion.button>
+                    <motion.button whileTap={{ scale: 0.96 }} onClick={() => { pickRole('student'); setStep('code'); }} style={{ ...tile, background: '#DFF7E6' }}>Учень</motion.button>
+                  </div>
+                  <button onClick={() => setSheet('signin')} style={link}>← Назад</button>
+                </>
+              )}
+              {sheet === 'signup-adult' && (
+                <>
+                  <div style={{ ...big, fontSize: 20, color: 'var(--c-ink)', textAlign: 'center' }}>Реєстрація</div>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={google} style={primary}>Продовжити з Google</motion.button>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <button onClick={() => setSheet('start')} style={link}>← Назад</button>
-                    <button onClick={() => setSheet('mail')} style={link}>або поштою</button>
+                    <button onClick={() => setSheet('signup')} style={link}>← Назад</button>
+                    <button onClick={() => { setMailNew(true); setSheet('mail'); }} style={link}>або поштою</button>
                   </div>
                 </>
               )}
@@ -244,10 +254,7 @@ export default function Start() {
                     style={{ ...primary, opacity: email && pw.length >= 6 ? 1 : 0.5 }}>
                     {mailNew ? 'Створити акаунт' : 'Увійти'}
                   </motion.button>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <button onClick={() => setSheet('signin')} style={link}>← Назад</button>
-                    <button onClick={() => setMailNew(!mailNew)} style={link}>{mailNew ? 'Вже є акаунт' : 'Немає акаунта? Створити'}</button>
-                  </div>
+                  <button onClick={() => setSheet(mailNew ? 'signup-adult' : 'signin')} style={link}>← Назад</button>
                 </>
               )}
               {authError && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{authError}</div>}
@@ -255,16 +262,23 @@ export default function Start() {
           </>
         )}
 
+        {step === 'code' && (
+          <>
+            <div style={{ flex: 1 }} />
+            <div style={{ ...card, padding: 18, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+              <div style={{ ...big, fontSize: 22, color: 'var(--c-ink)', textAlign: 'center' }}>Код від батьків</div>
+              <div style={{ ...big, fontSize: 14, color: 'var(--c-mut)', textAlign: 'center' }}>Батьки бачать його в розділі «Батькам»</div>
+              <input value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" placeholder="••••••"
+                style={{ ...field, width: '100%', textAlign: 'center', fontSize: 30, letterSpacing: 10 }} />
+              <motion.button whileTap={{ scale: 0.97 }} onClick={joinFamily} disabled={code.length !== 6} style={{ ...primary, width: '100%', opacity: code.length === 6 ? 1 : 0.5 }}>Далі</motion.button>
+              {codeMsg && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{codeMsg}</div>}
+              <button onClick={() => { setStep('hello'); setSheet('signup'); }} style={link}>← Назад</button>
+            </div>
+          </>
+        )}
+
         {step === 'child' && (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#fff', borderRadius: 18, padding: 4, boxShadow: 'var(--c-shadow)', marginTop: 4 }}>
-              {ROLES.map((r) => (
-                <button key={r.id} onClick={() => pickRole(r.id)}
-                  style={{ ...big, border: 0, borderRadius: 14, padding: '10px 0', fontSize: 15, cursor: 'pointer', background: role === r.id ? 'var(--c-primary)' : 'transparent', color: role === r.id ? '#fff' : 'var(--c-mut)', transition: 'all .2s' }}>
-                  {r.title}
-                </button>
-              ))}
-            </div>
             <div style={{ ...big, fontSize: 26, color: 'var(--c-ink)', textAlign: 'center' }}>{role === 'student' ? 'Про тебе' : 'Додай дитину'}</div>
             <div style={{ ...card, padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder={role === 'student' ? 'Як тебе звати?' : "Ім'я дитини"} maxLength={20}
