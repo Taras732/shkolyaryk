@@ -11,12 +11,14 @@ export interface Place {
   emoji: string;
   bg: string;
   games: string[];
+  /** Англійська стежка місця (рішення 09.10: на Острові Слів мови не змішуємо — перемикач «Українська / English»). */
+  en?: string[];
   /** Що каже звірятко, коли заходимо. */
   hello: string;
 }
 
 export const PLACES: Place[] = [
-  { id: 'island', title: 'Острів Слів', image: '/places/letters.webp', emoji: '🔤', bg: '#FFE9D6', hello: 'Шукаймо загублені слова!', games: ['uk-letters', 'letters-find', 'uk-syllables', 'syllable-words', 'syllable-build', 'english-words'] },
+  { id: 'island', title: 'Острів Слів', image: '/places/letters.webp', emoji: '🔤', bg: '#FFE9D6', hello: 'Шукаймо загублені слова!', games: ['uk-letters', 'letters-find', 'uk-syllables', 'syllable-words', 'syllable-build'], en: ['english-words', 'letters-find-en', 'english-word-picture'] },
   { id: 'mountain', title: 'Лічильна Гора', image: '/places/numbers.webp', emoji: '🔢', bg: '#EDE7FF', hello: 'Рахуймо, хто вище!', games: ['counting', 'recognize-digit', 'compare', 'pz-share', 'addition'] },
   { id: 'forest', title: 'Ліс Загадок', image: '/places/pictures.webp', emoji: '🧩', bg: '#FFF1C9', hello: 'Тут живуть загадки!', games: ['pic-puzzle', 'colors-find', 'shapes', 'sorting-game', 'pz-sort', 'logic-sequences', 'memory-associations', 'pz-maze', 'pz-heavier', 'command-machine'] },
   { id: 'cave', title: 'Печера Скарбів', image: '/places/memory.webp', emoji: '💎', bg: '#FFE3F2', hello: 'Знайдемо скарби?', games: ['find-same', 'find-shadow', 'memory-pairs', 'whats-changed', 'tap-the-dot'] },

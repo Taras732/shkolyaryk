@@ -113,6 +113,8 @@ const GAME_IMAGES = new Set<string>([
   'letters-find',
   'uk-syllables',
   'syllable-words',
+  'letters-find-en',
+  'english-word-picture',
   'syllable-build',
   'english-words',
   'counting',

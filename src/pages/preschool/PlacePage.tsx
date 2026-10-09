@@ -20,9 +20,19 @@ export default function PlacePage() {
   const [x0, setX0] = useState<number | null>(null);
 
   useEffect(() => { if (place) sayUk(`pre.hello.${place.id}`, place.hello); }, [place]);
+  // мова стежки (лише там, де є англійська): ?lang=en або останній вибір
+  const [lang, setLang] = useState<'uk' | 'en'>(() => {
+    if (new URLSearchParams(window.location.search).get('lang') === 'en') return 'en';
+    try { return localStorage.getItem(`shk.lang.${id}`) === 'en' ? 'en' : 'uk'; } catch { return 'uk'; }
+  });
+  const pickLang = (l: 'uk' | 'en') => {
+    setLang(l);
+    setPage(0);
+    try { localStorage.setItem(`shk.lang.${id}`, l); } catch { /* не запамʼятали — не біда */ }
+  };
   if (!place) return null;
 
-  const games = place.games.map(getGame).filter(Boolean);
+  const games = (lang === 'en' && place.en ? place.en : place.games).map(getGame).filter(Boolean);
   const pages = Array.from({ length: Math.max(1, Math.ceil(games.length / PER_PAGE)) }, (_, i) => games.slice(i * PER_PAGE, i * PER_PAGE + PER_PAGE));
   const big = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 
@@ -40,6 +50,20 @@ export default function PlacePage() {
         <div style={{ ...big, flex: 1, fontSize: 20, color: 'var(--c-ink)' }}>{place.title}</div>
         {place.image ? <img src={place.image} alt="" style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 16, background: '#fff', boxShadow: '0 4px 0 #F1E3CF' }} /> : <span style={{ fontSize: 40 }}>{place.emoji}</span>}
       </div>
+
+      {/* мова стежки — лише на місцях з англійською (Острів Слів) */}
+      {place.en && (
+        <div style={{ maxWidth: 520, width: '100%', margin: '0 auto', padding: '2px 16px 6px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#fff', borderRadius: 18, padding: 4, boxShadow: '0 4px 0 #F1E3CF' }}>
+            {([['uk', 'Українська'], ['en', 'English']] as const).map(([l, t]) => (
+              <button key={l} onClick={() => pickLang(l)}
+                style={{ ...big, border: 0, borderRadius: 14, padding: '10px 0', fontSize: 16, cursor: 'pointer', background: lang === l ? '#FFE7CF' : 'transparent', color: lang === l ? '#C2620A' : '#B9A88F' }}>
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {games.length === 0 ? (
         <div style={{ ...big, flex: 1, display: 'grid', placeItems: 'center', textAlign: 'center', padding: 24, fontSize: 20, color: 'var(--c-ink)', opacity: 0.7 }}>

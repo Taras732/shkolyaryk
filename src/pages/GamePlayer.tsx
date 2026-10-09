@@ -58,8 +58,11 @@ export default function GamePlayer() {
 
   // дошкілля: назад — у місце, звідки прийшли (?from=), інакше — у місце, де ця гра живе
   const preschool = profileClass(activeProfile) === 'preschool';
-  const place = preschool ? getPlace(search.get('from') ?? '') ?? PLACES.find((p) => p.games.includes(game.id)) : undefined;
-  const nextId = place ? place.games[(place.games.indexOf(game.id) + 1) % place.games.length] : undefined;
+  const place = preschool ? getPlace(search.get('from') ?? '') ?? PLACES.find((p) => p.games.includes(game.id) || p.en?.includes(game.id)) : undefined;
+  // англійська стежка місця — окремий список; «далі» і «назад» лишаються в тій самій мові
+  const isEn = !!place?.en?.includes(game.id);
+  const list = place ? (isEn ? place.en! : place.games) : [];
+  const nextId = place && list.includes(game.id) ? list[(list.indexOf(game.id) + 1) % list.length] : undefined;
 
   return (
     <GameShell
@@ -68,7 +71,7 @@ export default function GamePlayer() {
       level={profileLevel(activeProfile)}
       classLevel={profileClass(activeProfile)}
       profileId={activeProfile.id}
-      onExit={() => navigate(place ? `/place/${place.id}` : '/hub')}
+      onExit={() => navigate(place ? `/place/${place.id}${isEn ? '?lang=en' : ''}` : '/hub')}
       onNext={nextId ? () => navigate(`/game/${nextId}?from=${place!.id}`) : undefined}
     />
   );

@@ -34,6 +34,7 @@ const MAP: { title: string; items: Item[] }[] = [
       { label: 'Хто грає?', to: '/onboarding?pick=1' },
       { label: 'Головна', to: '/hub', kid: 'preschool' },
       { label: '🔤 Острів Слів', to: '/place/island', kid: 'preschool' },
+      { label: '🔤 Острів Слів · English', to: '/place/island?lang=en', kid: 'preschool' },
     ],
   },
 ];
