@@ -294,36 +294,42 @@ export default function Start() {
 
             <div>
               <div style={label}>{role === 'student' ? 'Клас' : 'Садок чи клас'}</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                {levels.map((l, i) => (
-                  <motion.button key={l} whileTap={{ scale: 0.95 }} onClick={() => setLevel(l)}
-                    style={{ ...big, border: 0, borderRadius: 20, background: TILE_BG[i % TILE_BG.length], padding: l === 'preschool' ? '12px 0' : '12px 0', cursor: 'pointer', color: 'var(--c-ink)', gridColumn: l === 'preschool' ? 'span 4' : undefined, boxShadow: level === l ? '0 0 0 3px var(--c-primary)' : 'var(--c-shadow)', lineHeight: 1 }}>
-                    {l === 'preschool' ? (
-                      <span style={{ fontSize: 20 }}>Ще в садочку <span style={{ fontSize: 13, color: 'var(--c-mut)' }}>· 3–6 років</span></span>
-                    ) : (
-                      <>
-                        <div style={{ fontSize: 40 }}>{l.slice(-1)}</div>
-                        <div style={{ fontSize: 12, color: 'var(--c-mut)', marginTop: 2 }}>клас</div>
-                      </>
-                    )}
-                  </motion.button>
-                ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px 10px' }}>
+                {levels.map((l, i) => {
+                  const on = level === l;
+                  return (
+                    <motion.button key={l} onClick={() => setLevel(l)} whileTap={{ scale: 0.9 }}
+                      animate={{ y: [0, -5, 0], scale: on ? 1.15 : 1 }}
+                      transition={{ y: { duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: i * 0.35 }, scale: { type: 'spring', stiffness: 300, damping: 15 } }}
+                      style={{ ...big, width: 60, height: 60, borderRadius: '50%', border: 0, cursor: 'pointer', background: on ? 'var(--c-primary)' : TILE_BG[i % TILE_BG.length], color: on ? '#fff' : 'var(--c-ink)', boxShadow: on ? '0 6px 16px rgba(124,58,237,.35)' : 'var(--c-shadow)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>
+                      {l === 'preschool' ? (
+                        <span style={{ fontSize: 13 }}>садок</span>
+                      ) : (
+                        <>
+                          <span style={{ fontSize: 24 }}>{l.slice(-1)}</span>
+                          <span style={{ fontSize: 9, opacity: 0.75 }}>клас</span>
+                        </>
+                      )}
+                    </motion.button>
+                  );
+                })}
               </div>
             </div>
 
-            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <div>
               <div style={label}>Друг</div>
-              <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 128px)', justifyContent: 'center', gap: 12 }}>
                 {FRIENDS.map((fr) => (
                   <motion.button key={fr.id} whileTap={{ scale: 0.93 }} onClick={() => setFriend(fr.id)} aria-label={fr.id}
                     animate={friend === fr.id ? { y: [0, -8, 0] } : { y: 0 }} transition={{ duration: 0.4 }}
-                    style={{ border: 0, borderRadius: 24, background: fr.bg, padding: 6, cursor: 'pointer', minWidth: 0, minHeight: 0, boxShadow: friend === fr.id ? '0 0 0 3px var(--c-primary)' : 'var(--c-shadow)' }}>
+                    style={{ border: 0, borderRadius: 24, background: fr.bg, padding: 14, cursor: 'pointer', width: 128, height: 128, boxShadow: friend === fr.id ? '0 0 0 3px var(--c-primary)' : 'var(--c-shadow)' }}>
                     <img src={fr.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   </motion.button>
                 ))}
               </div>
             </div>
 
+            <div style={{ flex: 1 }} />
             <motion.button whileTap={{ scale: 0.97 }} onClick={create} disabled={!name.trim()} style={{ ...primary, opacity: name.trim() ? 1 : 0.45 }}>Готово</motion.button>
           </>
         )}
