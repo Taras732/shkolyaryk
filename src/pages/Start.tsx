@@ -117,7 +117,7 @@ export default function Start() {
   const [name, setName] = useState('');
   const [level, setLevel] = useState<ClassLevel>('preschool');
   const [friend, setFriend] = useState(FRIENDS[0].id);
-  const [sheet, setSheet] = useState<'signin' | 'signup-adult' | 'mail'>('signin');
+  const [sheet, setSheet] = useState<'signin' | 'mail'>('signin');
   const [code, setCode] = useState('');
   const [codeMsg, setCodeMsg] = useState('');
   const [mailNew, setMailNew] = useState(false);
@@ -219,35 +219,26 @@ export default function Start() {
             <div style={{ ...card, padding: 14, display: 'flex', flexDirection: 'column', gap: 10, position: 'relative', zIndex: 1 }}>
               {sheet === 'signin' && (
                 <>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={google} style={primary}>Увійти через Google</motion.button>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={google} style={primary}>Продовжити з Google</motion.button>
                   <button onClick={() => { setMailNew(false); setSheet('mail'); }} style={link}>або поштою</button>
                   <div style={{ height: 1, background: 'var(--c-line)', margin: '2px 8px' }} />
-                  <button onClick={() => { pickRole('parent'); setSheet('signup-adult'); }} style={{ ...link, fontSize: 15 }}>Немає акаунта? <span style={{ color: 'var(--c-primary)' }}>Зареєструватися</span></button>
+                  <button onClick={() => { pickRole('parent'); setMailNew(true); setSheet('mail'); }} style={{ ...link, fontSize: 15 }}>Немає акаунта? <span style={{ color: 'var(--c-primary)' }}>Зареєструватися</span></button>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <button onClick={guest} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Спробувати без акаунта</button>
                     <button onClick={() => { pickRole('student'); setStep('code'); }} style={{ ...link, fontSize: 12, opacity: 0.8 }}>Є код від батьків?</button>
                   </div>
                 </>
               )}
-              {sheet === 'signup-adult' && (
-                <>
-                  <div style={{ ...big, fontSize: 20, color: 'var(--c-ink)', textAlign: 'center' }}>Реєстрація</div>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={google} style={primary}>Продовжити з Google</motion.button>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <button onClick={() => setSheet('signin')} style={link}>← Назад</button>
-                    <button onClick={() => { setMailNew(true); setSheet('mail'); }} style={link}>або поштою</button>
-                  </div>
-                </>
-              )}
               {sheet === 'mail' && (
                 <>
+                  <div style={{ ...big, fontSize: 20, color: 'var(--c-ink)', textAlign: 'center' }}>{mailNew ? 'Реєстрація' : 'Вхід поштою'}</div>
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Пошта" autoComplete="email" style={field} />
                   <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Пароль" autoComplete={mailNew ? 'new-password' : 'current-password'} style={field} />
                   <motion.button whileTap={{ scale: 0.97 }} onClick={byMail} disabled={!email || pw.length < 6}
                     style={{ ...primary, opacity: email && pw.length >= 6 ? 1 : 0.5 }}>
                     {mailNew ? 'Створити акаунт' : 'Увійти'}
                   </motion.button>
-                  <button onClick={() => setSheet(mailNew ? 'signup-adult' : 'signin')} style={link}>← Назад</button>
+                  <button onClick={() => setSheet('signin')} style={link}>← Назад</button>
                 </>
               )}
               {authError && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{authError}</div>}
