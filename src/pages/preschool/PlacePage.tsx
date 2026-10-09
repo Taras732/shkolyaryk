@@ -28,7 +28,7 @@ export default function PlacePage() {
   // тап — одразу в гру; назва звучить по дорозі (рішення 09.10: без «натисни ще раз»)
   const tap = (gid: string, title: string) => {
     sayUk(`pre.game.${gid}`, title);
-    navigate(`/game/${gid}`);
+    navigate(`/game/${gid}?from=${place!.id}`);
   };
 
   return (

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Рамка гри дошкілля</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1F2138; --mut:#8A8FA8; --pri:#7c3aed; --sh:0 4px 14px rgba(31,33,56,.10); }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:'Nunito',system-ui,sans-serif; color:var(--ink); background:#EEF0F6; padding:24px; }
+  h1 { font-weight:900; font-size:22px; margin-bottom:4px; }
+  .lead { font-size:14px; font-weight:700; color:var(--mut); margin-bottom:18px; }
+  .set { margin-bottom:30px; }
+  .set h2 { font-size:18px; font-weight:900; margin-bottom:4px; }
+  .set p { font-size:13px; font-weight:700; color:var(--mut); margin-bottom:10px; max-width:760px; }
+  .row { display:flex; gap:20px; flex-wrap:wrap; }
+  .phone { width:320px; height:660px; border-radius:34px; overflow:hidden; position:relative; box-shadow:0 10px 30px #0002; font-weight:900; display:flex; flex-direction:column; padding:14px; }
+  .phone > * { position:relative; z-index:2; }
+  .bg { position:absolute !important; inset:0; z-index:0 !important; }
+  .back { width:46px; height:46px; border-radius:16px; background:#fff; box-shadow:var(--sh); display:grid; place-items:center; font-size:22px; color:var(--pri); }
+  .top { display:flex; align-items:center; gap:10px; }
+  .stars { flex:1; display:flex; justify-content:center; gap:4px; font-size:22px; }
+  .stars .off { filter:grayscale(1); opacity:.28; }
+  .task { display:flex; align-items:flex-end; gap:6px; margin-top:14px; }
+  .task img { width:84px; }
+  .bubble { flex:1; display:flex; align-items:center; gap:8px; background:#fff; border-radius:22px 22px 22px 6px; padding:12px 12px 12px 16px; box-shadow:var(--sh); font-size:19px; line-height:1.2; }
+  .spk { flex:none; width:40px; height:40px; border-radius:50%; background:#EDE7FF; display:grid; place-items:center; font-size:18px; }
+  .mid { flex:1; display:flex; align-items:center; justify-content:center; }
+  /* A — картки */
+  .optsA { width:100%; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:-30px; }
+  .optA { aspect-ratio:1/1.12; background:#fff; border-radius:24px; box-shadow:0 6px 0 #F0D6BF, var(--sh); display:grid; place-items:center; font-size:62px; }
+  /* B — кульки */
+  @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-14px) } }
+  @keyframes drift { from { transform:translateX(-20px) } to { transform:translateX(20px) } }
+  .ball { position:absolute; width:96px; height:112px; border-radius:50% 50% 48% 48%; display:grid; place-items:center; font-size:46px; color:#fff; text-shadow:0 2px 0 rgba(0,0,0,.15); box-shadow:inset -10px -12px 0 rgba(0,0,0,.08), inset 10px 10px 0 rgba(255,255,255,.25); animation:float 3s ease-in-out infinite; }
+  .ball::after { content:''; position:absolute; bottom:-46px; left:50%; width:2px; height:46px; background:rgba(31,33,56,.25); }
+  .cloud { position:absolute; background:#fff; border-radius:40px; opacity:.9; animation:drift 8s ease-in-out infinite alternate; }
+  /* C — кубики */
+  .table { position:absolute; left:0; right:0; top:auto !important; bottom:0; height:44%; background:linear-gradient(180deg,#E9C49A,#D9A877); border-radius:40% 40% 0 0 / 14% 14% 0 0; }
+  .cubes { display:flex; gap:14px; justify-content:center; align-items:flex-end; margin-top:auto; margin-bottom:120px; }
+  .cube { width:84px; height:84px; border-radius:14px; display:grid; place-items:center; font-size:52px; color:#fff; position:relative; transform:rotate(var(--r)); box-shadow:0 10px 0 rgba(0,0,0,.18), inset -8px -8px 0 rgba(0,0,0,.1), inset 6px 6px 0 rgba(255,255,255,.25); }
+  .cube::before { content:''; position:absolute; left:8px; right:8px; bottom:-24px; height:10px; border-radius:50%; background:rgba(0,0,0,.18); filter:blur(3px); }
+  /* кінець */
+  .end { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
+  .end img { width:170px; }
+  .end h3 { font-size:30px; }
+  .end .stars { flex:none; font-size:34px; }
+  .icons { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .ic { aspect-ratio:1; border-radius:24px; background:#fff; box-shadow:var(--sh); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:34px; }
+  .ic small { font-size:11px; color:var(--mut); }
+  .ic.pri { background:var(--pri); color:#fff; } .ic.pri small { color:#fff; opacity:.85; }
+</style>
+</head>
+<body>
+  <h1>Рамка гри дошкілля — три варіанти, приклад «Знайди букву»</h1>
+  <div class="lead">У всіх: угорі лише ← (назад у місце) і 5 зірочок прогресу; 🔊 маленька в бульбашці; варіанти посередині екрана; у кінці ті самі 5 зірочок і кнопки-іконки.</div>
+
+  <div class="set">
+    <h2>A · Картки (твій варіант із правками)</h2>
+    <p>Спокійно й чисто: білі великі картки посередині, фон кольору місця.</p>
+    <div class="row">
+      <div class="phone" style="background:linear-gradient(180deg,#FFE9D6,#FFF8F0)">
+        <div class="top"><div class="back">←</div><div class="stars"><span>⭐</span><span>⭐</span><span class="off">⭐</span><span class="off">⭐</span><span class="off">⭐</span></div><div style="width:46px"></div></div>
+        <div class="task"><img src="/creatures/zodiac_rabbit_wood.png" alt=""><div class="bubble"><span style="flex:1">Знайди букву, яку я скажу!</span><span class="spk">🔊</span></div></div>
+        <div class="mid"><div class="optsA"><div class="optA">М</div><div class="optA">Б</div><div class="optA">О</div></div></div>
+      </div>
+      <div class="phone" style="background:linear-gradient(180deg,#FFF3C8,#FFF9E6)">
+        <div class="end"><div class="stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span class="off">⭐</span></div><img src="/creatures/zodiac_rabbit_wood.png" alt=""><h3>Молодець!</h3></div>
+        <div class="icons"><div class="ic">↻<small>ще раз</small></div><div class="ic pri">▶<small>далі</small></div><div class="ic">🏝<small>острів</small></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="set">
+    <h2>B · Кульки в небі (2.5D, рух)</h2>
+    <p>Букви на повітряних кульках, що погойдуються. Тап — кулька лопає зірочками. Живіше, більше «гри».</p>
+    <div class="row">
+      <div class="phone" style="background:linear-gradient(180deg,#BFE3FF,#E8F4FF 60%,#FFF4E8)">
+        <div class="cloud bg" style="top:120px;left:20px;width:90px;height:30px"></div>
+        <div class="cloud bg" style="top:200px;left:200px;width:70px;height:24px;animation-delay:-3s"></div>
+        <div class="bg" style="top:auto;bottom:0;height:110px;background:#BDE8C6;border-radius:50% 50% 0 0 / 30% 30% 0 0"></div>
+        <div class="top"><div class="back">←</div><div class="stars"><span>⭐</span><span>⭐</span><span class="off">⭐</span><span class="off">⭐</span><span class="off">⭐</span></div><div style="width:46px"></div></div>
+        <div class="task"><img src="/creatures/zodiac_rabbit_wood.png" alt=""><div class="bubble"><span style="flex:1">Лопни кульку з буквою, яку я скажу!</span><span class="spk">🔊</span></div></div>
+        <div class="mid" style="position:relative">
+          <div class="ball" style="left:6px;top:70px;background:#FF8FA3">М</div>
+          <div class="ball" style="left:110px;top:30px;background:#8CC8FF;animation-delay:-1s">Б</div>
+          <div class="ball" style="left:206px;top:84px;background:#8EDB9E;animation-delay:-2s">О</div>
+        </div>
+      </div>
+      <div class="phone" style="background:linear-gradient(180deg,#BFE3FF,#FFF4E8)">
+        <div class="end"><div class="stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span class="off">⭐</span></div><img src="/creatures/zodiac_rabbit_wood.png" alt=""><h3>Молодець!</h3></div>
+        <div class="icons"><div class="ic">↻<small>ще раз</small></div><div class="ic pri">▶<small>далі</small></div><div class="ic">🏝<small>острів</small></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="set">
+    <h2>C · Кубики на столі (2.5D, іграшки)</h2>
+    <p>Букви на дерев'яних кубиках, як справжні іграшки. Тап — кубик підстрибує й крутиться. Тепліше, «дитяча кімната».</p>
+    <div class="row">
+      <div class="phone" style="background:linear-gradient(180deg,#FFE9D6,#FFF3E6)">
+        <div class="table bg"></div>
+        <div class="top"><div class="back">←</div><div class="stars"><span>⭐</span><span>⭐</span><span class="off">⭐</span><span class="off">⭐</span><span class="off">⭐</span></div><div style="width:46px"></div></div>
+        <div class="task"><img src="/creatures/zodiac_rabbit_wood.png" alt=""><div class="bubble"><span style="flex:1">Дай мені кубик з буквою, яку я скажу!</span><span class="spk">🔊</span></div></div>
+        <div class="cubes"><div class="cube" style="background:#FF8FA3;--r:-6deg">М</div><div class="cube" style="background:#8CC8FF;--r:4deg">Б</div><div class="cube" style="background:#FFC36B;--r:-3deg">О</div></div>
+      </div>
+      <div class="phone" style="background:linear-gradient(180deg,#FFF3C8,#FFF3E6)">
+        <div class="table bg" style="height:30%"></div>
+        <div class="end"><div class="stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span class="off">⭐</span></div><img src="/creatures/zodiac_rabbit_wood.png" alt=""><h3>Молодець!</h3></div>
+        <div class="icons"><div class="ic">↻<small>ще раз</small></div><div class="ic pri">▶<small>далі</small></div><div class="ic">🏝<small>острів</small></div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

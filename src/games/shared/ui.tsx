@@ -1,5 +1,6 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import type { AnswerState } from '../types';
+import { Balloons, TaskBubble, usePreschool } from './preschool';
 
 /** Картка-завдання (canon): питання зверху + візуальний вміст. */
 export function PromptCard({
@@ -18,10 +19,14 @@ export function PromptCard({
   /** Зміна ключа = новий раунд = звучить знову. */
   sayKey?: string | number;
 }) {
+  const preschool = usePreschool();
   useEffect(() => {
     say?.(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sayKey]);
+  if (preschool) {
+    return <TaskBubble text={question} onSay={say ? () => say(true) : undefined}>{children}</TaskBubble>;
+  }
   return (
     <div className={`g-card${answerState === 'incorrect' ? ' shake' : ''}`} style={{ marginBottom: 18 }}>
       <div className="g-question">{question}</div>
@@ -81,11 +86,14 @@ export function ChoiceGrid<T extends string | number>({
   onPick: (value: T) => void;
   columns?: number;
 }) {
+  const preschool = usePreschool();
   const [selected, setSelected] = useState<T | null>(null);
 
   useEffect(() => {
     if (answerState === 'idle') setSelected(null);
   }, [answerState]);
+
+  if (preschool) return <Balloons options={options} correct={correct} disabled={disabled} answerState={answerState} onPick={onPick} />;
 
   const cols = columns ?? (options.length === 3 ? 3 : 2);
   // довгі текстові варіанти не влазять у базові 22px на вузьких екранах

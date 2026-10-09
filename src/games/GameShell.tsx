@@ -10,6 +10,8 @@ import { recordGameResult } from '@/school/mastery';
 import { fetchPrereqHint, type PrereqHint } from '@/school/hint';
 import { isWeakResult, buildPrereqHintMessage } from '@/school/hint-core';
 import { encouragementFor } from './shared/encouragement';
+import { FiveStars, PreschoolProvider, SKY, SkyScene } from './shared/preschool';
+import { sayUk } from './shared/uk-audio';
 import {
   type GameDefinition,
   type ProfileLevel,
@@ -93,9 +95,11 @@ interface GameShellProps {
   classLevel: ClassLevel;
   profileId: string;
   onExit: () => void;
+  /** Дошкілля: «Далі» — наступна гра в місці (якщо є). */
+  onNext?: () => void;
 }
 
-export default function GameShell({ game, level, classLevel, profileId, onExit }: GameShellProps) {
+export default function GameShell({ game, level, classLevel, profileId, onExit, onNext }: GameShellProps) {
   const { user } = useAuthStore();
   const { progress, updateProgress, profiles } = useProfileStore();
 
@@ -227,6 +231,47 @@ export default function GameShell({ game, level, classLevel, profileId, onExit }
   }, [state.finished]);
 
   const GameComponent = game.Component;
+  const preschool = classLevel === 'preschool';
+
+  if (!state.finished && preschool) {
+    const isBoard = round.answer === BOARD_DONE;
+    return (
+      <div style={{ position: 'relative', width: '100%', height: '100dvh', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <SkyScene />
+        <div style={{ position: 'relative', zIndex: 1, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520, margin: '0 auto', padding: '12px 16px 8px' }}>
+          {/* угорі лише ← (у місце) і 5 зірочок прогресу */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button onClick={onExit} aria-label="Назад"
+              style={{ width: 46, height: 46, borderRadius: 16, border: 0, background: '#fff', boxShadow: 'var(--c-shadow)', fontSize: 22, color: 'var(--c-primary)', cursor: 'pointer', fontWeight: 900 }}>←</button>
+            <div style={{ flex: 1 }}>{!isBoard && <FiveStars filled={Math.round((state.roundIndex / total) * 5)} />}</div>
+            <div style={{ width: 46 }} />
+          </div>
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', paddingTop: 10, paddingBottom: 60 }}>
+            <PreschoolProvider>
+              <GameComponent
+                key={round.id}
+                round={round}
+                roundIndex={state.roundIndex}
+                totalRounds={total}
+                disabled={state.answerState !== 'idle'}
+                answerState={state.answerState}
+                onAnswer={handleAnswer}
+                onMistake={handleMistake}
+              />
+            </PreschoolProvider>
+            {explain && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', animation: 'fadeInUp .3s ease both' }}>
+                <div style={{ background: '#fff', borderRadius: 18, padding: '12px 16px', boxShadow: 'var(--c-shadow)', fontWeight: 900, fontSize: 16, color: 'var(--c-ok-ink)', textAlign: 'center' }}>
+                  {explain.steps.join(' · ')}
+                </div>
+                <button className="g-btn primary" onClick={dismissExplain} style={{ maxWidth: 260 }}>Ще раз →</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!state.finished) {
     return (
@@ -313,6 +358,34 @@ export default function GameShell({ game, level, classLevel, profileId, onExit }
   const newUnlocked = unlockedAfter(state.difficulty, state.stars, prevUnlocked);
   const unlockedNext = newUnlocked > state.difficulty;
   const canPlayHarder = state.difficulty < 3 && newUnlocked > state.difficulty;
+  const again = () => dispatch({ type: 'RESET', levelData: game.generate(state.difficulty, level, classLevel), difficulty: state.difficulty });
+
+  if (preschool) {
+    // ті самі 5 зірочок, що вгорі гри: 3 → 5, 2 → 4, 1 → 3
+    const five = state.stars === 3 ? 5 : state.stars === 2 ? 4 : 3;
+    const next = onNext ?? (canPlayHarder
+      ? () => { const d = (state.difficulty + 1) as Difficulty; dispatch({ type: 'RESET', levelData: game.generate(d, level, classLevel), difficulty: d }); }
+      : again);
+    const icon = { height: 84, borderRadius: 24, border: 0, background: '#fff', boxShadow: 'var(--c-shadow)', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', gap: 2, fontSize: 34, cursor: 'pointer', fontFamily: 'var(--font-round)', fontWeight: 900 };
+    return (
+      <div style={{ position: 'relative', width: '100%', height: '100dvh', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <SkyScene />
+        <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520, margin: '0 auto', padding: '16px 16px 28px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+            <FiveStars filled={five} size={36} />
+            <img src="/creatures/zodiac_rabbit_wood.png" alt="" onLoad={() => sayUk('pre.well', 'Молодець!')}
+              style={{ width: 180, animation: 'pk-float 1.6s ease-in-out infinite' }} />
+            <div style={{ fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 32, color: 'var(--c-ink)' }}>Молодець!</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            <button onClick={again} aria-label="Ще раз" style={icon}>↻<small style={{ fontSize: 11, color: 'var(--c-mut)' }}>ще раз</small></button>
+            <button onClick={next} aria-label="Далі" style={{ ...icon, background: 'var(--c-primary)', color: '#fff' }}>▶<small style={{ fontSize: 11, opacity: 0.85 }}>далі</small></button>
+            <button onClick={onExit} aria-label="Назад у місце" style={icon}>🏝<small style={{ fontSize: 11, color: 'var(--c-mut)' }}>назад</small></button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const message =
     state.mistakes === 0
