@@ -16,7 +16,6 @@ export default function PlacePage() {
   const navigate = useNavigate();
   const place = getPlace(id);
   const [page, setPage] = useState(0);
-  const [armed, setArmed] = useState<string | null>(null);
   const [x0, setX0] = useState<number | null>(null);
 
   useEffect(() => { if (place) sayUk(`pre.hello.${place.id}`, place.hello); }, [place]);
@@ -26,10 +25,10 @@ export default function PlacePage() {
   const pages = Array.from({ length: Math.max(1, Math.ceil(games.length / PER_PAGE)) }, (_, i) => games.slice(i * PER_PAGE, i * PER_PAGE + PER_PAGE));
   const big = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 
+  // тап — одразу в гру; назва звучить по дорозі (рішення 09.10: без «натисни ще раз»)
   const tap = (gid: string, title: string) => {
-    if (armed === gid) { navigate(`/game/${gid}`); return; }
-    setArmed(gid);
     sayUk(`pre.game.${gid}`, title);
+    navigate(`/game/${gid}`);
   };
 
   return (
@@ -61,13 +60,11 @@ export default function PlacePage() {
               <div key={i} style={{ flex: 'none', width: '100%', height: '100%', boxSizing: 'border-box', padding: '0 16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'repeat(3, 1fr)', gap: 12 }}>
                 {pg.map((g) => g && (
                   <motion.button key={g.id} whileTap={{ scale: 0.94 }} onClick={() => tap(g.id, g.title)}
-                    animate={armed === g.id ? { scale: [1, 1.05, 1] } : { scale: 1 }}
-                    style={{ border: armed === g.id ? '4px solid var(--c-primary)' : '4px solid transparent', borderRadius: 24, background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, cursor: 'pointer', boxShadow: 'var(--c-shadow)', minHeight: 0 }}>
+                    style={{ border: 0, borderRadius: 24, background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, cursor: 'pointer', boxShadow: 'var(--c-shadow)', minHeight: 0 }}>
                     {g.image
                       ? <img src={g.image} alt="" draggable={false} style={{ width: '78%', flex: 1, minHeight: 0, objectFit: 'contain', mixBlendMode: 'multiply' }} />
                       : <span style={{ fontSize: 52, lineHeight: 1 }}>{g.icon}</span>}
                     <span style={{ ...big, fontSize: 13, color: 'var(--c-ink)', opacity: 0.6, textAlign: 'center', padding: '0 6px' }}>{g.title}</span>
-                    {armed === g.id && <span style={{ ...big, fontSize: 12, color: 'var(--c-primary)' }}>▶ ще раз — граємо</span>}
                   </motion.button>
                 ))}
               </div>

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PLACES } from '@/pages/preschool/places';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { profileClass } from '@/games/registry';
 import type { ClassLevel } from '@/games/types';
@@ -12,6 +11,7 @@ import type { ClassLevel } from '@/games/types';
  * Живе лише в `vite dev` (import.meta.env.DEV) — у прод не збирається.
  */
 type Item = { label: string; to: string; kid?: ClassLevel };
+// лише пропрацьовані екрани (09.10); нове — додаємо після того, як пройшли його з Тарасом
 const MAP: { title: string; items: Item[] }[] = [
   {
     title: 'Вхід',
@@ -29,14 +29,11 @@ const MAP: { title: string; items: Item[] }[] = [
     ],
   },
   {
-    title: 'Дитина',
+    title: 'Дитина (дошкілля)',
     items: [
       { label: 'Хто грає?', to: '/onboarding?pick=1' },
-      { label: 'Головна дошкілля (Дарина)', to: '/hub', kid: 'preschool' },
-      { label: 'Головна 2 клас (Соломія)', to: '/hub', kid: 'grade2' },
-      ...PLACES.map((p) => ({ label: `${p.emoji} ${p.title}`, to: `/place/${p.id}`, kid: 'preschool' as ClassLevel })),
-      { label: 'Гра: знайди букву', to: '/game/letters-find', kid: 'preschool' },
-      { label: 'Гра: знайди цифру', to: '/game/recognize-digit', kid: 'preschool' },
+      { label: 'Головна', to: '/hub', kid: 'preschool' },
+      { label: '🔤 Острів Слів', to: '/place/island', kid: 'preschool' },
     ],
   },
 ];
