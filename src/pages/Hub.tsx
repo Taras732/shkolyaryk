@@ -195,7 +195,7 @@ export default function Hub() {
             </div>
             <div className="hub-topright">
               <FirePill /><StarsPill /><Avatar />
-              <button onClick={() => navigate('/onboarding')} className="g-iconbtn" title="Змінити профіль" aria-label="Змінити профіль"><Repeat size={16} strokeWidth={1.75} /></button>
+              <button onClick={() => navigate('/onboarding?pick=1')} className="g-iconbtn" title="Змінити профіль" aria-label="Змінити профіль"><Repeat size={16} strokeWidth={1.75} /></button>
             </div>
           </div>
 

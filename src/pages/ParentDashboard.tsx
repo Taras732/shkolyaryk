@@ -175,7 +175,7 @@ export default function ParentDashboard() {
           {/* Topbar */}
           <div className="pd-topbar">
             <div className="pd-topbar-left">
-              <button className="pd-back" onClick={() => navigate('/onboarding')} aria-label="Назад">
+              <button className="pd-back" onClick={() => navigate('/onboarding?pick=1')} aria-label="Назад">
                 <ArrowLeft size={18} strokeWidth={2} />
               </button>
               <span className="font-display" style={{ fontSize: '15px', color: 'var(--text-dark)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
@@ -599,7 +599,7 @@ export default function ParentDashboard() {
 
           {/* Back button */}
           <button
-            onClick={() => navigate('/onboarding')}
+            onClick={() => navigate('/onboarding?pick=1')}
             className="btn-clay"
             style={{ width: '100%', marginTop: '32px' }}
           >

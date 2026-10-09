@@ -18,7 +18,7 @@ export default function Auth() {
 
   useEffect(() => {
     if (user) {
-      navigate('/role');
+      navigate('/');
     }
   }, [user, navigate]);
 
@@ -218,7 +218,7 @@ export default function Auth() {
           {/* Guest Auth — явний анонімний вхід (прогрес пишеться в БД без реєстрації) */}
           <button
             type="button"
-            onClick={async () => { await signInGuest(); navigate('/role'); }}
+            onClick={async () => { await signInGuest(); navigate('/'); }}
             disabled={loading}
             className="btn-clay accent"
             style={{ width: '100%', marginTop: '8px' }}

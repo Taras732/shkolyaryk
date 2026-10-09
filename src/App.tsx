@@ -14,6 +14,7 @@ import AfterSchool from './pages/AfterSchool';
 import Homework from './pages/Homework';
 import Family from './pages/Family';
 import Sheet from './pages/Sheet';
+import Start from './pages/Start';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 const Poc = lazy(() => import('./pages/poc/Poc'));
@@ -50,11 +51,15 @@ export default function App() {
     <Router>
       <Routes>
         {/* Вхід у продукт: Welcome → Auth → RoleSelect → Onboarding → Placement → Hub. */}
-        <Route path="/" element={<PhoneFrame><Welcome /></PhoneFrame>} />
+        {/* вхід одним екраном (09.10.2026); старі екрани — під /old/*, для відкату */}
+        <Route path="/" element={<WebShell><Start /></WebShell>} />
+        <Route path="/old/welcome" element={<PhoneFrame><Welcome /></PhoneFrame>} />
         <Route path="/welcome" element={<Navigate to="/" replace />} />
         <Route path="/auth" element={<PhoneFrame><Auth /></PhoneFrame>} />
-        <Route path="/role" element={<PhoneFrame><RoleSelect /></PhoneFrame>} />
-        <Route path="/onboarding" element={<PhoneFrame><Onboarding /></PhoneFrame>} />
+        <Route path="/role" element={<Navigate to="/" replace />} />
+        <Route path="/old/role" element={<PhoneFrame><RoleSelect /></PhoneFrame>} />
+        <Route path="/onboarding" element={<WebShell><Start /></WebShell>} />
+        <Route path="/old/onboarding" element={<PhoneFrame><Onboarding /></PhoneFrame>} />
         {/* S1: кабінет батьків — веб-SaaS layout, як Hub/GamePlayer, а не телефонна рамка. */}
         <Route path="/parent" element={<WebShell><ParentDashboard /></WebShell>} />
         <Route path="/hub" element={<WebShell><Hub /></WebShell>} />
