@@ -35,6 +35,8 @@ const MAP: { title: string; items: Item[] }[] = [
       { label: 'Головна', to: '/hub', kid: 'preschool' },
       { label: '🔤 Острів Слів', to: '/place/island', kid: 'preschool' },
       { label: '🔤 Острів Слів · English', to: '/place/island?lang=en', kid: 'preschool' },
+      { label: '💎 Печера Скарбів', to: '/place/cave', kid: 'preschool' },
+      { label: '🧩 Ліс Загадок', to: '/place/forest', kid: 'preschool' },
     ],
   },
 ];
