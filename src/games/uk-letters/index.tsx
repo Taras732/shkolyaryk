@@ -3,7 +3,7 @@ import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData }
 import { BOARD_DONE } from '../types';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { hasUkAudio, sayUk, sayUkSeq } from '../shared/uk-audio';
-import { SayButton } from '../shared/ui';
+import { Balloons, FiveStars, TaskBubble } from '../shared/preschool';
 import { findLetterKey, letterParts } from '../shared/spoken-names';
 import { introKey, introText, wordKey, type Letter } from './letters';
 import {
@@ -46,42 +46,25 @@ const BIG_LETTER = { fontSize: 120, fontWeight: 900, lineHeight: 1, color: 'var(
 
 const say = (l: Letter) => sayUk(wordKey(l), l.word);
 
-function SayBtn({ onClick }: { onClick: () => void }) {
-  if (!hasUkAudio()) return null;
-  return (
-    <button type="button" className="g-btn soft" style={{ width: 'auto', padding: '10px 20px', fontSize: 17, marginTop: 10 }} onClick={onClick}>
-      🔊 Послухай
-    </button>
-  );
-}
-
 function Intro({ letter, onDone }: { letter: Letter; onDone: () => void }) {
-  useEffect(() => sayUk(introKey(letter), introText(letter)), [letter]);
+  const hear = () => sayUk(introKey(letter), introText(letter));
+  useEffect(hear, [letter]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
-    <>
-      <div className="g-card" style={{ marginBottom: 16 }}>
-        <div className="g-question">Нова буква</div>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 18 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <TaskBubble text="Нова буква!" onSay={hear} />
+      <button type="button" onClick={hear}
+        style={{ border: 0, cursor: 'pointer', background: '#fff', borderRadius: 32, boxShadow: 'var(--c-shadow)', padding: '18px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
           <span style={BIG_LETTER}>{letter.ch}</span>
           <span style={{ ...BIG_LETTER, fontSize: 64, color: 'var(--c-mut)' }}>{letter.ch.toLowerCase()}</span>
         </div>
-        <div style={{ fontSize: 72, marginTop: 10 }}>{letter.emoji}</div>
-        <div style={{ fontSize: 30, fontWeight: 900, color: 'var(--c-ink)', marginTop: 4 }}>
-          {letter.initial ? (
-            <>
-              <span style={{ color: 'var(--c-primary)' }}>{letter.word[0].toUpperCase()}</span>
-              {letter.word.slice(1)}
-            </>
-          ) : (
-            letter.word
-          )}
+        <div style={{ fontSize: 72 }}>{letter.emoji}</div>
+        <div style={{ fontSize: 30, fontWeight: 900, color: 'var(--c-ink)', fontFamily: 'var(--font-round)' }}>
+          {letter.initial ? (<><span style={{ color: 'var(--c-primary)' }}>{letter.word[0].toUpperCase()}</span>{letter.word.slice(1)}</>) : letter.word}
         </div>
-        <SayBtn onClick={() => sayUk(introKey(letter), introText(letter))} />
-      </div>
-      <button className="g-btn primary" onClick={onDone}>
-        Пограємо! →
       </button>
-    </>
+      <button className="g-btn primary" onClick={onDone}>Пограємо! →</button>
+    </div>
   );
 }
 
@@ -139,77 +122,57 @@ function Quiz({
     }
   };
 
-  const prompt =
-    q.mode === 'letter' ? (
-      <>
-        <div className="g-question">З якої букви починається?</div>
-        <div style={{ fontSize: 96 }}>{q.target.emoji}</div>
-        <SayBtn onClick={() => say(q.target)} />
-      </>
-    ) : sameHeard ? (
-      <>
-        <div className="g-question">Знайди букву</div>
-        <SayButton onClick={() => sayFind(q.target, true)} />
-      </>
-    ) : (
-      <>
-        <div className="g-question">{q.mode === 'same' ? 'Знайди таку саму букву' : 'Що починається з цієї букви?'}</div>
-        <div style={BIG_LETTER}>{q.target.ch}</div>
-      </>
-    );
+  const task =
+    q.mode === 'letter' ? 'З якої букви починається?' : q.mode === 'picture' ? 'Що починається з цієї букви?' : sameHeard ? 'Знайди букву, яку я скажу!' : 'Знайди таку саму букву';
+  const onSay = q.mode === 'letter' ? () => say(q.target) : sameHeard ? () => sayFind(q.target, true) : q.mode === 'picture' ? () => sayUkSeq([{ key: `n_${q.target.ch}`, text: q.target.ch }]) : undefined;
+  // що показати під бульбашкою: картинку слова, букву (для «картинки») або нічого (ціль лише звучить)
+  const shown =
+    q.mode === 'letter' ? <span style={{ fontSize: 96, lineHeight: 1 }}>{q.target.emoji}</span>
+    : q.mode === 'picture' || !sameHeard ? <span style={{ ...BIG_LETTER, fontSize: 96 }}>{q.target.ch}</span>
+    : null;
+  const state = !picked ? 'idle' : correct ? 'correct' : 'incorrect';
 
   return (
-    <>
-      <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 800, color: 'var(--c-mut)', marginBottom: 8 }}>
-        {idx + 1} / {queue.length}
-      </div>
-      <div className={`g-card${picked && !correct ? ' shake' : ''}`} style={{ marginBottom: 6 }}>
-        {prompt}
-      </div>
-      <div className="g-choices" style={{ ['--g-cols' as string]: q.options.length > 3 ? 2 : 3 }}>
-        {q.options.map((o) => {
-          const cls = !picked ? '' : o.ch === q.target.ch ? (o.ch === picked ? ' correct' : ' reveal') : o.ch === picked ? ' wrong' : '';
-          return (
-            <button key={o.ch} className={`g-choice${cls}`} disabled={!!picked} onClick={() => pick(o)} style={{ fontSize: q.mode === 'picture' ? 52 : 64, padding: '14px 4px' }}>
-              {q.mode === 'picture' ? o.emoji : o.ch}
-            </button>
-          );
-        })}
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <FiveStars filled={Math.round((idx / queue.length) * 5)} />
+      <TaskBubble text={task} onSay={onSay}>
+        {shown && <div style={{ background: '#fff', borderRadius: 28, boxShadow: 'var(--c-shadow)', padding: '10px 26px' }} className={picked && !correct ? 'shake' : ''}>{shown}</div>}
+      </TaskBubble>
+      <Balloons
+        options={q.options.map((o) => ({ value: o.ch, node: q.mode === 'picture' ? <span style={{ fontSize: 50 }}>{o.emoji}</span> : o.ch }))}
+        correct={q.target.ch}
+        disabled={!!picked}
+        answerState={state}
+        onPick={(ch) => pick(q.options.find((o) => o.ch === ch)!)}
+      />
       {picked && !correct && (
-        <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '12px 14px', textAlign: 'center', color: GREEN, fontWeight: 900, fontSize: 22 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ background: '#fff', borderRadius: 20, boxShadow: 'var(--c-shadow)', padding: '12px 14px', textAlign: 'center', color: GREEN, fontWeight: 900, fontSize: 24 }}>
             {q.target.ch} — {q.target.emoji} {q.target.word}
           </div>
-          <button className="g-btn primary" onClick={next}>
-            Далі →
-          </button>
+          <button className="g-btn primary" onClick={next}>Далі →</button>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
 const STATUS_BG: Record<Status, string> = { locked: '#EEF0F5', learning: '#FFE7B3', known: '#CDEFD2', gold: '#FFD95A' };
 const STATUS_INK: Record<Status, string> = { locked: '#B5B9C9', learning: '#8A5A00', known: '#1E7A3A', gold: '#7A5200' };
 
-/** Смужка буквара: 33 букви групами; сірі — ще ні, жовті — вчу, зелені — знаю, золоті — закріплено повтором. */
+/** Смужка буквара: лише поточна група, великими плитками; колір — стан букви. */
 function LetterStrip({ progress }: { progress: LetterProgress }) {
-  const cur = currentGroup(progress);
+  const gi = Math.min(currentGroup(progress), GROUPS.length - 1);
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 6, marginBottom: 10 }}>
-      {GROUPS.map((g, gi) => (
-        <div key={g.title} style={{ display: 'flex', gap: 2, padding: 2, borderRadius: 8, outline: gi === cur ? '2px solid var(--c-primary)' : 'none' }}>
-          {g.letters.map((ch) => {
-            const st = statusOf(progress[ch]);
-            return (
-              <span key={ch} title={ch} style={{ width: 18, height: 22, borderRadius: 5, display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 900, fontFamily: 'var(--font-round)', background: STATUS_BG[st], color: STATUS_INK[st] }}>
-                {st === 'locked' ? '' : ch}
-              </span>
-            );
-          })}
-        </div>
-      ))}
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
+      {GROUPS[gi].letters.map((ch) => {
+        const st = statusOf(progress[ch]);
+        return (
+          <span key={ch} style={{ width: 40, height: 44, borderRadius: 12, display: 'grid', placeItems: 'center', fontSize: 24, fontWeight: 900, fontFamily: 'var(--font-round)', background: st === 'locked' ? 'rgba(255,255,255,.7)' : STATUS_BG[st], color: st === 'locked' ? '#B5B9C9' : STATUS_INK[st], boxShadow: 'var(--c-shadow)' }}>
+            {ch}
+          </span>
+        );
+      })}
     </div>
   );
 }

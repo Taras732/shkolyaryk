@@ -36,6 +36,12 @@ def items() -> dict[str, tuple[str, str]]:
         out[f"n_{ch}"] = (f"{name.capitalize()}.", RATE_NAME)
     for i, name in enumerate(re.findall(r"'([^']+)'", digits)):
         out[f"d_{i}"] = (f"{name.capitalize()}.", RATE_NAME)
+    # буквар: слово-опора (w_<слово>) і знайомство з буквою (l_<буква>)
+    names = dict(re.findall(r"(\S): '([^']+)'", letters))
+    lsrc = (ROOT / "src" / "games" / "uk-letters" / "letters.ts").read_text(encoding="utf-8")
+    for ch, word in re.findall(r"L\('(.)', '([^']+)'", lsrc):
+        out[f"w_{word}"] = (f"{word.capitalize()}.", RATE_NAME)
+        out[f"l_{ch}"] = (f"Це буква {names.get(ch, ch)}. {word.capitalize()}.", RATE_PHRASE)
     return out
 
 
