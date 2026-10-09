@@ -24,8 +24,16 @@ const FRIENDS = [
   { id: 'dragon', img: '/creatures/zodiac_dragon_fire.png', bg: '#FFE9D6' },
   { id: 'horse', img: '/creatures/zodiac_horse_water.png', bg: '#EDE7FF' },
 ];
+// ролі звірятами, не емодзі: дорослий — великий бичок із зайченям, учень — тигреня
+const ROLES: { id: Role; title: string; hint: string; bg: string; imgs: string[] }[] = [
+  { id: 'parent', title: 'Я дорослий', hint: 'додам дитину', bg: '#FFE9D6', imgs: ['/creatures/zodiac_ox_earth.png', '/creatures/zodiac_rabbit_wood.png'] },
+  { id: 'student', title: 'Я учень', hint: 'граю сам', bg: '#DFF7E6', imgs: ['/creatures/zodiac_tiger_metal.png'] },
+];
 const AGE_GROUP: Record<ClassLevel, '5-6' | '6-7' | '7-8'> = { preschool: '5-6', grade1: '6-7', grade2: '7-8', grade3: '7-8', grade4: '7-8' };
 const TILE_BG = ['#FFE9D6', '#DFF7E6', '#EDE7FF', '#FFF3C8', '#FFE3EC', '#E3EEFF'];
+
+/** Тло екранів входу: мʼякий пастельний градієнт замість сірого (як небо над головною). */
+const BG = 'radial-gradient(120% 60% at 50% 0%, #EFE9FF 0%, transparent 70%), radial-gradient(90% 50% at 0% 100%, #FFE9D6 0%, transparent 70%), radial-gradient(90% 50% at 100% 100%, #DFF7E6 0%, transparent 70%), #FBFAFF';
 
 const big = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 const card = { background: '#fff', borderRadius: 24, boxShadow: 'var(--c-shadow)' } as const;
@@ -100,7 +108,7 @@ export default function Start() {
   const levels = role === 'student' ? CLASS_LEVELS.filter((l) => l !== 'preschool') : CLASS_LEVELS;
 
   return (
-    <div style={{ width: '100%', height: '100dvh', background: 'var(--c-bg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: '100%', height: '100dvh', background: BG, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px calc(16px + env(safe-area-inset-bottom))', maxWidth: 520, width: '100%', margin: '0 auto' }}>
         {step === 'hello' && (
           <>
@@ -112,12 +120,18 @@ export default function Start() {
               <div style={{ ...big, fontSize: 15, color: 'var(--c-mut)' }}>Граємося та вчимося</div>
             </div>
 
-            <div style={{ ...big, fontSize: 15, color: 'var(--c-mut)', textAlign: 'center' }}>Хто ви?</div>
+            <div style={{ ...big, fontSize: 15, color: 'var(--c-mut)', textAlign: 'center' }}>Хто тут?</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {([['parent', '👨‍👩‍👧', 'Батьки', '#FFE9D6'], ['student', '🧒', 'Я учень', '#DFF7E6']] as const).map(([r, e, l, bg]) => (
-                <motion.button key={r} whileTap={{ scale: 0.95 }} onClick={() => setRole(r)}
-                  style={{ ...big, border: 0, borderRadius: 22, background: bg, padding: '14px 8px', fontSize: 16, color: 'var(--c-ink)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, boxShadow: role === r ? '0 0 0 3px var(--c-primary)' : 'var(--c-shadow)' }}>
-                  <span style={{ fontSize: 34 }}>{e}</span>{l}
+              {ROLES.map((r) => (
+                <motion.button key={r.id} whileTap={{ scale: 0.95 }} onClick={() => setRole(r.id)}
+                  style={{ ...big, border: 0, borderRadius: 22, background: r.bg, padding: '10px 8px 12px', fontSize: 16, color: 'var(--c-ink)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, boxShadow: role === r.id ? '0 0 0 3px var(--c-primary)' : 'var(--c-shadow)' }}>
+                  <span style={{ height: 70, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                    {r.imgs.map((src, i) => (
+                      <img key={src} src={src} alt="" style={{ height: i === 0 ? 70 : 46, marginLeft: i ? -14 : 0, objectFit: 'contain' }} />
+                    ))}
+                  </span>
+                  {r.title}
+                  <span style={{ fontSize: 12, color: 'var(--c-mut)' }}>{r.hint}</span>
                 </motion.button>
               ))}
             </div>

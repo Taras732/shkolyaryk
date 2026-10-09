@@ -19,6 +19,8 @@ import { useAuthStore } from '@/stores/useAuthStore';
 
 const Poc = lazy(() => import('./pages/poc/Poc'));
 const PlacePage = lazy(() => import('./pages/preschool/PlacePage'));
+// панель розробника — лише в vite dev, у прод не збирається
+const DevNav = import.meta.env.DEV ? lazy(() => import('./components/DevNav')) : null;
 import { runFamilySync } from '@/school/family-sync-run';
 
 // Легасі-сторінки (Welcome/Auth/Onboarding/...) поки в телефонній рамці.
@@ -79,6 +81,7 @@ export default function App() {
         {/* Невідомий URL → на головну (без білого екрана). */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      {DevNav && <Suspense fallback={null}><DevNav /></Suspense>}
     </Router>
   );
 }
