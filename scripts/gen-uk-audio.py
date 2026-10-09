@@ -9,6 +9,7 @@
 """
 import asyncio
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -77,6 +78,11 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_fly"] = ("Лови світлячків!", RATE_PHRASE)
     out["p_fly_bee"] = ("Лови світлячків, але не чіпай бджілку!", RATE_PHRASE)
     out["pre.done"] = ("Ура! Гру пройдено!", RATE_PHRASE)
+    # Лічильна Гора (10.10)
+    out["p_count"] = ("Скільки тут?", RATE_PHRASE)
+    out["p_more"] = ("Де більше?", RATE_PHRASE)
+    out["p_sum"] = ("Скільки разом?", RATE_PHRASE)
+    out["p_share"] = ("Розклади порівну!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
         out[f"odd_{cid}"] = (f"Молодець! Решта — {plural}.", RATE_PHRASE)
@@ -92,6 +98,19 @@ OVERRIDES: dict[str, tuple[str, str, str]] = {
 }
 
 
+def trim_tail(path: Path) -> None:
+    """Хвіст тиші edge-tts (~1.1 с) обрізаємо до 0.15 с: інакше між «Знайди цифру» і «пʼять»
+    виходить півтори секунди (Тарас 10.10: «скоротити вдвічі»). Повторний прогін нічого не змінює."""
+    tmp = path.with_suffix(".tmp.mp3")
+    subprocess.run(
+        ["ffmpeg", "-y", "-loglevel", "error", "-i", str(path), "-af",
+         "areverse,silenceremove=start_periods=1:start_threshold=-40dB:start_silence=0.15,areverse",
+         "-b:a", "48k", str(tmp)],
+        check=True,
+    )
+    tmp.replace(path)
+
+
 async def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for key, (text, rate) in items().items():
@@ -102,6 +121,7 @@ async def main() -> None:
         if key in OVERRIDES:
             voice, text, rate = OVERRIDES[key]
         await edge_tts.Communicate(text, voice, rate=rate).save(str(path))
+        trim_tail(path)
         print("ok", key)
     keys = sorted(p.stem for p in OUT.glob("*.mp3"))
     body = ",\n".join(f"  '{k}'" for k in keys)
@@ -118,4 +138,8 @@ async def main() -> None:
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
+    if "--trim-all" in sys.argv:
+        for f in sorted(OUT.glob("*.mp3")):
+            trim_tail(f)
+        print("trimmed all")
     asyncio.run(main())

@@ -1,5 +1,10 @@
+import { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import type { GameDefinition, GameComponentProps } from '../types';
 import { PromptCard, ChoiceGrid } from '../shared/ui';
+import { sayUk } from '../shared/uk-audio';
+import { usePreschool } from '../shared/preschool';
+import { Objects, SceneTask } from '../shared/count-ui';
 import { generate, type Payload } from './generate';
 
 function Bunch({ n, emoji }: { n: number; emoji: string }) {
@@ -26,7 +31,47 @@ function Bunch({ n, emoji }: { n: number; emoji: string }) {
   );
 }
 
-function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, number>) {
+/**
+ * Дошкілля (10.10.2026): тицяєш саму купку, де більше, — без чисел.
+ * Порівняти «на око» малюк уміє раніше, ніж знає цифри.
+ */
+function PreschoolCompare({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, number>) {
+  const { l, r, emoji } = round.payload;
+  const correct = Math.max(l, r);
+  const [sel, setSel] = useState<number | null>(null);
+  useEffect(() => {
+    if (answerState === 'idle') setSel(null);
+  }, [answerState]);
+  const say = (again?: boolean) => (again || round.id === 'r0') && sayUk('p_more', 'Де більше?');
+  const m = Math.max(l, r);
+  const size = m <= 3 ? 42 : m <= 5 ? 32 : m <= 8 ? 26 : 21;
+  return (
+    <SceneTask question="Де більше?" say={say} sayKey={round.id}>
+      <div style={{ display: 'flex', gap: 14, alignItems: 'center', position: 'relative', zIndex: 1 }}>
+        {[l, r].map((n, i) => {
+          const picked = sel === i;
+          const ok = picked && answerState === 'correct';
+          const wrong = picked && answerState === 'incorrect';
+          const hint = answerState === 'incorrect' && n === correct;
+          return (
+            <motion.button key={i} type="button" disabled={disabled} whileTap={{ scale: 0.94 }}
+              onClick={() => { if (disabled) return; setSel(i); onAnswer(n); }}
+              style={{ border: 0, cursor: 'pointer', background: ok ? '#DCF7E3' : '#fff', borderRadius: 30, padding: '16px 12px', minWidth: 150, minHeight: 210,
+                display: 'grid', placeItems: 'center', boxShadow: `0 7px 0 ${ok ? '#9FDDB0' : '#EED9BF'}${ok || hint ? ', 0 0 0 4px #22C55E' : ''}`,
+                opacity: answerState === 'correct' && !picked ? 0.45 : 1, animation: ok ? 'pk-pop .45s ease-out forwards' : wrong ? 'pk-shake .4s ease' : undefined }}>
+              <Objects n={n} emoji={emoji} size={size} />
+            </motion.button>
+          );
+        })}
+      </div>
+    </SceneTask>
+  );
+}
+
+function Component(props: GameComponentProps<Payload, number>) {
+  const preschool = usePreschool();
+  if (preschool) return <PreschoolCompare {...props} />;
+  const { round, disabled, answerState, onAnswer } = props;
   const { l, r, emoji } = round.payload;
   const correct = Math.max(l, r);
   // Варіанти = дві кількості (обери більше число).
