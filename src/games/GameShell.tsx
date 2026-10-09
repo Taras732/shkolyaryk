@@ -377,7 +377,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
         <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520, margin: '0 auto', padding: '16px 16px 28px' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
             <FiveStars filled={five} size={36} />
-            <img src="/creatures/zodiac_rabbit_wood.png" alt="" onLoad={() => sayUk('pre.well', 'Молодець!')}
+            <img src="/creatures/zodiac_rabbit_wood.png" alt="" onLoad={() => sayUk('pre.done', 'Ура! Гру пройдено!')}
               style={{ width: 180, animation: 'pk-float 1.6s ease-in-out infinite' }} />
             <div style={{ fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 32, color: 'var(--c-ink)' }}>Молодець!</div>
           </div>

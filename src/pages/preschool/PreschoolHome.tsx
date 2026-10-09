@@ -87,7 +87,7 @@ export default function PreschoolHome() {
                   const now = i === 0;
                   return (
                     <motion.button key={s.gameId} whileTap={{ scale: 0.93 }}
-                      onClick={() => { if (g) sayUk(`pre.game.${g.id}`, g.title); navigate(`/game/${s.gameId}`); }}
+                      onClick={() => navigate(`/game/${s.gameId}`)}
                       animate={now ? { y: [0, -3, 0] } : { y: 0 }} transition={now ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
                       style={{ position: 'relative', aspectRatio: '1', borderRadius: 18, border: 0, padding: 4, cursor: 'pointer', background: '#fff', boxShadow: now ? '0 0 0 3px #F08A24, 0 5px 0 #F1E3CF' : '0 5px 0 #F1E3CF', display: 'grid', placeItems: 'center', minWidth: 0 }}
                       aria-label={g?.title}>
@@ -119,7 +119,7 @@ export default function PreschoolHome() {
                   <div key={i} style={{ flex: 'none', width: '100%', height: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 10, paddingRight: 1 }}>
                     {pg.map((p) => (
                       <motion.button key={p.id} whileTap={{ scale: 0.95 }}
-                        onClick={() => { sayUk(`pre.place.${p.id}`, p.title); navigate(`/place/${p.id}`); }}
+                        onClick={() => navigate(`/place/${p.id}`)}
                         style={{ border: 0, borderRadius: 26, background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: 8, cursor: 'pointer', boxShadow: '0 5px 0 #F1E3CF', minHeight: 0 }}>
                         {p.image
                           ? <img src={p.image} alt="" draggable={false} style={{ width: '80%', flex: 1, minHeight: 0, objectFit: 'contain', mixBlendMode: 'multiply', borderRadius: 16 }} />

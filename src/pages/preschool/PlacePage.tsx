@@ -38,7 +38,8 @@ export default function PlacePage() {
 
   // тап — одразу в гру; назва звучить по дорозі (рішення 09.10: без «натисни ще раз»)
   const tap = (gid: string, title: string) => {
-    sayUk(`pre.game.${gid}`, title);
+    // назву не вимовляємо: гра оголошує завдання сама (інакше двічі одне й те саме, 09.10)
+    void title;
     navigate(`/game/${gid}?from=${place!.id}`);
   };
 
