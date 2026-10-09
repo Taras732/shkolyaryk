@@ -97,7 +97,7 @@ const card = { background: '#fff', borderRadius: 24, boxShadow: 'var(--c-shadow)
 const primary = { ...big, border: 0, borderRadius: 20, padding: '15px 0', fontSize: 18, background: 'var(--c-primary)', color: '#fff', cursor: 'pointer' } as const;
 const tile = { ...big, border: 0, borderRadius: 22, padding: '22px 0', fontSize: 18, color: 'var(--c-ink)', cursor: 'pointer', boxShadow: 'var(--c-shadow)' } as const;
 const field = { ...big, fontSize: 16, border: 0, borderRadius: 16, background: 'var(--c-bg)', padding: '13px 16px', color: 'var(--c-ink)', outline: 'none' } as const;
-const arrowBtn = { border: 0, background: '#fff', borderRadius: '50%', width: 44, height: 44, fontSize: 28, fontWeight: 900, color: 'var(--c-primary)', cursor: 'pointer', boxShadow: 'var(--c-shadow)' } as const;
+const label = { ...big, fontSize: 13, color: 'var(--c-mut)', margin: '0 0 6px 4px' } as const;
 const link = { ...big, border: 0, background: 'none', fontSize: 13, color: 'var(--c-mut)', cursor: 'pointer', padding: 4 } as const;
 
 function readRole(): Role | null {
@@ -120,7 +120,6 @@ export default function Start() {
   const [friend, setFriend] = useState(FRIENDS[0].id);
   const [sheet, setSheet] = useState<'signin' | 'signup' | 'signup-adult' | 'mail'>('signin');
   const [code, setCode] = useState('');
-  const [childPage, setChildPage] = useState(0);
   const [codeMsg, setCodeMsg] = useState('');
   const [mailNew, setMailNew] = useState(false);
   const [email, setEmail] = useState('');
@@ -197,12 +196,6 @@ export default function Start() {
   };
 
   if (step === null) return null;
-  // два варіанти екрана «Додай дитину» на вибір Тараса (?c=a | ?c=b)
-  const childVariant = new URLSearchParams(window.location.search).get('c') === 'b' ? 'b' : 'a';
-  const fi = Math.max(0, FRIENDS.findIndex((x) => x.id === friend));
-  const friendImg = FRIENDS[fi].img;
-  const friendBg = FRIENDS[fi].bg;
-  const shiftFriend = (d: number) => setFriend(FRIENDS[(fi + d + FRIENDS.length) % FRIENDS.length].id);
   const levels = role === 'student' ? CLASS_LEVELS.filter((l) => l !== 'preschool') : CLASS_LEVELS;
 
   return (
@@ -285,87 +278,52 @@ export default function Start() {
           </>
         )}
 
-        {step === 'child' && childVariant === 'a' && (
+        {step === 'child' && (
           <>
-            {/* A — крок за кроком: одне питання на екран */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
-              <button onClick={() => (childPage ? setChildPage(childPage - 1) : setStep('hello'))} style={{ ...link, fontSize: 22 }} aria-label="Назад">←</button>
-              <div style={{ flex: 1, display: 'flex', gap: 6 }}>
-                {[0, 1, 2].map((i) => <div key={i} style={{ flex: 1, height: 8, borderRadius: 8, background: i <= childPage ? 'var(--c-primary)' : '#fff' }} />)}
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-              <img src="/creatures/zodiac_rabbit_wood.png" alt="" style={{ width: 64 }} />
-              <div style={{ ...big, ...card, flex: 1, padding: '12px 14px', fontSize: 20, color: 'var(--c-ink)' }}>
-                {childPage === 0 ? (role === 'student' ? 'Як тебе звати?' : 'Як звати дитину?') : childPage === 1 ? (role === 'student' ? 'У якому ти класі?' : `${name.trim() || 'Дитина'} ходить у…`) : 'Обери друга!'}
+            {/* один екран у стилі великих плиток (рішення 09.10): імʼя, садок/клас, друг */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+              <button onClick={() => setStep('hello')} style={{ ...link, fontSize: 22 }} aria-label="Назад">←</button>
+              <img src="/creatures/zodiac_rabbit_wood.png" alt="" style={{ width: 52 }} />
+              <div style={{ ...big, ...card, flex: 1, padding: '10px 14px', fontSize: 19, color: 'var(--c-ink)' }}>
+                {role === 'student' ? 'Розкажи про себе!' : 'Додаймо дитину!'}
               </div>
             </div>
 
-            {childPage === 0 && (
-              <>
-                <input autoFocus value={name} onChange={(e) => setName(e.target.value)} maxLength={20} placeholder="Імʼя"
-                  style={{ ...big, ...card, border: 0, fontSize: 30, textAlign: 'center', padding: '22px 12px', color: 'var(--c-ink)', outline: 'none', marginTop: 10 }} />
-                <div style={{ flex: 1 }} />
-                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setChildPage(1)} disabled={!name.trim()} style={{ ...primary, opacity: name.trim() ? 1 : 0.45 }}>Далі</motion.button>
-              </>
-            )}
+            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={20} placeholder={role === 'student' ? 'Твоє імʼя' : 'Імʼя дитини'}
+              style={{ ...big, ...card, border: 0, fontSize: 26, textAlign: 'center', padding: '14px 12px', color: 'var(--c-ink)', outline: 'none' }} />
 
-            {childPage === 1 && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+            <div>
+              <div style={label}>{role === 'student' ? 'Клас' : 'Садок чи клас'}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                 {levels.map((l, i) => (
-                  <motion.button key={l} whileTap={{ scale: 0.95 }} onClick={() => { setLevel(l); setChildPage(2); }}
-                    style={{ ...big, border: 0, borderRadius: 24, background: TILE_BG[i % TILE_BG.length], padding: '18px 8px', cursor: 'pointer', boxShadow: level === l ? '0 0 0 3px var(--c-primary)' : 'var(--c-shadow)', color: 'var(--c-ink)', gridColumn: l === 'preschool' ? 'span 2' : undefined }}>
-                    <div style={{ fontSize: l === 'preschool' ? 26 : 44, lineHeight: 1 }}>{l === 'preschool' ? 'Ще в садочку' : l.slice(-1)}</div>
-                    <div style={{ fontSize: 14, color: 'var(--c-mut)', marginTop: 4 }}>{l === 'preschool' ? '3–6 років' : 'клас'}</div>
+                  <motion.button key={l} whileTap={{ scale: 0.95 }} onClick={() => setLevel(l)}
+                    style={{ ...big, border: 0, borderRadius: 20, background: TILE_BG[i % TILE_BG.length], padding: l === 'preschool' ? '12px 0' : '12px 0', cursor: 'pointer', color: 'var(--c-ink)', gridColumn: l === 'preschool' ? 'span 4' : undefined, boxShadow: level === l ? '0 0 0 3px var(--c-primary)' : 'var(--c-shadow)', lineHeight: 1 }}>
+                    {l === 'preschool' ? (
+                      <span style={{ fontSize: 20 }}>Ще в садочку <span style={{ fontSize: 13, color: 'var(--c-mut)' }}>· 3–6 років</span></span>
+                    ) : (
+                      <>
+                        <div style={{ fontSize: 40 }}>{l.slice(-1)}</div>
+                        <div style={{ fontSize: 12, color: 'var(--c-mut)', marginTop: 2 }}>клас</div>
+                      </>
+                    )}
                   </motion.button>
                 ))}
               </div>
-            )}
-
-            {childPage === 2 && (
-              <>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
-                  {FRIENDS.map((fr) => (
-                    <motion.button key={fr.id} whileTap={{ scale: 0.93 }} onClick={() => setFriend(fr.id)} aria-label={fr.id}
-                      animate={friend === fr.id ? { y: [0, -8, 0] } : { y: 0 }} transition={{ duration: 0.4 }}
-                      style={{ border: 0, borderRadius: 26, background: fr.bg, padding: 10, cursor: 'pointer', aspectRatio: '1', minWidth: 0, boxShadow: friend === fr.id ? '0 0 0 4px var(--c-primary)' : 'var(--c-shadow)' }}>
-                      <img src={fr.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                    </motion.button>
-                  ))}
-                </div>
-                <div style={{ flex: 1 }} />
-                <motion.button whileTap={{ scale: 0.97 }} onClick={create} style={primary}>Готово</motion.button>
-              </>
-            )}
-          </>
-        )}
-
-        {step === 'child' && childVariant === 'b' && (
-          <>
-            {/* B — як створення героя: друг по центру, імʼя табличкою, вік одним рядом */}
-            <div style={{ ...big, fontSize: 24, color: 'var(--c-ink)', textAlign: 'center', marginTop: 6 }}>{role === 'student' ? 'Це ти!' : 'Новий гравець'}</div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4 }}>
-              <button onClick={() => shiftFriend(-1)} style={arrowBtn} aria-label="Попередній друг">‹</button>
-              <motion.div key={friend} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                style={{ width: 190, height: 190, borderRadius: '50%', background: friendBg, display: 'grid', placeItems: 'center', boxShadow: 'var(--c-shadow)' }}>
-                <img src={friendImg} alt="" style={{ width: 160, height: 160, objectFit: 'contain' }} />
-              </motion.div>
-              <button onClick={() => shiftFriend(1)} style={arrowBtn} aria-label="Наступний друг">›</button>
             </div>
-            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={20} placeholder={role === 'student' ? 'Твоє імʼя' : 'Імʼя дитини'}
-              style={{ ...big, border: 0, borderRadius: 18, background: '#fff', boxShadow: 'var(--c-shadow)', fontSize: 26, textAlign: 'center', padding: '14px 12px', color: 'var(--c-ink)', outline: 'none', margin: '6px 30px 0' }} />
-            <div style={{ ...card, padding: 10, marginTop: 6 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${levels.length}, 1fr)`, gap: 6 }}>
-                {levels.map((l) => (
-                  <button key={l} onClick={() => setLevel(l)}
-                    style={{ ...big, border: 0, borderRadius: 16, padding: '10px 0', cursor: 'pointer', background: level === l ? 'var(--c-primary)' : 'var(--c-bg)', color: level === l ? '#fff' : 'var(--c-ink)', lineHeight: 1.05 }}>
-                    <div style={{ fontSize: l === 'preschool' ? 15 : 24 }}>{l === 'preschool' ? 'Садок' : l.slice(-1)}</div>
-                    <div style={{ fontSize: 10, opacity: 0.75 }}>{l === 'preschool' ? '3–6 р.' : 'клас'}</div>
-                  </button>
+
+            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+              <div style={label}>Друг</div>
+              <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 10 }}>
+                {FRIENDS.map((fr) => (
+                  <motion.button key={fr.id} whileTap={{ scale: 0.93 }} onClick={() => setFriend(fr.id)} aria-label={fr.id}
+                    animate={friend === fr.id ? { y: [0, -8, 0] } : { y: 0 }} transition={{ duration: 0.4 }}
+                    style={{ border: 0, borderRadius: 24, background: fr.bg, padding: 6, cursor: 'pointer', minWidth: 0, minHeight: 0, boxShadow: friend === fr.id ? '0 0 0 3px var(--c-primary)' : 'var(--c-shadow)' }}>
+                    <img src={fr.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  </motion.button>
                 ))}
               </div>
             </div>
-            <div style={{ flex: 1 }} />
+
             <motion.button whileTap={{ scale: 0.97 }} onClick={create} disabled={!name.trim()} style={{ ...primary, opacity: name.trim() ? 1 : 0.45 }}>Готово</motion.button>
           </>
         )}
