@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { CLASS_LEVELS, type ClassLevel } from '@/games/types';
 import PuppetBunny from '@/pages/poc/PuppetBunny';
+import { deviceChild, redeemCode, setDeviceChild } from '@/school/device-code';
 import type { Face } from '@/pages/poc/Bunny';
 
 /**
@@ -136,9 +137,19 @@ export default function Start() {
   const wantPick = new URLSearchParams(window.location.search).has('pick');
   // ?add=1 — батьки додають дитину з «Батькам»; після «Готово» повертаємось туди з кодом
   const wantAdd = new URLSearchParams(window.location.search).has('add');
+  // ?login=1 — показати вхід, як на новому пристрої (для перевірки коду на одному браузері)
+  const wantLogin = new URLSearchParams(window.location.search).has('login');
   useEffect(() => {
     if (loading || step !== null) return;
-    if (wantAdd) setStep('child');
+    const mine = deviceChild();
+    const own = mine ? profiles.find((p) => p.id === mine) : undefined;
+    if (wantLogin) setStep('hello');
+    else if (wantAdd) setStep('child');
+    else if (own && !wantPick) {
+      // пристрій дитини (увійшла за кодом) — одразу її головна
+      selectProfile(own.id);
+      navigate('/hub', { replace: true });
+    }
     else if (wantPick && profiles.length > 0) setStep('pick');
     else if (profiles.length === 1) {
       selectProfile(profiles[0].id);
@@ -146,7 +157,7 @@ export default function Start() {
     } else if (profiles.length > 1) setStep('pick');
     else if (user && readRole() !== 'student') navigate('/parents', { replace: true }); // батьки без дітей — дашборд з підсвіченим «Додай дитину»
     else setStep(user ? 'child' : 'hello');
-  }, [loading, profiles, step, wantPick, wantAdd, user, selectProfile, navigate]);
+  }, [loading, profiles, step, wantPick, wantAdd, wantLogin, user, selectProfile, navigate]);
 
   // повернення з Google веде на /onboarding = цей самий екран; далі вирішує ефект маршруту
   const google = async () => {
@@ -161,9 +172,18 @@ export default function Start() {
   };
 
   // TODO(supabase): код родини звіряється на сервері (таблиця family_codes); без бази — чесна відмова
-  const joinFamily = async () => {
+  const joinFamily = async (value: string) => {
+    const id = redeemCode(value);
+    const kid = id ? useProfileStore.getState().profiles.find((p) => p.id === id) : undefined;
+    if (!kid) {
+      setCodeMsg('Код не підходить або вже протермінований. Попроси новий.');
+      setCode('');
+      return;
+    }
     pickRole('student');
-    setCodeMsg('Код поки не перевірити: потрібна база (Supabase).');
+    setDeviceChild(kid.id); // пристрій тепер її: далі одразу головна
+    selectProfile(kid.id);
+    navigate('/hub', { replace: true });
   };
 
   const pickRole = (r: Role) => {
@@ -241,7 +261,7 @@ export default function Start() {
                       const v = e.target.value.replace(/\D/g, '').slice(0, 6);
                       setCode(v);
                       setCodeMsg('');
-                      if (v.length === 6) joinFamily(); // шоста цифра — входимо одразу, без кнопки
+                      if (v.length === 6) joinFamily(v); // шоста цифра — входимо одразу, без кнопки
                     }}
                     style={{ ...field, textAlign: 'center', fontSize: 26, letterSpacing: 8, padding: '10px 12px' }} />
                   {codeMsg && <div style={{ ...big, fontSize: 13, color: '#B04A6A', textAlign: 'center' }}>{codeMsg}</div>}

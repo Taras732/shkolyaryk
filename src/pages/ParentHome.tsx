@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { getGame, profileClass } from '@/games/registry';
 import { CLASS_META } from '@/games/types';
+import { issueCode } from '@/school/device-code';
 
 /**
  * «Батькам» — дашборд батьків (рішення 09.10.2026).
@@ -22,17 +23,11 @@ const AVATAR: Record<string, string> = {
   ox: '/creatures/zodiac_ox_earth.png',
   monkey: '/creatures/zodiac_monkey_fire.png',
 };
-const CODE_TTL_MS = 15 * 60 * 1000;
 const SKY = 'linear-gradient(180deg, #BFE3FF 0%, #DDEFFF 40%, #F3EEFF 100%)';
 const big = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 const card = { background: '#fff', borderRadius: 24, boxShadow: 'var(--c-shadow)' } as const;
 const primary = { ...big, border: 0, borderRadius: 20, padding: '14px 0', fontSize: 17, background: 'var(--c-primary)', color: '#fff', cursor: 'pointer', width: '100%' } as const;
 const soft = { ...big, border: 0, borderRadius: 16, padding: '12px 0', fontSize: 15, background: 'var(--c-bg)', color: 'var(--c-primary)', cursor: 'pointer' } as const;
-
-function newCode(): string {
-  const n = crypto.getRandomValues(new Uint32Array(1))[0] % 1_000_000;
-  return String(n).padStart(6, '0');
-}
 
 export default function ParentHome() {
   const navigate = useNavigate();
@@ -52,7 +47,7 @@ export default function ParentHome() {
 
   // щойно додали дитину (?code=<id>) — одразу показати код для неї
   useEffect(() => {
-    if (params.get('code') && child && !code) setCode({ value: newCode(), until: Date.now() + CODE_TTL_MS });
+    if (params.get('code') && child && !code) setCode(issueCode(child.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [child?.id]);
 
@@ -164,12 +159,12 @@ export default function ParentHome() {
                     <button onClick={share} style={soft}>Поділитися</button>
                   </div>
                 ) : (
-                  <button onClick={() => setCode({ value: newCode(), until: Date.now() + CODE_TTL_MS })} style={primary}>Новий код</button>
+                  <button onClick={() => setCode(issueCode(child.id))} style={primary}>Новий код</button>
                 )}
                 <div style={{ ...big, fontSize: 12, color: 'var(--c-mut)', textAlign: 'center' }}>На пристрої дитини: Школярик → «або код від батьків»</div>
               </div>
             ) : (
-              <button onClick={() => setCode({ value: newCode(), until: Date.now() + CODE_TTL_MS })} style={primary}>Підключити пристрій дитини</button>
+              <button onClick={() => setCode(issueCode(child.id))} style={primary}>Підключити пристрій дитини</button>
             )}
 
             <button onClick={() => navigate('/?add=1')} style={soft}>+ Додати ще дитину</button>
