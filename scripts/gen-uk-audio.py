@@ -74,6 +74,8 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_odd"] = ("Що тут зайве?", RATE_PHRASE)
     out["p_remember"] = ("Запамʼятай!", RATE_PHRASE)
     out["p_changed"] = ("Що змінилось?", RATE_PHRASE)
+    out["p_fly"] = ("Лови світлячків!", RATE_PHRASE)
+    out["p_fly_bee"] = ("Лови світлячків, але не чіпай бджілку!", RATE_PHRASE)
     out["pre.done"] = ("Ура! Гру пройдено!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

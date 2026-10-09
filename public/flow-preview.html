@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Новий шлях входу</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1F2138; --mut:#7A7D99; --pri:#7c3aed; --soft:#EDE7FF; --peach:#FFE9D6; --mint:#DFF7E6; --sun:#FFF3C8; --rose:#FFE3EC; --line:#D9D4F2; }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:'Nunito',system-ui,sans-serif; color:var(--ink); background:linear-gradient(180deg,#F1EEFF,#FFF4F7); padding:28px 24px 60px; }
+  h1 { font-weight:900; font-size:26px; }
+  .sub { color:var(--mut); font-weight:700; margin:6px 0 26px; }
+  .lane { background:#fff8; border:1.5px solid var(--line); border-radius:24px; padding:18px 18px 22px; margin-bottom:22px; }
+  .lane h2 { font-size:15px; font-weight:900; text-transform:uppercase; letter-spacing:.6px; color:var(--pri); margin-bottom:4px; }
+  .lane p.note { color:var(--mut); font-weight:700; font-size:13px; margin-bottom:14px; }
+  .row { display:flex; align-items:center; gap:10px; overflow-x:auto; padding:12px 4px 4px; }
+  .arrow { font-size:26px; color:#B9B2E6; flex:none; }
+  .phone { flex:none; width:170px; height:330px; border-radius:26px; background:#fff; box-shadow:0 6px 18px #5b3fd21f; padding:14px 12px; display:flex; flex-direction:column; gap:8px; position:relative; }
+  .num { position:absolute; top:-10px; left:-8px; background:var(--pri); color:#fff; font-weight:900; font-size:13px; width:26px; height:26px; border-radius:50%; display:grid; place-items:center; }
+  .t { font-weight:900; font-size:15px; text-align:center; line-height:1.15; }
+  .s { font-size:11px; color:var(--mut); font-weight:700; text-align:center; }
+  .btn { border-radius:14px; padding:9px; text-align:center; font-weight:900; font-size:12px; background:var(--pri); color:#fff; }
+  .btn.ghost { background:var(--soft); color:var(--pri); }
+  .pick { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .pick div { border-radius:14px; padding:10px 4px; text-align:center; font-weight:900; font-size:12px; background:var(--peach); }
+  .pick div.on { outline:2.5px solid var(--pri); }
+  .field { border-radius:10px; background:#F4F3FA; padding:8px; font-size:11px; color:var(--mut); font-weight:700; }
+  .chips { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; }
+  .chips span { font-size:10.5px; font-weight:900; padding:5px 7px; border-radius:99px; background:var(--soft); color:var(--pri); }
+  .chips span.on { background:var(--pri); color:#fff; }
+  .mascot { width:70px; height:70px; margin:0 auto; border-radius:50%; display:grid; place-items:center; overflow:hidden; }
+  .mascot img { width:100%; }
+  .kids { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .kid { border-radius:16px; background:var(--peach); padding:6px; text-align:center; font-weight:900; font-size:11px; }
+  .kid:nth-child(2){background:var(--mint)} .kid:nth-child(3){background:var(--soft)} .kid:nth-child(4){background:var(--sun)}
+  .kid img { width:44px; display:block; margin:0 auto; }
+  .home { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .home div { border-radius:14px; display:grid; place-items:end center; padding-bottom:6px; font-size:10px; font-weight:900; }
+  .bubble { display:flex; align-items:center; gap:6px; }
+  .bubble img { width:34px; }
+  .bubble span { background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:5px 8px; font-size:11px; font-weight:900; }
+  .tabbar { display:flex; justify-content:space-around; font-size:10px; font-weight:900; color:var(--mut); border-top:1px solid #eee; padding-top:6px; }
+  .tabbar b { color:var(--pri); }
+  .gone { margin-top:6px; display:flex; gap:8px; flex-wrap:wrap; }
+  .gone span { font-size:12px; font-weight:800; color:#B04A6A; background:var(--rose); border-radius:99px; padding:5px 10px; text-decoration:line-through; }
+  .lock { font-size:10.5px; text-align:center; font-weight:800; color:var(--mut); }
+</style>
+</head>
+<body>
+  <h1>Новий шлях входу</h1>
+  <div class="sub">Роль і вік питаємо один раз. Далі дитина щоразу потрапляє одразу на свою головну.</div>
+
+  <div class="lane">
+    <h2>А · Реєструються батьки (перший раз)</h2>
+    <p class="note">Основний шлях. Батьки створюють профіль кожної дитини і вказують вік.</p>
+    <div class="row">
+      <div class="phone"><span class="num">1</span>
+        <div class="mascot" style="background:var(--peach)"><img src="/creatures/zodiac_rabbit_wood.png" alt=""></div>
+        <div class="t">Школярик</div><div class="s">Граємося та вчимося</div>
+        <div style="flex:1"></div>
+        <div class="btn">Почати</div><div class="btn ghost">Вже маю акаунт</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">2</span>
+        <div class="t">Хто реєструється?</div>
+        <div class="pick"><div class="on">👨‍👩‍👧<br>Батьки</div><div style="background:var(--mint)">🧒<br>Я учень</div></div>
+        <div class="field">email</div><div class="field">пароль</div>
+        <div class="btn">Створити</div>
+        <div class="s">або Google · або без акаунта</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">3</span>
+        <div class="t">Додай дитину</div>
+        <div class="field">Імʼя: Дарина</div>
+        <div class="s">Скільки років?</div>
+        <div class="chips"><span class="on">Дошкілля</span><span>1 клас</span><span>2 клас</span><span>3 клас</span><span>4 клас</span></div>
+        <div class="s">Друг</div>
+        <div class="chips"><span class="on">🐰</span><span>🐯</span><span>🐲</span></div>
+        <div style="flex:1"></div>
+        <div class="btn ghost">+ Ще дитина</div><div class="btn">Готово</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">4</span>
+        <div class="t">Хто грає?</div>
+        <div class="kids">
+          <div class="kid"><img src="/creatures/zodiac_rabbit_wood.png" alt="">Дарина</div>
+          <div class="kid"><img src="/creatures/zodiac_tiger_metal.png" alt="">Марія</div>
+          <div class="kid"><img src="/creatures/zodiac_dragon_fire.png" alt="">Соломія</div>
+          <div class="kid"><img src="/creatures/zodiac_horse_water.png" alt="">Емілія</div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="lock">🔒 Батькам</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">5</span>
+        <div class="bubble"><img src="/creatures/zodiac_rabbit_wood.png" alt=""><span>Привіт! Пограємо?</span></div>
+        <div class="home">
+          <div style="background:var(--peach)">Острів Слів</div><div style="background:var(--soft)">Лічильна Гора</div>
+          <div style="background:var(--sun)">Ліс Загадок</div><div style="background:var(--rose)">Печера Скарбів</div>
+        </div>
+        <div class="tabbar"><b>Дім</b><span>Друг</span><span>Батькам</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <h2>Б · Реєструється учень сам (перший раз)</h2>
+    <p class="note">Для старших, які читають. Дошкілля сюди не потрапляє: його реєструють батьки.</p>
+    <div class="row">
+      <div class="phone"><span class="num">1</span><div class="t">Вітання</div><div class="s">те саме, що в А</div></div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">2</span>
+        <div class="t">Хто реєструється?</div>
+        <div class="pick"><div>👨‍👩‍👧<br>Батьки</div><div class="on" style="background:var(--mint)">🧒<br>Я учень</div></div>
+        <div class="field">email або Google</div><div class="btn">Далі</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">3</span>
+        <div class="t">Про тебе</div>
+        <div class="field">Як тебе звати?</div>
+        <div class="s">У якому ти класі?</div>
+        <div class="chips"><span>1 клас</span><span class="on">2 клас</span><span>3 клас</span><span>4 клас</span></div>
+        <div class="s">Обери друга</div>
+        <div class="chips"><span>🐰</span><span class="on">🐯</span><span>🐲</span></div>
+        <div style="flex:1"></div><div class="btn">Готово</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">4</span><div class="t">Головна свого класу</div><div class="s">поки шкільна, як зараз; нова — у п.3 плану</div></div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <h2>В · Кожен наступний раз</h2>
+    <p class="note">Без вітання і без входу: акаунт запамʼятовується.</p>
+    <div class="row">
+      <div class="phone"><span class="num">·</span><div class="t">Відкрив застосунок</div><div class="s" style="margin-top:10px">одна дитина в пристрої</div></div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">5</span><div class="t">Одразу головна</div><div class="s">нуль кроків</div></div>
+      <span class="arrow" style="margin-left:24px">·</span>
+      <div class="phone"><span class="num">·</span><div class="t">Відкрив застосунок</div><div class="s" style="margin-top:10px">кілька дітей</div></div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">4</span><div class="t">Хто грає?</div><div class="s">один тап</div></div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">5</span><div class="t">Головна дитини</div></div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <h2>Знімаємо з шляху</h2>
+    <div class="gone"><span>«Хто заходить?» окремим екраном</span><span>Тест рівня для нового профілю</span><span>«Мій день» для дошкілля</span><span>Вітання при кожному вході</span></div>
+    <p class="note" style="margin-top:10px">Екрани в коді лишаються — лише не стоять на шляху. Відкат простий.</p>
+  </div>
+</body>
+</html>

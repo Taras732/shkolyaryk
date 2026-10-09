@@ -107,6 +107,8 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'p_changed',
   'p_find_digit',
   'p_find_letter',
+  'p_fly',
+  'p_fly_bee',
   'p_odd',
   'p_remember',
   'pre.done',

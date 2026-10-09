@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Шлях дитини</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1F2138; --mut:#7A7D99; --pri:#7c3aed; --soft:#EDE7FF; --peach:#FFE9D6; --mint:#DFF7E6; --sun:#FFF3C8; --rose:#FFE3EC; --line:#D9D4F2; }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:'Nunito',system-ui,sans-serif; color:var(--ink); background:linear-gradient(180deg,#DDEFFF,#F3EEFF 40%,#FFF4F7); padding:28px 24px 60px; }
+  h1 { font-weight:900; font-size:26px; }
+  .sub { color:var(--mut); font-weight:700; margin:6px 0 24px; }
+  .lane { background:#fffa; border:1.5px solid var(--line); border-radius:24px; padding:18px 18px 22px; margin-bottom:20px; }
+  .lane h2 { font-size:15px; font-weight:900; text-transform:uppercase; letter-spacing:.6px; color:var(--pri); margin-bottom:4px; }
+  .note { color:var(--mut); font-weight:700; font-size:13px; margin-bottom:10px; }
+  .row { display:flex; align-items:flex-start; gap:10px; overflow-x:auto; padding:12px 4px 4px; }
+  .arrow { font-size:26px; color:#B9B2E6; flex:none; align-self:center; }
+  .col { flex:none; width:184px; display:flex; flex-direction:column; gap:8px; }
+  .phone { height:340px; border-radius:26px; background:#fff; box-shadow:0 6px 18px #5b3fd21f; padding:12px; display:flex; flex-direction:column; gap:7px; position:relative; overflow:hidden; }
+  .num { position:absolute; top:6px; left:6px; background:var(--pri); color:#fff; font-weight:900; font-size:12px; width:22px; height:22px; border-radius:50%; display:grid; place-items:center; z-index:2; }
+  .t { font-weight:900; font-size:14px; text-align:center; line-height:1.15; }
+  .s { font-size:10.5px; color:var(--mut); font-weight:700; text-align:center; }
+  .tag { font-size:11px; font-weight:900; border-radius:10px; padding:6px 8px; }
+  .tag.now { background:#F4F3FA; color:var(--mut); }
+  .tag.new { background:var(--mint); color:#1E7A3A; }
+  .bub { display:flex; align-items:center; gap:5px; }
+  .bub img { width:34px; }
+  .bub span { background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:4px 7px; font-size:10.5px; font-weight:900; }
+  .kid { border-radius:16px; padding:6px; text-align:center; font-weight:900; font-size:11px; }
+  .kid img { width:46px; display:block; margin:0 auto; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .tile { border-radius:14px; display:grid; place-items:center; font-size:26px; height:62px; position:relative; }
+  .tile b { position:absolute; right:4px; bottom:3px; font-size:11px; }
+  .stars { text-align:center; font-size:15px; letter-spacing:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
+  .opt span { background:#fff; border-radius:12px; text-align:center; padding:9px 0; font-weight:900; font-size:18px; box-shadow:0 2px 6px #0001; }
+  .say { width:60px; height:60px; border-radius:50%; background:#fff; margin:4px auto; display:grid; place-items:center; font-size:26px; box-shadow:0 2px 8px #0001; }
+  .btn { border-radius:12px; padding:8px; text-align:center; font-weight:900; font-size:12px; background:var(--pri); color:#fff; }
+  .btn.ghost { background:var(--soft); color:var(--pri); }
+  .path { position:relative; flex:1; }
+  .st { position:absolute; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font-size:18px; background:#fff; box-shadow:0 2px 6px #0002; }
+  .st.done { background:var(--mint); } .st.cur { outline:3px solid var(--pri); } .st.lock { opacity:.45; }
+  .q { background:#fff; border:1.5px dashed #F2B8C9; border-radius:16px; padding:12px 14px; margin-top:6px; }
+  .q h3 { font-size:14px; font-weight:900; color:#B04A6A; margin-bottom:6px; }
+  .q li { font-size:13px; font-weight:700; margin:4px 0 4px 18px; }
+</style>
+</head>
+<body>
+  <h1>Шлях дитини</h1>
+  <div class="sub">Що бачить дитина від відкриття до кінця гри. Під кожним екраном — що є зараз і що змінюємо.</div>
+
+  <div class="lane">
+    <h2>Спільний пристрій батьків (зараз)</h2>
+    <p class="note">Батьки вже увійшли. Дитина відкриває застосунок — і далі все без читання: звук, картинки, зайчик.</p>
+    <div class="row">
+      <div class="col">
+        <div class="phone" style="background:linear-gradient(#DDEFFF,#F3EEFF)"><span class="num">1</span>
+          <div class="t" style="margin-top:6px">Хто грає?</div>
+          <div class="grid2">
+            <div class="kid" style="background:var(--peach)"><img src="/creatures/zodiac_rabbit_wood.png" alt="">Дарина</div>
+            <div class="kid" style="background:var(--mint)"><img src="/creatures/zodiac_tiger_metal.png" alt="">Марія</div>
+            <div class="kid" style="background:var(--soft)"><img src="/creatures/zodiac_dragon_fire.png" alt="">Соломія</div>
+            <div class="kid" style="background:var(--sun)"><img src="/creatures/zodiac_horse_water.png" alt="">Емілія</div>
+          </div>
+        </div>
+        <div class="tag now">Є: картки з іменами, без звуку</div>
+        <div class="tag new">Нове: тап — друг каже імʼя голосом; великі картки на галявині</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="col">
+        <div class="phone" style="background:#F6F7FB"><span class="num">2</span>
+          <div class="bub" style="margin-top:6px"><img src="/creatures/zodiac_rabbit_wood.png" alt=""><span>Привіт! Пограємо?</span></div>
+          <div style="background:var(--pri);border-radius:14px;padding:6px" class="grid2"><div class="tile" style="background:#fff;height:40px;font-size:18px">🔤</div><div class="tile" style="background:#ffffff33;height:40px;font-size:18px">🔢</div></div>
+          <div class="grid2"><div class="tile" style="background:var(--peach)">📚</div><div class="tile" style="background:var(--soft)">🧮</div><div class="tile" style="background:var(--sun)">🧩</div><div class="tile" style="background:var(--rose)">⭐</div></div>
+        </div>
+        <div class="tag now">Є: головна дошкілля (08.10) — лишаємо</div>
+        <div class="tag new">Нове: лише фон галявини, як на вході</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="col">
+        <div class="phone" style="background:linear-gradient(#FFE9D6,#FFF6EC)"><span class="num">3</span>
+          <div class="bub" style="margin-top:6px"><img src="/creatures/zodiac_rabbit_wood.png" alt=""><span>Острів Слів! Куди підемо?</span></div>
+          <div class="path">
+            <svg viewBox="0 0 160 220" style="position:absolute;inset:0;width:100%;height:100%"><path d="M30 200 C 120 180, 140 140, 80 120 S 20 60, 120 20" fill="none" stroke="#E8C9A8" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 14"/></svg>
+            <div class="st done" style="left:10px;top:170px">🔤</div>
+            <div class="st done" style="left:95px;top:150px">🅰️</div>
+            <div class="st cur" style="left:60px;top:95px">🧩</div>
+            <div class="st lock" style="left:15px;top:50px">🔒</div>
+            <div class="st lock" style="left:105px;top:5px">🔒</div>
+          </div>
+        </div>
+        <div class="tag now">Є: білі картки з емодзі й підписами — дитина не прочитає</div>
+        <div class="tag new">Нове: стежка зі станціями; поточна світиться, тап — назва голосом (п.2 плану)</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="col">
+        <div class="phone" style="background:linear-gradient(#FFE9D6,#FFF6EC)"><span class="num">4</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px"><span style="font-size:14px">✕</span><span class="stars">⭐⭐☆☆☆</span></div>
+          <div class="bub"><img src="/creatures/zodiac_rabbit_wood.png" alt=""><span>Знайди букву…</span></div>
+          <div class="say">🔊</div>
+          <div style="flex:1"></div>
+          <div class="opt"><span>Ї</span><span>Т</span><span>Ц</span></div>
+        </div>
+        <div class="tag now">Є: сірий шкільний екран, смужка, «Легко»</div>
+        <div class="tag new">Нове: фон місця, зайчик з бульбашкою, 5 зірочок, ✕ — назад на стежку</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="col">
+        <div class="phone" style="background:linear-gradient(#FFF3C8,#FFF9E6)"><span class="num">5</span>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+            <div class="stars" style="font-size:24px">⭐⭐⭐</div>
+            <img src="/creatures/zodiac_rabbit_wood.png" alt="" style="width:80px">
+            <div class="t">Молодець!</div>
+          </div>
+          <div class="btn">Далі по стежці →</div>
+          <div class="btn ghost">Ще раз</div>
+        </div>
+        <div class="tag now">Є: загальний екран результату</div>
+        <div class="tag new">Нове: зайчик радіє голосом, станція на стежці відкривається</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <h2>Свій пристрій дитини (пізніше)</h2>
+    <p class="note">Один раз: дитина вводить код від батьків. Далі пристрій відкривається одразу на її головній.</p>
+    <div class="row">
+      <div class="col">
+        <div class="phone" style="background:linear-gradient(#DDEFFF,#F3EEFF)"><span class="num">1</span>
+          <div class="t" style="margin-top:30px">Код від батьків</div>
+          <div style="font-size:22px;font-weight:900;letter-spacing:4px;text-align:center;background:#fff;border-radius:12px;padding:8px 0">482 913</div>
+          <div class="btn">Далі</div>
+        </div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="col">
+        <div class="phone" style="background:linear-gradient(#DDEFFF,#F3EEFF)"><span class="num">2</span>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+            <img src="/creatures/zodiac_tiger_metal.png" alt="" style="width:90px"><div class="t">Привіт, Маріє!</div>
+          </div>
+        </div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="col">
+        <div class="phone" style="background:#F6F7FB"><span class="num">3</span><div class="t" style="margin-top:40px">Головна Марії</div><div class="s">далі як на спільному пристрої, кроки 2–5</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="q">
+    <h3>Що вирішити</h3>
+    <ol>
+      <li>Порядок робіт: спершу оболонка гри (4–5), потім стежка в місці (3)? Чи навпаки?</li>
+      <li>На «Хто грає?» друг каже імʼя голосом — генеруємо mp3 для кожного імені чи голос пристрою?</li>
+    </ol>
+  </div>
+</body>
+</html>

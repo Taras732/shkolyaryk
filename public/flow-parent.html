@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Шлях батьків</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1F2138; --mut:#7A7D99; --pri:#7c3aed; --soft:#EDE7FF; --peach:#FFE9D6; --mint:#DFF7E6; --sun:#FFF3C8; --rose:#FFE3EC; --sky:#DDEFFF; --line:#D9D4F2; }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:'Nunito',system-ui,sans-serif; color:var(--ink); background:linear-gradient(180deg,#DDEFFF,#F3EEFF 40%,#FFF4F7); padding:28px 24px 60px; }
+  h1 { font-weight:900; font-size:26px; }
+  .sub { color:var(--mut); font-weight:700; margin:6px 0 24px; }
+  .lane { background:#fffa; border:1.5px solid var(--line); border-radius:24px; padding:18px 18px 22px; margin-bottom:20px; }
+  .lane h2 { font-size:15px; font-weight:900; text-transform:uppercase; letter-spacing:.6px; color:var(--pri); margin-bottom:4px; }
+  .note { color:var(--mut); font-weight:700; font-size:13px; margin-bottom:10px; }
+  .row { display:flex; align-items:center; gap:10px; overflow-x:auto; padding:12px 4px 4px; }
+  .arrow { font-size:26px; color:#B9B2E6; flex:none; }
+  .phone { flex:none; width:180px; height:340px; border-radius:26px; background:#fff; box-shadow:0 6px 18px #5b3fd21f; padding:14px 12px; display:flex; flex-direction:column; gap:8px; position:relative; }
+  .num { position:absolute; top:-10px; left:-8px; background:var(--pri); color:#fff; font-weight:900; font-size:13px; width:26px; height:26px; border-radius:50%; display:grid; place-items:center; }
+  .t { font-weight:900; font-size:15px; text-align:center; line-height:1.15; }
+  .s { font-size:11px; color:var(--mut); font-weight:700; text-align:center; }
+  .btn { border-radius:14px; padding:9px; text-align:center; font-weight:900; font-size:12px; background:var(--pri); color:#fff; }
+  .btn.ghost { background:var(--soft); color:var(--pri); }
+  .field { border-radius:10px; background:#F4F3FA; padding:8px; font-size:11px; color:var(--mut); font-weight:700; }
+  .chips { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; }
+  .chips span { font-size:10.5px; font-weight:900; padding:5px 7px; border-radius:99px; background:var(--soft); color:var(--pri); }
+  .chips span.on { background:var(--pri); color:#fff; }
+  .item { display:flex; align-items:center; gap:8px; border-radius:14px; padding:8px; font-weight:900; font-size:12px; background:var(--peach); }
+  .item img { width:30px; }
+  .item small { display:block; font-size:10px; color:var(--mut); }
+  .item.off { background:#F4F3FA; color:#B5B7C9; }
+  .code { font-size:26px; font-weight:900; letter-spacing:5px; text-align:center; color:var(--pri); background:var(--soft); border-radius:14px; padding:10px 0; }
+  .qr { width:84px; height:84px; margin:0 auto; border-radius:10px; background:repeating-linear-gradient(45deg,#1F2138 0 4px,#fff 4px 8px), #fff; opacity:.85; }
+  .gate { font-size:22px; font-weight:900; text-align:center; background:var(--sun); border-radius:14px; padding:12px 0; }
+  .keys { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+  .keys span { background:#F4F3FA; border-radius:8px; text-align:center; padding:5px 0; font-weight:900; font-size:12px; }
+  .q { background:#fff; border:1.5px dashed #F2B8C9; border-radius:16px; padding:12px 14px; margin-top:6px; }
+  .q h3 { font-size:14px; font-weight:900; color:#B04A6A; margin-bottom:6px; }
+  .q li { font-size:13px; font-weight:700; margin:4px 0 4px 18px; }
+</style>
+</head>
+<body>
+  <h1>Шлях батьків</h1>
+  <div class="sub">Що бачать і роблять батьки: реєстрація, діти, підключення пристрою дитини. Дитячий шлях — наступним кроком.</div>
+
+  <div class="lane">
+    <h2>1 · Перший раз: реєстрація і діти</h2>
+    <p class="note">Один раз. Батьки створюють акаунт і додають усіх дітей.</p>
+    <div class="row">
+      <div class="phone"><span class="num">1</span>
+        <div class="t">Вхід</div><div style="flex:1"></div>
+        <div class="btn">Увійти через Google</div><div class="s">або поштою</div>
+        <div class="s" style="color:var(--pri)">Немає акаунта? Зареєструватися</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">2</span>
+        <div class="t">Хто реєструється?</div>
+        <div class="item" style="justify-content:center;outline:2.5px solid var(--pri)">Дорослий</div>
+        <div class="item" style="justify-content:center;background:var(--mint)">Учень</div>
+        <div style="flex:1"></div>
+        <div class="btn">Продовжити з Google</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">3</span>
+        <div class="t">Додай дитину</div>
+        <div class="field">Імʼя: Дарина</div>
+        <div class="chips"><span class="on">Дошкілля</span><span>1</span><span>2</span><span>3</span><span>4 клас</span></div>
+        <div class="chips"><span class="on">🐰</span><span>🐯</span><span>🐲</span><span>🦄</span></div>
+        <div style="flex:1"></div>
+        <div class="btn ghost">+ Ще дитина</div><div class="btn">Готово</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">4</span>
+        <div class="t">Хто грає?</div>
+        <div class="item"><img src="/creatures/zodiac_rabbit_wood.png" alt="">Дарина<small>дошкілля</small></div>
+        <div class="item" style="background:var(--mint)"><img src="/creatures/zodiac_tiger_metal.png" alt="">Марія<small>1 клас</small></div>
+        <div class="item" style="background:var(--soft)"><img src="/creatures/zodiac_dragon_fire.png" alt="">Соломія<small>2 клас</small></div>
+        <div class="item" style="background:var(--sun)"><img src="/creatures/zodiac_horse_water.png" alt="">Емілія<small>3 клас</small></div>
+        <div style="flex:1"></div><div class="s">🔒 Батькам</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <h2>2 · Розділ «Батькам»</h2>
+    <p class="note">За замком: задачка, яку дитина не розвʼяже. Тут усе керування.</p>
+    <div class="row">
+      <div class="phone"><span class="num">5</span>
+        <div class="t">Тільки для дорослих</div>
+        <div class="gate">47 + 28 = ?</div>
+        <div class="keys"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">6</span>
+        <div class="t">Батькам</div>
+        <div class="item">👧 Діти<small style="margin-left:auto">4</small></div>
+        <div class="item" style="background:var(--mint)">📱 Підключити пристрій дитини</div>
+        <div class="item off">📈 Прогрес · пізніше</div>
+        <div class="item off">⏱ Час гри · пізніше</div>
+        <div style="flex:1"></div><div class="s">Вийти з акаунта</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">7</span>
+        <div class="t">Діти</div>
+        <div class="item"><img src="/creatures/zodiac_rabbit_wood.png" alt="">Дарина<small>дошкілля · ✎</small></div>
+        <div class="item" style="background:var(--mint)"><img src="/creatures/zodiac_tiger_metal.png" alt="">Марія<small>1 клас · ✎</small></div>
+        <div class="s">✎ — імʼя, клас, друг, видалити</div>
+        <div style="flex:1"></div><div class="btn ghost">+ Додати дитину</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <h2>3 · Підключити пристрій дитини</h2>
+    <p class="note">Коли в дитини свій планшет чи телефон. Два способи — батьки обирають зручний.</p>
+    <div class="row">
+      <div class="phone"><span class="num">8</span>
+        <div class="t">Чий пристрій?</div>
+        <div class="item"><img src="/creatures/zodiac_rabbit_wood.png" alt="">Дарина</div>
+        <div class="item" style="background:var(--mint);outline:2.5px solid var(--pri)"><img src="/creatures/zodiac_tiger_metal.png" alt="">Марія</div>
+        <div class="item" style="background:var(--soft)"><img src="/creatures/zodiac_dragon_fire.png" alt="">Соломія</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">9</span>
+        <div class="t">Код для Марії</div>
+        <div class="code">482 913</div>
+        <div class="s">діє 15 хвилин</div>
+        <div class="qr"></div>
+        <div class="s">або наведи камеру пристрою дитини</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="phone"><span class="num">10</span>
+        <div class="t">Готово ✓</div>
+        <div class="s">Пристрій Марії підключено</div>
+        <div class="item" style="background:var(--mint)">📱 iPad · Марія<small style="margin-left:auto">відʼєднати</small></div>
+        <div style="flex:1"></div><div class="btn">Добре</div>
+      </div>
+      <span class="arrow" style="margin-left:18px">·</span>
+      <div class="phone"><span class="num">alt</span>
+        <div class="t">Або простіше</div>
+        <div class="s" style="margin-top:8px">Батьки беруть пристрій дитини, входять своїм Google і обирають дитину. Код не потрібен.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="q">
+    <h3>Що вирішити до дитячого шляху</h3>
+    <ol>
+      <li>Пристрій дитини прив'язаний до однієї дитини чи показує «Хто грає?» з усіма?</li>
+      <li>Код одноразовий на 15 хв (безпечніше) чи постійний код родини (простіше)?</li>
+      <li>«Прогрес» і «Час гри» показуємо сірими «пізніше» чи ховаємо до готовності?</li>
+    </ol>
+  </div>
+</body>
+</html>
