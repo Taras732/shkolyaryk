@@ -33,12 +33,12 @@ export default function PlacePage() {
   };
 
   return (
-    <div style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', background: place.bg, overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', background: '#FFF8EE', overflow: 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 6px', maxWidth: 520, width: '100%', margin: '0 auto' }}>
         <motion.button whileTap={{ scale: 0.9 }} onClick={() => navigate('/hub')} aria-label="Додому"
-          style={{ width: 52, height: 52, borderRadius: '50%', border: 0, background: '#fff', fontSize: 26, boxShadow: 'var(--c-shadow)', cursor: 'pointer' }}>🏠</motion.button>
+          style={{ width: 46, height: 46, borderRadius: 14, border: 0, background: '#fff', fontSize: 22, boxShadow: '0 5px 0 #F1E3CF', cursor: 'pointer' }}>🏠</motion.button>
         <div style={{ ...big, flex: 1, fontSize: 20, color: 'var(--c-ink)' }}>{place.title}</div>
-        {place.image ? <img src={place.image} alt="" style={{ width: 56, height: 56, objectFit: 'contain', mixBlendMode: 'multiply' }} /> : <span style={{ fontSize: 40 }}>{place.emoji}</span>}
+        {place.image ? <img src={place.image} alt="" style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 16, background: '#fff', boxShadow: '0 4px 0 #F1E3CF' }} /> : <span style={{ fontSize: 40 }}>{place.emoji}</span>}
       </div>
 
       {games.length === 0 ? (
@@ -61,7 +61,7 @@ export default function PlacePage() {
               <div key={i} style={{ flex: 'none', width: '100%', height: '100%', boxSizing: 'border-box', padding: '0 16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'repeat(3, 1fr)', gap: 12 }}>
                 {pg.map((g) => g && (
                   <motion.button key={g.id} whileTap={{ scale: 0.94 }} onClick={() => tap(g.id, g.title)}
-                    style={{ border: 0, borderRadius: 24, background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, cursor: 'pointer', boxShadow: 'var(--c-shadow)', minHeight: 0 }}>
+                    style={{ border: 0, borderRadius: 26, background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, cursor: 'pointer', boxShadow: '0 5px 0 #F1E3CF', minHeight: 0 }}>
                     {g.image
                       ? <img src={g.image} alt="" draggable={false} style={{ width: '78%', flex: 1, minHeight: 0, objectFit: 'contain', mixBlendMode: 'multiply' }} />
                       : <span style={{ fontSize: 52, lineHeight: 1 }}>{g.icon}</span>}
@@ -77,7 +77,7 @@ export default function PlacePage() {
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, padding: '6px 0 calc(14px + env(safe-area-inset-bottom))' }}>
           {pages.map((_, i) => (
             <button key={i} onClick={() => setPage(i)} aria-label={`Сторінка ${i + 1}`}
-              style={{ width: i === page ? 24 : 10, height: 10, borderRadius: 9, border: 0, padding: 0, background: i === page ? 'var(--c-primary)' : 'rgba(0,0,0,.15)', cursor: 'pointer' }} />
+              style={{ width: i === page ? 24 : 10, height: 10, borderRadius: 9, border: 0, padding: 0, background: i === page ? '#F08A24' : '#EED9BF', cursor: 'pointer' }} />
           ))}
         </div>
       )}

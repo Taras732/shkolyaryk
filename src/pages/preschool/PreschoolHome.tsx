@@ -53,7 +53,7 @@ export default function PreschoolHome() {
   const big = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 
   return (
-    <div style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--c-bg)', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', background: '#FFF8EE', overflow: 'hidden' }}>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', padding: '10px 16px 8px', maxWidth: 520, width: '100%', margin: '0 auto' }}>
         {tab === 'friend' ? (
           <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center' }}><Companion /></div>
@@ -64,23 +64,23 @@ export default function PreschoolHome() {
               <div style={{ width: 92, flex: 'none' }}>
                 <PuppetBunny face={face} bounce={bounce} onZone={poke} />
               </div>
-              <div style={{ ...big, flex: 1, background: '#fff', borderRadius: 18, padding: '10px 12px', fontSize: 16, color: 'var(--c-ink)', boxShadow: 'var(--c-shadow)', position: 'relative' }}>
+              <div style={{ ...big, flex: 1, background: '#fff', borderRadius: 18, padding: '10px 12px', fontSize: 16, color: 'var(--c-ink)', boxShadow: '0 5px 0 #F1E3CF', position: 'relative' }}>
                 {hello}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 {/* хто грає: аватарка дитини; кілька дітей — тап змінює, одна — просто показ */}
                 <button onClick={profiles.length > 1 ? () => navigate('/onboarding?pick=1') : undefined} disabled={profiles.length < 2}
                   aria-label={profiles.length > 1 ? 'Змінити, хто грає' : activeProfile.nickname}
-                  style={{ width: 46, height: 46, borderRadius: '50%', border: 0, padding: 2, background: '#fff', boxShadow: profiles.length > 1 ? '0 0 0 2px var(--c-primary), var(--c-shadow)' : 'var(--c-shadow)', cursor: profiles.length > 1 ? 'pointer' : 'default' }}>
+                  style={{ width: 46, height: 46, borderRadius: '50%', border: 0, padding: 2, background: '#fff', boxShadow: profiles.length > 1 ? '0 0 0 3px #F08A24, 0 4px 0 #F1E3CF' : '0 5px 0 #F1E3CF', cursor: profiles.length > 1 ? 'pointer' : 'default' }}>
                   <img src={AVATAR[activeProfile.avatar_id] ?? AVATAR.rabbit} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </button>
-                <div style={{ ...big, background: '#fff', borderRadius: 99, padding: '3px 8px', fontSize: 13, boxShadow: 'var(--c-shadow)' }}>⭐ {activeProfile.total_stars}</div>
+                <div style={{ ...big, background: '#fff', borderRadius: 99, padding: '3px 8px', fontSize: 13, boxShadow: '0 5px 0 #F1E3CF' }}>⭐ {activeProfile.total_stars}</div>
               </div>
             </div>
 
             {/* на сьогодні: три картки з картинками; перша — «зараз» з ▶ на ній; тап — назва голосом і гра */}
-            <div style={{ background: 'var(--c-primary)', borderRadius: 22, padding: '8px 10px 10px', marginTop: 8 }}>
-              <div style={{ ...big, fontSize: 13, color: 'rgba(255,255,255,.85)', margin: '0 0 6px 4px' }}>На сьогодні</div>
+            <div style={{ background: '#FFE9D2', borderRadius: 26, padding: '8px 10px 12px', marginTop: 10, boxShadow: '0 6px 0 #F5D3AE' }}>
+              <div style={{ ...big, fontSize: 13, color: '#B07A3C', margin: '0 0 6px 4px' }}>На сьогодні</div>
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.max(1, plan.length)}, 1fr)`, gap: 8 }}>
                 {plan.map((s, i) => {
                   const g = getGame(s.gameId);
@@ -89,13 +89,13 @@ export default function PreschoolHome() {
                     <motion.button key={s.gameId} whileTap={{ scale: 0.93 }}
                       onClick={() => { if (g) sayUk(`pre.game.${g.id}`, g.title); navigate(`/game/${s.gameId}`); }}
                       animate={now ? { y: [0, -3, 0] } : { y: 0 }} transition={now ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
-                      style={{ position: 'relative', aspectRatio: '1', borderRadius: 18, border: 0, padding: 4, cursor: 'pointer', background: now ? '#fff' : 'rgba(255,255,255,.72)', boxShadow: now ? '0 0 0 4px rgba(255,255,255,.4)' : 'none', display: 'grid', placeItems: 'center', minWidth: 0 }}
+                      style={{ position: 'relative', aspectRatio: '1', borderRadius: 18, border: 0, padding: 4, cursor: 'pointer', background: '#fff', boxShadow: now ? '0 0 0 3px #F08A24, 0 5px 0 #F1E3CF' : '0 5px 0 #F1E3CF', display: 'grid', placeItems: 'center', minWidth: 0 }}
                       aria-label={g?.title}>
                       {g?.image
                         ? <img src={g.image} alt="" draggable={false} style={{ width: '88%', height: '88%', objectFit: 'contain', mixBlendMode: 'multiply', opacity: now ? 1 : 0.85 }} />
                         : <span style={{ fontSize: 40 }}>{g?.icon ?? '⭐'}</span>}
                       {now && (
-                        <span style={{ position: 'absolute', right: 6, bottom: 6, width: 30, height: 30, borderRadius: '50%', background: 'var(--c-primary)', color: '#fff', display: 'grid', placeItems: 'center', fontSize: 14, boxShadow: '0 2px 6px rgba(0,0,0,.2)' }}>▶</span>
+                        <span style={{ position: 'absolute', right: 6, bottom: 6, width: 30, height: 30, borderRadius: '50%', background: '#F08A24', color: '#fff', display: 'grid', placeItems: 'center', fontSize: 14, boxShadow: '0 3px 0 #C2620A' }}>▶</span>
                       )}
                     </motion.button>
                   );
@@ -120,7 +120,7 @@ export default function PreschoolHome() {
                     {pg.map((p) => (
                       <motion.button key={p.id} whileTap={{ scale: 0.95 }}
                         onClick={() => { sayUk(`pre.place.${p.id}`, p.title); navigate(`/place/${p.id}`); }}
-                        style={{ border: 0, borderRadius: 24, background: p.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: 8, cursor: 'pointer', boxShadow: 'var(--c-shadow)', minHeight: 0 }}>
+                        style={{ border: 0, borderRadius: 26, background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: 8, cursor: 'pointer', boxShadow: '0 5px 0 #F1E3CF', minHeight: 0 }}>
                         {p.image
                           ? <img src={p.image} alt="" draggable={false} style={{ width: '80%', flex: 1, minHeight: 0, objectFit: 'contain', mixBlendMode: 'multiply', borderRadius: 16 }} />
                           : <span style={{ fontSize: 56, flex: 1, display: 'grid', placeItems: 'center' }}>{p.emoji}</span>}
@@ -134,7 +134,7 @@ export default function PreschoolHome() {
             <div style={{ display: 'flex', justifyContent: 'center', gap: 8, paddingTop: 8 }}>
               {pages.map((_, i) => (
                 <button key={i} onClick={() => setPage(i)} aria-label={`Сторінка ${i + 1}`}
-                  style={{ width: i === page ? 24 : 10, height: 10, borderRadius: 9, border: 0, padding: 0, background: i === page ? 'var(--c-primary)' : 'var(--c-line)', cursor: 'pointer', transition: 'width .2s' }} />
+                  style={{ width: i === page ? 24 : 10, height: 10, borderRadius: 9, border: 0, padding: 0, background: i === page ? '#F08A24' : '#EED9BF', cursor: 'pointer', transition: 'width .2s' }} />
               ))}
             </div>
           </>
