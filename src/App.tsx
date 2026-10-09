@@ -20,8 +20,9 @@ import { useAuthStore } from '@/stores/useAuthStore';
 
 const Poc = lazy(() => import('./pages/poc/Poc'));
 const PlacePage = lazy(() => import('./pages/preschool/PlacePage'));
-// панель розробника — лише в vite dev, у прод не збирається
-const DevNav = import.meta.env.DEV ? lazy(() => import('./components/DevNav')) : null;
+// панель розробника — у vite dev і на дев-стенді (shkolyaryk-dev); на проді не показується
+const DEV_HOST = typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1|shkolyaryk-dev\.)/.test(window.location.hostname);
+const DevNav = import.meta.env.DEV || DEV_HOST ? lazy(() => import('./components/DevNav')) : null;
 import { runFamilySync } from '@/school/family-sync-run';
 
 // Легасі-сторінки (Welcome/Auth/Onboarding/...) поки в телефонній рамці.

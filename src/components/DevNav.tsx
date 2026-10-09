@@ -8,7 +8,7 @@ import type { ClassLevel } from '@/games/types';
  * Панель розробника — КАРТА ЕКРАНІВ по ролях: Вхід · Батьки · Дитина.
  * Кожен пункт відкриває екран у потрібному стані (з потрібною дитиною).
  * Правило: зʼявився новий екран — додаємо сюди рядок.
- * Живе лише в `vite dev` (import.meta.env.DEV) — у прод не збирається.
+ * Живе у `vite dev` і на дев-стенді (shkolyaryk-dev) — на проді не показується.
  */
 type Item = { label: string; to: string; kid?: ClassLevel };
 // лише пропрацьовані екрани (09.10); нове — додаємо після того, як пройшли його з Тарасом
@@ -80,13 +80,25 @@ export default function DevNav() {
     location.href = '/?login=1';
   };
 
-  const seed = async () => {
+  const ensureFamily = async () => {
     const st = useProfileStore.getState();
     for (const [name, cl, age, av] of FAMILY) {
       if (!useProfileStore.getState().profiles.some((p) => p.nickname === name)) await st.createProfile(name, age, av, undefined, cl);
     }
+  };
+  const seed = async () => {
+    await ensureFamily();
     setOpen(false);
     navigate('/onboarding?pick=1');
+  };
+  // без реєстрації — одразу головна Дарини (для тесту на дев-стенді)
+  const quickHome = async () => {
+    await ensureFamily();
+    const st = useProfileStore.getState();
+    const kid = st.profiles.find((p) => p.nickname === 'Дарина') ?? st.profiles.find((p) => profileClass(p) === 'preschool');
+    if (kid) st.selectProfile(kid.id);
+    setOpen(false);
+    navigate('/hub');
   };
 
   return (
@@ -97,6 +109,7 @@ export default function DevNav() {
             <button style={{ ...btn, background: '#FFE3EC', color: '#9d174d' }} onClick={reset}>⟲ Скинути все</button>
             <button style={{ ...btn, background: '#DFF7E6', color: '#166534' }} onClick={seed}>👪 Тестова родина</button>
           </div>
+          <button style={{ ...btn, background: '#FFE7CF', color: '#C2620A' }} onClick={quickHome}>⚡ Одразу на головну (Дарина)</button>
           {MAP.map((g) => (
             <div key={g.title} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={head}>{g.title}</div>
