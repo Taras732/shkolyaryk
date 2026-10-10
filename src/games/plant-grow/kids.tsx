@@ -46,6 +46,7 @@ export function KidsPlant({ round, disabled, onAnswer, onMistake }: GameComponen
   const plant = PLANTS.find((p) => p.id === round.payload.plant)!;
   const asks = round.payload.asks;
   const [stage, setStage] = useState(0);
+  const [busy, setBusy] = useState(false); // поки рослина росте, нові дотики не рахуються (повторні тапи 10.10)
   const [shake, setShake] = useState(false);
   const [fx, setFx] = useState<{ id: number; kind: string }[]>([]);
   useEffect(() => { setStage(0); }, [round.id]);
@@ -58,7 +59,7 @@ export function KidsPlant({ round, disabled, onAnswer, onMistake }: GameComponen
   const say = (again?: boolean) => (again || round.id === 'r0') && sayUk('p_plant', 'Що потрібно квіточці?');
 
   const tap = (id: string) => {
-    if (disabled || stage >= plant.stages.length - 1) return;
+    if (disabled || busy || stage >= plant.stages.length - 1) return;
     const needed = asks ? (asks[stage] === 'water' ? WATER : SUN) : null;
     const ok = needed ? id === needed : id === WATER || id === SUN;
     if (!ok) {
@@ -71,7 +72,8 @@ export function KidsPlant({ round, disabled, onAnswer, onMistake }: GameComponen
     setFx((a) => [...a, e]);
     window.setTimeout(() => setFx((a) => a.filter((x) => x.id !== e.id)), 900);
     const next = stage + 1;
-    window.setTimeout(() => setStage(next), 450);
+    setBusy(true);
+    window.setTimeout(() => { setStage(next); setBusy(false); }, 450);
     if (next === plant.stages.length - 1) window.setTimeout(() => onAnswer(GROWN), 1500);
   };
 
@@ -92,10 +94,10 @@ export function KidsPlant({ round, disabled, onAnswer, onMistake }: GameComponen
             transition={{ type: 'spring', stiffness: 220, damping: 15 }}
             style={{ height: h, maxWidth: '100%', objectFit: 'contain', transformOrigin: '50% 100%', filter: 'drop-shadow(0 6px 4px rgba(90,60,20,.18))' }} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${round.payload.options.length <= 4 ? 4 : 3}, 78px)`, gap: 10, justifyContent: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${round.payload.options.length <= 4 ? 2 : 3}, 72px)`, gap: 10, justifyContent: 'center' }}>
           {round.payload.options.map((id) => (
             <motion.button key={id} type="button" aria-label={id} disabled={disabled} whileTap={{ scale: 0.9 }} onClick={() => tap(id)}
-              style={{ width: 78, height: 78, border: 0, borderRadius: 22, background: '#fff', boxShadow: '0 5px 0 #F1E3CF', cursor: 'pointer', display: 'grid', placeItems: 'center', padding: 8 }}>
+              style={{ width: 72, height: 72, border: 0, borderRadius: 22, background: '#fff', boxShadow: '0 5px 0 #F1E3CF', cursor: 'pointer', display: 'grid', placeItems: 'center', padding: 8 }}>
               <img src={`/count/${id}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </motion.button>
           ))}
