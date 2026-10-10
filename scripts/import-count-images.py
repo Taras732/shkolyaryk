@@ -15,7 +15,7 @@ sheet = []
 for png in sorted(p for p in SRC.glob("*.png") if not p.stem.startswith("_")):
     im = remove(Image.open(png).convert("RGBA"))
     im = im.crop(im.getchannel("A").point(lambda v: 255 if v > 16 else 0).getbbox())
-    side = 512 if png.stem in HEROES or png.stem.startswith("cyc_") else 256
+    side = 512 if png.stem in HEROES or png.stem.startswith(("cyc_", "as_")) else 256
     im.thumbnail((side, side))
     im.save(DST / f"{png.stem}.webp", "WEBP", quality=85, method=6)
     sheet.append(im)

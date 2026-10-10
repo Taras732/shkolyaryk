@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round, ProfileLevel } from '../types';
 import type { Choice } from '../shared/ui';
 import { PromptCard, ChoiceGrid, shuffle, randInt } from '../shared/ui';
+import { usePreschool } from '../shared/preschool';
+import { KidsAssoc, generateKids, type KidAssocP } from './kids';
 
 interface PairItem {
   key: string;
@@ -39,6 +41,7 @@ function pairsFor(level: ProfileLevel, difficulty: Difficulty): number {
 }
 
 function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payload, string> {
+  if (level === 'L0') return generateKids(difficulty) as unknown as LevelData<Payload, string>;
   const n = pairsFor(level, difficulty);
   const rounds: Round<Payload, string>[] = Array.from({ length: ROUNDS_PER_LEVEL }, (_, i) => {
     const pairs = shuffle(SEMANTIC_PAIRS).slice(0, n);
@@ -51,7 +54,14 @@ function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payloa
   return { difficulty, rounds };
 }
 
-function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
+function Component(props: GameComponentProps<Payload, string>) {
+  const preschool = usePreschool();
+  if (preschool && (props.round.payload as unknown as KidAssocP).kid)
+    return <KidsAssoc {...(props as unknown as GameComponentProps<KidAssocP, string>)} />;
+  return <SchoolAssoc {...props} />;
+}
+
+function SchoolAssoc({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
   const { pairs, query, queryIsA } = round.payload;
   const [phase, setPhase] = useState<'memorize' | 'answer'>('memorize');
 

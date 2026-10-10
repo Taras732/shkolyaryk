@@ -101,6 +101,7 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_sort_cycle"] = ("Що спочатку, а що потім?", RATE_PHRASE)
     out["p_maze"] = ("Проведи до смаколика!", RATE_PHRASE)
     out["p_sort_colors"] = ("Склади кульки за кольором!", RATE_PHRASE)
+    out["p_assoc"] = ("Що з чим дружить?", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
