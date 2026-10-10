@@ -7,6 +7,9 @@ import { resolvePlan } from '@/school/plan-resolve';
 import { sayUk } from '@/games/shared/uk-audio';
 import PetPuppet from '@/pets/PetPuppet';
 import { petById } from '@/pets/pets';
+import { usePetChoice } from '@/pets/state';
+import SleepyBasket from '@/pets/SleepyBasket';
+import PetPicker from '@/pets/PetPicker';
 import Companion from '@/pages/poc/Companion';
 import type { Face } from '@/pages/poc/Bunny';
 import { PLACES } from './places';
@@ -37,14 +40,19 @@ export default function PreschoolHome() {
   const [face, setFace] = useState<Face>('smile');
   const [bounce, setBounce] = useState(0);
   const [x0, setX0] = useState<number | null>(null);
+  const [picking, setPicking] = useState(false);
+  const choice = usePetChoice(activeProfile?.id);
   if (!activeProfile) return null;
 
   const plan = resolvePlan(activeProfile).slice(0, 3);
   const pages = Array.from({ length: Math.ceil(PLACES.length / PER_PAGE) }, (_, i) => PLACES.slice(i * PER_PAGE, i * PER_PAGE + PER_PAGE));
   // без імені: кличний відмінок («Маріє») автоматично не утворити
-  const hello = 'Привіт! Пограємо?';
+  // друг v2: не обрано → кошик світиться; обрано, але спить → «пограй, і прокинеться»
+  const hello = !choice.petId ? 'Хтось тут спить! Обери свого друга.' : !choice.awake ? 'Шшш… друг спить. Пограй, і він прокинеться!' : 'Привіт! Пограємо?';
 
   const poke = () => {
+    if (!choice.petId) { setPicking(true); return; }
+    if (!choice.awake) { sayUk('pet.sleeping', 'Шшш, друг спить. Пограй, і він прокинеться!'); return; }
     setFace('happy');
     setBounce((b) => b + 1);
     sayUk('pre.hello', hello);
@@ -63,7 +71,13 @@ export default function PreschoolHome() {
             {/* звірятко + привітання */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 92, flex: 'none' }}>
-                <PetPuppet pet={petById(activeProfile?.avatar_id)} face={face} bounce={bounce} onZone={poke} />
+                {choice.petId && choice.awake
+                  ? <PetPuppet pet={petById(choice.petId)} face={face} bounce={bounce} onZone={poke} />
+                  : (
+                    <button type="button" onClick={poke} aria-label={choice.petId ? 'Друг спить' : 'Обрати друга'} style={{ border: 0, background: 'transparent', padding: 0, cursor: 'pointer' }}>
+                      <SleepyBasket pet={choice.petId ? petById(choice.petId) : undefined} size={92} glow={!choice.petId} />
+                    </button>
+                  )}
               </div>
               <div style={{ ...big, flex: 1, background: '#fff', borderRadius: 18, padding: '10px 12px', fontSize: 16, color: 'var(--c-ink)', boxShadow: '0 5px 0 #F1E3CF', position: 'relative' }}>
                 {hello}
@@ -142,6 +156,7 @@ export default function PreschoolHome() {
         )}
       </div>
 
+      {picking && <PetPicker profileId={activeProfile.id} onDone={() => setPicking(false)} />}
       <BottomNav active={tab} onHome={() => setTab('home')} onFriend={() => setTab('friend')} />
     </div>
   );
