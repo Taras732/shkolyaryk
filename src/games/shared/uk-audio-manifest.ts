@@ -246,6 +246,8 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'poc.sleep',
   'poc.wake',
   'pre.done',
+  'pys.done',
+  'pys.hello',
   'raft.done',
   'raft.float',
   'raft.hello',
