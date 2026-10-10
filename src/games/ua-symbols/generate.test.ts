@@ -44,6 +44,8 @@ describe('ua-symbols — раунди не повторюються в межа�
       for (const d of DIFFS) {
         for (let i = 0; i < 40; i++) {
           for (const r of uaSymbols.generate(d, level).rounds) {
+            // дошкільна хатинка-подарунки — дошка без варіантів (10.10)
+            if ((r.payload as { gifts?: boolean }).gifts) continue;
             const opts = r.payload.options;
             expect(new Set(opts).size, `дублі варіантів: ${opts}`).toBe(opts.length);
             expect(opts).toContain(r.answer);
