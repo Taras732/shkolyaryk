@@ -4,7 +4,7 @@ import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round }
 import { BOARD_DONE } from '../types';
 import { sayUk } from '../shared/uk-audio';
 import { TaskBubble, useBoardProgress } from '../shared/preschool';
-import { ROUNDS, buildTasks, explain, type OddTask } from './core';
+import { ROUNDS, buildTasks, type OddTask } from './core';
 
 /** «Що тут зайве?»: чотири великі картки в сцені; знайшов — зайчик пояснює, чому зайва (див. core.ts). */
 interface Payload {
@@ -12,7 +12,8 @@ interface Payload {
 }
 type Answer = typeof BOARD_DONE;
 
-const NEXT_MS = 2300;
+/** Пауза на «сяйво» правильної картинки; пояснення «Решта — …» прибране (10.10: накладалось на наступну картинку). */
+const NEXT_MS = 1200;
 
 function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
   const round: Round<Payload, Answer> = { id: 'odd-board', payload: { difficulty }, answer: BOARD_DONE };
@@ -49,13 +50,11 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<Payload, A
   }, [solved]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!task) return null;
-  const why = explain(task);
 
   const tap = (i: number) => {
     if (solved) return;
     if (i === task.odd) {
       setSolved(true);
-      sayUk(why.key, why.text);
       return;
     }
     setShake(i);
@@ -66,7 +65,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<Payload, A
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <TaskBubble text={solved ? why.text : 'Що тут зайве?'} onSay={() => (solved ? sayUk(why.key, why.text) : sayUk('p_odd', 'Що тут зайве?'))}>
+      <TaskBubble text="Що тут зайве?" onSay={() => sayUk('p_odd', 'Що тут зайве?')}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 120px)', gap: 16, position: 'relative', zIndex: 1 }}>
           {task.items.map((e, i) => {
             const isOdd = i === task.odd;
