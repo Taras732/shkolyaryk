@@ -29,7 +29,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   const shown = answerState !== 'idle';
   const angle = shown ? (heavy === left ? -TILT : TILT) : 0;
   const dy = useMemo(() => ARM * Math.sin((angle * Math.PI) / 180), [angle]);
-  const spring = { type: 'spring', stiffness: 300, damping: 16 } // швидко: раунд змінюється через 0.85 с as const;
+  const spring = { type: 'spring', stiffness: 300, damping: 16 } as const; // швидко: раунд змінюється через 0.85 с
 
   const pan = (id: AnimalId, side: -1 | 1) => {
     const picked = sel === id;
