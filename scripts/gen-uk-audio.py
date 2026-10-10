@@ -153,6 +153,9 @@ def items() -> dict[str, tuple[str, str]]:
     out["garden.grew"] = ("Ура, підросло! Завтра — ще більше!", RATE_PHRASE)
     out["garden.harvest"] = ("Урожай! Віднесемо другу в кошик.", RATE_PHRASE)
     out["garden.planted"] = ("Посадили! Тепер полий і дай сонечка.", RATE_PHRASE)
+    out["dw_q"] = ("Що вдягнути другові?", RATE_PHRASE)
+    for wid, say in (("sunny", "Сонечко пече!"), ("rainy", "Іде дощик!"), ("snowy", "Падає сніг!"), ("windy", "Дме вітер!")):
+        out[f"dw_{wid}"] = (say, RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

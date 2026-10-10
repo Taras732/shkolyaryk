@@ -78,6 +78,7 @@ import pzScales from './pz-scales';
 import pzShare from './pz-share';
 import pourKids from './pour-kids';
 import heavyKids from './heavy-kids';
+import dressWeather from './dress-weather';
 import pzHanoi from './pz-hanoi';
 import pzLights from './pz-lights';
 import pzMaze from './pz-maze';
@@ -94,7 +95,7 @@ export const GAMES: GameDefinition[] = [
   // Англійська
   englishWords, enReading, enInstructions, lettersFindEn, englishWordPicture,
   // Наука
-  colorsFind, shapes, waterStates, sinkFloat, animalsHabitat, plantGrow, seasonsWeather, gears,
+  colorsFind, shapes, dressWeather, waterStates, sinkFloat, animalsHabitat, plantGrow, seasonsWeather, gears,
   // Логіка
   picPuzzle, slidePuzzle, pzJugs, pzSort, pzHanoi, pzLights, pzMaze, pzHeavier, heavyKids, pzRiver, logicSequences, sortingGame, sudoku, magicSquare, commandMachine,
   // Пам'ять
