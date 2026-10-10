@@ -82,7 +82,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
         <PromptCard
           question="Знайди букву"
           answerState={answerState}
-          say={(again) => sayUkSeq(letterParts(target, again))}
+          say={(again) => sayUkSeq(letterParts(target, again || round.id !== 'r0'))}
           sayKey={`${round.id}-${target}`}
         />
       ) : (

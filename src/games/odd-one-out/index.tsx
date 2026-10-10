@@ -12,8 +12,8 @@ interface Payload {
 }
 type Answer = typeof BOARD_DONE;
 
-/** Пауза на «сяйво» правильної картинки; пояснення «Решта — …» прибране (10.10: накладалось на наступну картинку). */
-const NEXT_MS = 1200;
+/** Пауза на «сяйво» правильної картинки; звучить лише «Молодець!» — пояснення «Решта — …» накладалось на наступну картинку (10.10). */
+const NEXT_MS = 1500;
 
 function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
   const round: Round<Payload, Answer> = { id: 'odd-board', payload: { difficulty }, answer: BOARD_DONE };
@@ -55,6 +55,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<Payload, A
     if (solved) return;
     if (i === task.odd) {
       setSolved(true);
+      sayUk('p_good', 'Молодець!');
       return;
     }
     setShake(i);

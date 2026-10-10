@@ -1,5 +1,6 @@
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid, randInt, shuffle } from '../shared/ui';
+import { hasUkAudio, sayUkSeq } from '../shared/uk-audio';
 
 type ColorId =
   | 'red'
@@ -97,6 +98,7 @@ function pickDistractors(target: ColorId, pool: ColorId[], count: number, useSim
 }
 
 interface Payload {
+  colorId: ColorId;
   colorName: string;
   hex: string;
   options: { name: string; hex: string }[];
@@ -119,6 +121,7 @@ function generate(difficulty: Difficulty): LevelData<Payload, string> {
     rounds.push({
       id: `r${i}`,
       payload: {
+        colorId: target,
         colorName: COLOR_NAME[target],
         hex: COLOR_HEX[target],
         options: ids.map((id) => ({ name: COLOR_NAME[id], hex: COLOR_HEX[id] })),
@@ -130,7 +133,12 @@ function generate(difficulty: Difficulty): LevelData<Payload, string> {
 }
 
 function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
-  const { colorName, hex, options } = round.payload;
+  const { colorId, colorName, hex, options } = round.payload;
+  // дошкільня не читає: «Знайди колір» звучить раз на гру (перший раунд), далі й на 🔊 — лише назва кольору
+  const name = { key: `col_${colorId}`, text: colorName.toLowerCase() };
+  const say = hasUkAudio(name.key)
+    ? (again?: boolean) => sayUkSeq(again || round.id !== 'r0' ? [name] : [{ key: 'p_find_color', text: 'Знайди колір' }, name])
+    : undefined;
   const choices = options.map((opt) => ({
     value: opt.hex,
     node: (
@@ -150,7 +158,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   }));
   return (
     <>
-      <PromptCard question="Знайди колір" answerState={answerState}>
+      <PromptCard question="Знайди колір" answerState={answerState} say={say} sayKey={`${round.id}-${colorId}`}>
         <div
           style={{
             fontSize: 32,

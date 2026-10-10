@@ -66,7 +66,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
         <PromptCard
           question="Знайди цифру"
           answerState={answerState}
-          say={(again) => sayUkSeq(digitParts(digit, again))}
+          say={(again) => sayUkSeq(digitParts(digit, again || round.id !== 'r0'))}
           sayKey={`${round.id}-${digit}`}
         />
       ) : (

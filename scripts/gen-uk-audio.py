@@ -85,6 +85,18 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_share"] = ("Розклади порівну!", RATE_PHRASE)
     out["p_more_who"] = ("У кого більше?", RATE_PHRASE)
     out["p_pour"] = ("Налий рівно до зірочки!", RATE_PHRASE)
+    # «Знайди колір» (10.10): фраза і назва окремо, як у «Знайди цифру»
+    out["p_find_color"] = ("Знайди колір.", RATE_PHRASE)
+    csrc = (ROOT / "src" / "games" / "colors-find" / "index.tsx").read_text(encoding="utf-8")
+    cnames = re.search(r"COLOR_NAME[^{]*\{(.*?)\};", csrc, re.S).group(1)
+    for cid, name in re.findall(r"(\w+): '([^']+)'", cnames):
+        out[f"col_{cid}"] = (f"{name}.", RATE_NAME)
+    # «Фігури» (10.10): «Знайди фігуру» + назва
+    out["p_find_shape"] = ("Знайди фігуру.", RATE_PHRASE)
+    ssrc2 = (ROOT / "src" / "games" / "shapes" / "index.tsx").read_text(encoding="utf-8")
+    for sid, name in re.findall(r"(\w+): '([^']+)'", re.search(r"SHAPE_NAMES[^{]*\{(.*?)\};", ssrc2, re.S).group(1)):
+        out[f"shape_{sid}"] = (f"{name}.", RATE_NAME)
+    out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
         out[f"odd_{cid}"] = (f"Молодець! Решта — {plural}.", RATE_PHRASE)

@@ -1,5 +1,6 @@
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid, randInt, shuffle } from '../shared/ui';
+import { hasUkAudio, sayUkSeq } from '../shared/uk-audio';
 
 type ShapeId = 'circle' | 'square' | 'triangle' | 'rectangle' | 'oval' | 'star';
 
@@ -41,8 +42,11 @@ function pickOptions(target: ShapeId, pool: ShapeId[], count: number): ShapeId[]
 function generate(difficulty: Difficulty): LevelData<Payload, string> {
   const { pool, count } = poolFor(difficulty);
   const rounds: Round<Payload, string>[] = [];
+  let prev: ShapeId | null = null;
   for (let i = 0; i < 5; i++) {
-    const shape = pool[randInt(0, pool.length - 1)];
+    let shape = pool[randInt(0, pool.length - 1)];
+    while (shape === prev) shape = pool[randInt(0, pool.length - 1)];
+    prev = shape;
     const options = pickOptions(shape, pool, Math.min(count, pool.length));
     rounds.push({ id: `r${i}`, payload: { shape, options }, answer: SHAPE_NAMES[shape] });
   }
@@ -115,13 +119,22 @@ function ShapeSvg({ shape, size }: { shape: ShapeId; size: number }) {
 
 function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
   const { shape, options } = round.payload;
-  const choices = options.map((id) => ({ value: SHAPE_NAMES[id] }));
+  // дошкільня не читає: фігура звучить, варіанти — самі фігури (10.10; було «Яка це фігура?» з назвами-словами)
+  const choices = options.map((id) => ({
+    value: SHAPE_NAMES[id],
+    node: <span aria-label={SHAPE_NAMES[id]} style={{ display: 'block', lineHeight: 0 }}><ShapeSvg shape={id} size={60} /></span>,
+  }));
+  const name = { key: `shape_${shape}`, text: SHAPE_NAMES[shape].toLowerCase() };
+  // «Знайди фігуру» — раз на гру (перший раунд), далі й на 🔊 — лише назва
+  const say = hasUkAudio(name.key)
+    ? (again?: boolean) => sayUkSeq(again || round.id !== 'r0' ? [name] : [{ key: 'p_find_shape', text: 'Знайди фігуру' }, name])
+    : undefined;
 
   return (
     <>
-      <PromptCard question="Яка це фігура?" answerState={answerState}>
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '8px auto' }}>
-          <ShapeSvg shape={shape} size={120} />
+      <PromptCard question="Знайди фігуру" answerState={answerState} say={say} sayKey={`${round.id}-${shape}`}>
+        <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--c-ink)', textAlign: 'center', margin: '8px auto' }}>
+          {SHAPE_NAMES[shape]}
         </div>
       </PromptCard>
       <ChoiceGrid
