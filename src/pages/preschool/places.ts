@@ -23,7 +23,7 @@ export const PLACES: Place[] = [
   { id: 'forest', title: 'Ліс Загадок', image: '/places/pictures.webp', emoji: '🧩', bg: '#FFF1C9', hello: 'Тут живуть загадки!', games: ['pic-puzzle', 'colors-find', 'shapes', 'sorting-game', 'pz-sort', 'logic-sequences', 'memory-associations', 'pz-maze', 'heavy-kids'] },
   { id: 'cave', title: 'Печера Скарбів', image: '/places/memory.webp', emoji: '💎', bg: '#FFE3F2', hello: 'Знайдемо скарби?', games: ['odd-one-out', 'find-shadow', 'memory-pairs', 'whats-changed', 'tap-the-dot'] },
   { id: 'garden', title: 'Чарівний Сад', image: '/places/world.webp', emoji: '🌳', bg: '#DFF7E6', hello: 'Подивимось, що росте!', games: ['animals-habitat', 'plant-grow', 'seasons-weather', 'dress-weather', 'water-states', 'sink-float', 'gears', 'ua-symbols'] },
-  { id: 'meadow', title: 'Музична Поляна', emoji: '🎵', bg: '#E0F2FE', hello: 'Послухаймо, хто співає!', games: ['animal-sounds'] },
+  { id: 'meadow', title: 'Музична Поляна', emoji: '🎵', bg: '#E0F2FE', hello: 'Послухаймо, хто співає!', games: ['animal-sounds', 'xylophone-repeat'] },
   { id: 'cottage', title: 'Хатинка друга', image: '/places/calm.webp', emoji: '🏡', bg: '#E2F6F3', hello: 'Як ти сьогодні?', games: ['emotions-recognize', 'breathing', 'life-scenarios'] },
   { id: 'workshop', title: 'Майстерня', emoji: '🎨', bg: '#FCE7F3', hello: 'Помайструймо разом!', games: ['dress-friend'] },
 ];

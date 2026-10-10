@@ -453,4 +453,5 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'weather_snowy',
   'weather_sunny',
   'weather_windy',
+  'xylo.hello',
 ]);
