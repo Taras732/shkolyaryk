@@ -37,6 +37,8 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'd_7',
   'd_8',
   'd_9',
+  'dress.hello',
+  'dress.hello_empty',
   'dw_q',
   'dw_rainy',
   'dw_snowy',

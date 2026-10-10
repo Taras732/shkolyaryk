@@ -160,6 +160,8 @@ def items() -> dict[str, tuple[str, str]]:
     asrc = (ROOT / "src" / "games" / "animal-sounds" / "index.tsx").read_text(encoding="utf-8")
     for aid, snd in re.findall(r"\{ id: '(\w+)', name: '[^']+', sound: '([^']+)' \}", asrc):
         out[f"snd_{aid}"] = (snd, RATE_WORD)
+    out["dress.hello"] = ("Одягни мене!", RATE_PHRASE)
+    out["dress.hello_empty"] = ("Одягни мене! Ще речі — у грі «Що вдягнути?»", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
