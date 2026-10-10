@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid, randInt, shuffle } from '../shared/ui';
+import { usePreschool } from '../shared/preschool';
+import { KidsIce, generateKids, type IceP } from './kids';
 
 type StateId = 'solid' | 'liquid' | 'gas';
 
@@ -35,7 +37,8 @@ function poolFor(difficulty: Difficulty): ItemEntry[] {
   return difficulty === 1 ? ITEMS.filter((i) => i.basic) : ITEMS;
 }
 
-function generate(difficulty: Difficulty): LevelData<Payload, string> {
+function generate(difficulty: Difficulty, level?: string): LevelData<Payload, string> {
+  if (level === 'L0') return generateKids(difficulty) as unknown as LevelData<Payload, string>;
   const pool = poolFor(difficulty);
   const rounds: Round<Payload, string>[] = [];
   let prev = -1;
@@ -53,7 +56,13 @@ function generate(difficulty: Difficulty): LevelData<Payload, string> {
   return { difficulty, rounds };
 }
 
-function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
+function Component(props: GameComponentProps<Payload, string>) {
+  const preschool = usePreschool();
+  if (preschool && (props.round.payload as unknown as IceP).kid) return <KidsIce {...(props as unknown as GameComponentProps<IceP, string>)} />;
+  return <SchoolWater {...props} />;
+}
+
+function SchoolWater({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
   const { emoji, state } = round.payload;
   // shuffle() кличе Math.random() — рахуємо один раз на round.id, щоб порядок варіантів
   // не мінявся при кожному ре-рендері (напр. після невірної відповіді).
@@ -79,7 +88,8 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
 
 const waterStates: GameDefinition<Payload, string> = {
   id: 'water-states',
-  title: 'Стани води',
+  title: 'Морозиво для друга', // дошкільна версія — дослід (10.10); шкільна лишилась «Стани води» в коді
+  image: '/count/ice_pop.webp',
   subject: 'science',
   levels: ['L0'],
   icon: '💧',
