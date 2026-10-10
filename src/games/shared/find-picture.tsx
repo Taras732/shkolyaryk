@@ -20,16 +20,18 @@ export interface FindItem {
 
 export interface FindPayload {
   kid: true;
+  /** Який набір картинок (гра з кількома наборами — пори року / погода). */
+  set?: string;
   target: string;
   options: string[];
 }
 
-export function makeFindRounds(items: FindItem[], d: Difficulty, rounds = 5): LevelData<FindPayload, string> {
-  const count = Math.min(items.length, d === 1 ? 3 : 4);
+export function makeFindRounds(items: FindItem[], d: Difficulty, rounds = 5, opts: { count?: number; set?: string } = {}): LevelData<FindPayload, string> {
+  const count = Math.min(items.length, opts.count ?? (d === 1 ? 3 : 4));
   const targets = shuffle(items).slice(0, Math.min(rounds, items.length));
   const out: Round<FindPayload, string>[] = targets.map((t, i) => ({
     id: `r${i}`,
-    payload: { kid: true, target: t.id, options: shuffle([t.id, ...shuffle(items.filter((x) => x.id !== t.id)).slice(0, count - 1).map((x) => x.id)]) },
+    payload: { kid: true, set: opts.set, target: t.id, options: shuffle([t.id, ...shuffle(items.filter((x) => x.id !== t.id)).slice(0, count - 1).map((x) => x.id)]) },
     answer: t.id,
   }));
   return { difficulty: d, rounds: out };

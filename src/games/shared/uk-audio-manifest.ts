@@ -426,4 +426,8 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'w_їжа',
   'w_їжак',
   'w_ґудзик',
+  'weather_rainy',
+  'weather_snowy',
+  'weather_sunny',
+  'weather_windy',
 ]);

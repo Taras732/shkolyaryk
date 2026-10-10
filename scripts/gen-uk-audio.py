@@ -134,6 +134,8 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_find_season"] = ("Знайди", RATE_PHRASE)
     for sid, say in (("winter", "зиму"), ("spring", "весну"), ("summer", "літо"), ("autumn", "осінь")):
         out[f"season_{sid}"] = (f"{say}.", RATE_NAME)
+    for wid, say in (("sunny", "сонечко"), ("rainy", "дощик"), ("snowy", "сніг"), ("windy", "вітер")):
+        out[f"weather_{wid}"] = (f"{say}.", RATE_NAME)
     out["p_sinkfloat"] = ("Плаває чи тоне? Торкнись, де воно буде!", RATE_PHRASE)
     out["p_habitat"] = ("Де живе", RATE_PHRASE)
     hsrc = (ROOT / "src" / "games" / "animals-habitat" / "kids.tsx").read_text(encoding="utf-8")
