@@ -13,6 +13,7 @@ import { petById } from './pets';
 import { usePetChoice } from './state';
 import { useWakePlay } from './useWakePlay';
 import { eatenToday, markEaten, snacksToday, tummyToday, PLAN_FOOD_MAX } from './food';
+import { loadGarden, takeFromPantry } from './garden';
 
 /**
  * Вкладка «Друг» (концепція v2, 10.10.2026). Друг учиться з ігор, тож тут — не уроки, а стан і турбота:
@@ -64,6 +65,8 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
   }, [profileId, profile]);
   const [eaten, setEaten] = useState(() => eatenToday(profileId));
   const left = Math.max(0, snacks - eaten);
+  // урожай з «Городу друга» чекає в коморі — теж у кошик (модель «результат живе», 10.10)
+  const [pantry, setPantry] = useState(() => loadGarden(profileId).pantry);
 
   const [face, setFace] = useState<Face>('smile');
   const [bounce, setBounce] = useState(0);
@@ -89,7 +92,7 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
   const feed = (x: number, y: number) => {
     const r = petBox.current?.getBoundingClientRect();
     if (!r || x < r.left || x > r.right || y < r.top || y > r.bottom) return;
-    setEaten(markEaten(profileId));
+    if (pantry.length) { takeFromPantry(profileId); setPantry((p) => p.slice(1)); } else setEaten(markEaten(profileId));
     react('chew', 'Ням-ням! Смачно!', 1300, 'pet.yum');
     later(1300, () => { setBounce((b) => b + 1); setFace('happy'); });
     later(2800, () => setFace('smile'));
@@ -150,10 +153,10 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
 
       {/* кошик з ласощами (вільні ігри): своя їжа друга, тягнуть до рота */}
       <div style={{ position: 'absolute', bottom: '3%', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 12, zIndex: 3 }}>
-        {face !== 'sleep' && left > 0 && Array.from({ length: left }, (_, k) => {
-          const f = pet.food[k % pet.food.length];
+        {face !== 'sleep' && left + pantry.length > 0 && Array.from({ length: Math.min(5, left + pantry.length) }, (_, k) => {
+          const f = k < pantry.length ? { img: pantry[k], name: 'урожай' } : pet.food[(k - pantry.length) % pet.food.length];
           return (
-            <motion.div key={`${eaten}-${k}`} drag dragSnapToOrigin dragConstraints={zone} dragElastic={0.2} aria-label={f.name}
+            <motion.div key={`${eaten}-${pantry.length}-${k}`} drag dragSnapToOrigin dragConstraints={zone} dragElastic={0.2} aria-label={f.name}
               onDragEnd={(_, info) => feed(info.point.x - window.scrollX, info.point.y - window.scrollY)}
               whileDrag={{ scale: 1.25, rotate: -15 }}
               style={{ width: 60, height: 60, borderRadius: 20, background: '#fff', display: 'grid', placeItems: 'center', boxShadow: '0 6px 16px -6px rgba(0,0,0,.3)', cursor: 'grab', touchAction: 'none' }}>
@@ -161,7 +164,7 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
             </motion.div>
           );
         })}
-        {face !== 'sleep' && left === 0 && (
+        {face !== 'sleep' && left + pantry.length === 0 && (
           <motion.button whileTap={{ scale: 0.9 }} aria-label="Кошик з ласощами порожній"
             onClick={() => react('o', 'Ласощі зʼявляються за ігри. Пограй ще трішки!', 1800, 'pet.nosnack')}
             style={{ width: 60, height: 60, borderRadius: 20, border: 0, background: 'rgba(255,255,255,.7)', fontSize: 30, cursor: 'pointer' }}>

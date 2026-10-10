@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
+import { BOARD_DONE } from '../types';
 import { PromptCard, shuffle } from '../shared/ui';
 import { usePreschool } from '../shared/preschool';
-import { KidsPlant, generateKids, type KidPlantP } from './kids';
+import { KidsPlant, type KidPlantP } from './kids';
+import { GardenBoard, generateGarden, type GardenP } from './garden';
 
 /** Сентінел-відповідь раунду: саму перевірку виконує Component при завершенні ряду. */
 const SORTED = 'sorted' as const;
@@ -35,7 +37,8 @@ function buildRound(index: number, count: number): Round<Payload, SortAnswer> {
 }
 
 function generate(difficulty: Difficulty, level?: string): LevelData<Payload, SortAnswer> {
-  if (level === 'L0') return generateKids(difficulty) as unknown as LevelData<Payload, SortAnswer>;
+  // дошкілля: «Город друга» (10.10); стара «Що потрібно квіточці?» (kids.tsx) лишилась, не підключена
+  if (level === 'L0') return generateGarden(difficulty) as unknown as LevelData<Payload, SortAnswer>;
   const count = stageCountFor(difficulty);
   const rounds: Round<Payload, SortAnswer>[] = [];
   for (let i = 0; i < 5; i++) rounds.push(buildRound(i, count));
@@ -46,6 +49,7 @@ const WRONG_FEEDBACK_MS = 450;
 
 function Component(props: GameComponentProps<Payload, SortAnswer>) {
   const preschool = usePreschool();
+  if (preschool && (props.round.payload as unknown as GardenP).garden) return <GardenBoard {...(props as unknown as GameComponentProps<GardenP, typeof BOARD_DONE>)} />;
   if (preschool && (props.round.payload as unknown as KidPlantP).kid) return <KidsPlant {...(props as unknown as GameComponentProps<KidPlantP, string>)} />;
   return <SchoolPlant {...props} />;
 }
@@ -149,7 +153,7 @@ function SchoolPlant({ round, disabled, answerState, onAnswer, onMistake }: Game
 
 const plantGrow: GameDefinition<Payload, SortAnswer> = {
   id: 'plant-grow',
-  title: 'Ріст рослини',
+  title: 'Город друга',
   subject: 'science',
   levels: ['L0'],
   icon: '🌱',

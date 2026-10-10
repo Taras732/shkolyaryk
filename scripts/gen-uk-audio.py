@@ -148,6 +148,11 @@ def items() -> dict[str, tuple[str, str]]:
     out["br_out"] = ("Видих…", RATE_PHRASE)
     out["plant_dry"] = ("Мені сухо!", RATE_PHRASE)
     out["plant_dark"] = ("Мені темно!", RATE_PHRASE)
+    out["garden.hello"] = ("Посади насінинку, полий і дай сонечка. Завтра підросте!", RATE_PHRASE)
+    out["garden.nowater"] = ("Водичка закінчилась. Пограй у «На сьогодні» — і буде ще!", RATE_PHRASE)
+    out["garden.grew"] = ("Ура, підросло! Завтра — ще більше!", RATE_PHRASE)
+    out["garden.harvest"] = ("Урожай! Віднесемо другу в кошик.", RATE_PHRASE)
+    out["garden.planted"] = ("Посадили! Тепер полий і дай сонечка.", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
