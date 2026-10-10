@@ -89,8 +89,13 @@ function buildSequence(cfg: Config): number[] {
 function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payload, number> {
   const cfg = configFor(difficulty, level);
   const rounds: Round<Payload, number>[] = [];
+  // без повторів: на L0 рядів мало (крок +1 до 10 — лише 7), і той самий ряд випадав кілька разів за гру
+  const seen = new Set<string>();
   for (let i = 0; i < 5; i++) {
-    const sequence = buildSequence(cfg);
+    let sequence = buildSequence(cfg);
+    const prevAnswer = rounds[i - 1]?.answer;
+    for (let t = 0; t < 50 && (seen.has(sequence.join(',')) || sequence[sequence.length - 1] === prevAnswer); t++) sequence = buildSequence(cfg);
+    seen.add(sequence.join(','));
     const hidden = sequence.length - 1;
     rounds.push({
       id: `r${i}`,

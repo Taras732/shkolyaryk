@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { useMotionValueEvent, useSpring } from 'motion/react';
 import type { Difficulty, GameComponentProps, GameDefinition, LevelData } from '../types';
 import { sayUk } from '../shared/uk-audio';
 import { SceneTask } from '../shared/count-ui';
@@ -11,12 +11,54 @@ function generate(difficulty: Difficulty): LevelData<Payload, AnimalId> {
   return { difficulty, rounds: makePairs(difficulty).map((p, i) => ({ id: `r${i}`, payload: p, answer: p.heavy })) };
 }
 
-const ARM = 118; // від центру коромисла до шальки
-const TILT = 16; // градусів, коли терези показали правду
-const SIDE = 128; // звірятко однакового розміру — порівнюємо знанням, а не картинкою
+const ARM = 120; // від осі до гачка шальки (одиниці viewBox)
+const TILT = 15; // градусів, коли терези показали правду
+const SIDE = 112; // звірятко однакового розміру — порівнюємо знанням, а не картинкою
+const PIVOT = { x: 190, y: 104 };
+const CHAIN = 128; // від гачка до краю шальки: гачок видно над головою звіра
+const VB = { w: 380, h: 350 };
+
+/** Латунні градієнти: об'єм без картинок — світло зверху-зліва, тінь знизу. */
+function Defs() {
+  return (
+    <defs>
+      <linearGradient id="hk-brass" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#FFE3A3" />
+        <stop offset=".45" stopColor="#E8AE4E" />
+        <stop offset="1" stopColor="#A86E22" />
+      </linearGradient>
+      <linearGradient id="hk-col" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="#A86E22" />
+        <stop offset=".35" stopColor="#FFE3A3" />
+        <stop offset=".6" stopColor="#E8AE4E" />
+        <stop offset="1" stopColor="#8C5A1A" />
+      </linearGradient>
+      <radialGradient id="hk-bowl" cx=".35" cy=".2" r=".9">
+        <stop offset="0" stopColor="#FFE9B8" />
+        <stop offset=".55" stopColor="#E3A548" />
+        <stop offset="1" stopColor="#9C6420" />
+      </radialGradient>
+      <radialGradient id="hk-bowl-ok" cx=".35" cy=".2" r=".9">
+        <stop offset="0" stopColor="#E3FBE9" />
+        <stop offset=".55" stopColor="#7FD49A" />
+        <stop offset="1" stopColor="#3F9B5C" />
+      </radialGradient>
+      <radialGradient id="hk-knob" cx=".35" cy=".3" r=".75">
+        <stop offset="0" stopColor="#FFF4D6" />
+        <stop offset=".5" stopColor="#F2A93B" />
+        <stop offset="1" stopColor="#B4651A" />
+      </radialGradient>
+      <radialGradient id="hk-shadow">
+        <stop offset="0" stopColor="rgba(60,80,30,.35)" />
+        <stop offset="1" stopColor="rgba(60,80,30,0)" />
+      </radialGradient>
+    </defs>
+  );
+}
 
 /**
- * Терези: до відповіді стоять рівно (інакше відповідь видно), після тапу нахиляються в бік важчого —
+ * Терези 2.5D (10.10.2026, SVG): шальки висять на ланцюжках і лишаються рівними, коли коромисло нахиляється.
+ * До відповіді стоять рівно (інакше відповідь видно); після тапу — нахил у бік важчого,
  * і на правильній, і на помилковій відповіді: дитина бачить, як насправді.
  */
 function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, AnimalId>) {
@@ -27,47 +69,71 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   }, [answerState]);
   const say = (again?: boolean) => (again || round.id === 'r0') && sayUk('p_heavy', 'Хто важчий?');
   const shown = answerState !== 'idle';
-  const angle = shown ? (heavy === left ? -TILT : TILT) : 0;
-  const dy = useMemo(() => ARM * Math.sin((angle * Math.PI) / 180), [angle]);
-  const spring = { type: 'spring', stiffness: 300, damping: 16 } as const; // швидко: раунд змінюється через 0.85 с
+  const target = shown ? (heavy === left ? -TILT : TILT) : 0;
+  // кут — пружина; кожен кадр перераховує кінці коромисла (шальки висять вертикально)
+  const spring = useSpring(0, { stiffness: 260, damping: 15 }); // швидко: раунд змінюється через 0.85 с
+  const [angle, setAngle] = useState(0);
+  useMotionValueEvent(spring, 'change', setAngle);
+  useEffect(() => spring.set(target), [target, spring]);
+
+  const rad = (angle * Math.PI) / 180;
+  const end = (side: -1 | 1) => ({ x: PIVOT.x + side * ARM * Math.cos(rad), y: PIVOT.y + side * ARM * Math.sin(rad) });
 
   const pan = (id: AnimalId, side: -1 | 1) => {
+    const e = end(side);
+    const rim = e.y + CHAIN;
     const picked = sel === id;
     const ok = picked && answerState === 'correct';
     const wrong = picked && answerState === 'incorrect';
     const hint = answerState === 'incorrect' && id === heavy;
+    const tap = () => { if (disabled) return; setSel(id); onAnswer(id); };
     return (
-      <motion.button key={id} type="button" disabled={disabled} aria-label={ANIMALS.find((a) => a.id === id)!.name}
-        onClick={() => { if (disabled) return; setSel(id); onAnswer(id); }}
-        animate={{ y: side * dy }} transition={spring} whileTap={{ scale: 0.95 }}
-        style={{ position: 'absolute', left: `calc(50% + ${side * ARM}px - ${SIDE / 2 + 14}px)`, bottom: 128, width: SIDE + 28,
-          border: 0, background: 'transparent', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center',
-          animation: wrong ? 'pk-shake .4s ease' : ok ? 'pk-pop .45s ease-out forwards' : undefined }}>
-        <img src={`/count/${id}.webp`} alt="" draggable={false}
-          style={{ width: SIDE, height: SIDE, objectFit: 'contain', marginBottom: -8, position: 'relative', zIndex: 1,
-            filter: ok || hint ? 'drop-shadow(0 0 10px #22C55E)' : 'drop-shadow(0 4px 3px rgba(90,60,20,.18))' }} />
-        {/* шалька */}
-        <div style={{ width: '100%', height: 22, borderRadius: '0 0 70px 70px', background: ok ? '#9FDDB0' : '#E7B66B', boxShadow: '0 5px 0 #C9924A' }} />
-        <div style={{ width: 4, height: 40, background: '#B0803F' }} />
-      </motion.button>
+      <g key={id} role="button" aria-label={ANIMALS.find((a) => a.id === id)!.name} onClick={tap} style={{ cursor: disabled ? 'default' : 'pointer' }}
+        className={wrong ? 'hk-shake' : undefined}>
+        {/* три ланцюжки від гачка до краю шальки */}
+        {[-46, 0, 46].map((dx) => (
+          <line key={dx} x1={e.x} y1={e.y} x2={e.x + dx} y2={rim} stroke="#B07A2E" strokeWidth={2} strokeDasharray="3 2" strokeLinecap="round" />
+        ))}
+        <circle cx={e.x} cy={e.y} r={6} fill="url(#hk-knob)" />
+        {/* звірятко стоїть у шальці: низ картинки трохи нижче краю */}
+        <image href={`/count/${id}.webp`} x={e.x - SIDE / 2} y={rim - SIDE + 10} width={SIDE} height={SIDE}
+          style={{ filter: ok || hint ? 'drop-shadow(0 0 8px #22C55E)' : 'drop-shadow(0 3px 2px rgba(90,60,20,.2))' }} />
+        {/* миска: передній край поверх лап, щоб звір «сидів» усередині */}
+        <path d={`M ${e.x - 58} ${rim} Q ${e.x} ${rim + 50} ${e.x + 58} ${rim} Z`} fill={ok ? 'url(#hk-bowl-ok)' : 'url(#hk-bowl)'} />
+        <ellipse cx={e.x} cy={rim} rx={58} ry={9} fill="none" stroke={ok ? '#3F9B5C' : '#8C5A1A'} strokeWidth={2.5} />
+        <ellipse cx={e.x} cy={rim + 1} rx={52} ry={5} fill="none" stroke="rgba(255,255,255,.55)" strokeWidth={1.5} />
+        {/* невидима велика зона тапу — малюк влучає в будь-яке місце біля звіра */}
+        <rect x={e.x - 64} y={rim - SIDE} width={128} height={SIDE + 46} fill="transparent" />
+      </g>
     );
   };
 
   return (
     <SceneTask question="Хто важчий?" say={say} sayKey={round.id} peek={false}
-      sceneBg="linear-gradient(180deg, #FFF4E3 0%, #FFE9D2 74%, #DDEFC9 74%, #CFE8B8 100%)">
-      {/* терези стоять на траві: низ сцени, а не по центру */}
-      <div style={{ position: 'absolute', left: '50%', bottom: '14%', transform: 'translateX(-50%)', width: '100%', maxWidth: 380, height: 330 }}>
-        {/* стійка */}
-        <div style={{ position: 'absolute', left: '50%', bottom: 18, width: 16, height: 104, marginLeft: -8, borderRadius: 8, background: '#B0803F' }} />
-        <div style={{ position: 'absolute', left: '50%', bottom: 8, width: 120, height: 22, marginLeft: -60, borderRadius: 12, background: '#C9924A' }} />
-        {/* коромисло */}
-        <motion.div animate={{ rotate: angle }} transition={spring}
-          style={{ position: 'absolute', left: '50%', bottom: 118, width: ARM * 2 + 24, height: 14, marginLeft: -(ARM + 12), borderRadius: 7, background: '#C9924A' }} />
-        <div style={{ position: 'absolute', left: '50%', bottom: 113, width: 24, height: 24, marginLeft: -12, borderRadius: '50%', background: '#F08A24' }} />
+      sceneBg="linear-gradient(180deg, #FFF4E3 0%, #FFE9D2 70%, #DDEFC9 70%, #C6E3AC 100%)">
+      <style>{`@keyframes hk-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}} .hk-shake{animation:hk-shake .4s ease}`}</style>
+      <svg viewBox={`0 0 ${VB.w} ${VB.h}`} style={{ position: 'absolute', left: '50%', bottom: '8%', transform: 'translateX(-50%)', width: '100%', maxWidth: 400 }}>
+        <Defs />
+        {/* тінь на траві */}
+        <ellipse cx={PIVOT.x} cy={336} rx={120} ry={12} fill="url(#hk-shadow)" />
+        {/* основа: плаский циліндр */}
+        <ellipse cx={PIVOT.x} cy={326} rx={70} ry={12} fill="#8C5A1A" />
+        <rect x={PIVOT.x - 70} y={312} width={140} height={14} fill="url(#hk-col)" />
+        <ellipse cx={PIVOT.x} cy={312} rx={70} ry={12} fill="url(#hk-brass)" />
+        {/* колона */}
+        <rect x={PIVOT.x - 9} y={PIVOT.y} width={18} height={312 - PIVOT.y} rx={6} fill="url(#hk-col)" />
+        {/* коромисло: товстіше до центру */}
+        <g transform={`rotate(${angle} ${PIVOT.x} ${PIVOT.y})`}>
+          <path d={`M ${PIVOT.x - ARM - 6} ${PIVOT.y - 4} Q ${PIVOT.x} ${PIVOT.y - 13} ${PIVOT.x + ARM + 6} ${PIVOT.y - 4} L ${PIVOT.x + ARM + 6} ${PIVOT.y + 4} Q ${PIVOT.x} ${PIVOT.y + 13} ${PIVOT.x - ARM - 6} ${PIVOT.y + 4} Z`} fill="url(#hk-brass)" stroke="#8C5A1A" strokeWidth={1.5} />
+        </g>
+        <circle cx={PIVOT.x} cy={PIVOT.y} r={13} fill="url(#hk-knob)" stroke="#8C5A1A" strokeWidth={1.5} />
+        {/* стрілка-показник над віссю */}
+        <g transform={`rotate(${angle} ${PIVOT.x} ${PIVOT.y})`}>
+          <path d={`M ${PIVOT.x} ${PIVOT.y - 44} L ${PIVOT.x - 6} ${PIVOT.y - 12} L ${PIVOT.x + 6} ${PIVOT.y - 12} Z`} fill="#F08A24" />
+        </g>
         {pan(left, -1)}
         {pan(right, 1)}
-      </div>
+      </svg>
     </SceneTask>
   );
 }
