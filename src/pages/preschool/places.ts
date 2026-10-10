@@ -27,7 +27,7 @@ export const PLACES: Place[] = [
   { id: 'garden', title: 'Чарівний Сад', image: '/places/world.webp', emoji: '🌳', bg: '#DFF7E6', hello: 'Подивимось, що росте!', games: ['animals-habitat', 'plant-grow', 'seasons-weather', 'dress-weather', 'water-states', 'gears'] },
   { id: 'meadow', title: 'Музична Поляна', emoji: '🎵', bg: '#E0F2FE', hello: 'Послухаймо, хто співає!', games: ['animal-sounds', 'xylophone-repeat'] },
   { hidden: true /* Тарас 10.10: не пропрацьовано, повернемось пізніше */, id: 'cottage', title: 'Хатинка друга', image: '/places/calm.webp', emoji: '🏡', bg: '#E2F6F3', hello: 'Як ти сьогодні?', games: ['emotions-recognize', 'breathing', 'life-scenarios'] },
-  { id: 'workshop', title: 'Майстерня', emoji: '🎨', bg: '#FCE7F3', hello: 'Помайструймо разом!', games: ['coloring', 'pysanka', 'dress-friend'] },
+  { hidden: true /* Тарас 10.10: окремо пропрацювати */, id: 'workshop', title: 'Майстерня', emoji: '🎨', bg: '#FCE7F3', hello: 'Помайструймо разом!', games: ['coloring', 'pysanka', 'dress-friend'] },
 ];
 
 export const getPlace = (id: string) => PLACES.find((p) => p.id === id);
