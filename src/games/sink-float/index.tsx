@@ -2,7 +2,9 @@ import { useMemo } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid, shuffle } from '../shared/ui';
 import { usePreschool } from '../shared/preschool';
-import { KidsSink, generateKids, type KidSinkP } from './kids';
+import { KidsSink, type KidSinkP } from './kids';
+import { RaftBoard, generateRaft, type RaftP } from './raft';
+import { BOARD_DONE } from '../types';
 
 type Behavior = 'sink' | 'float';
 
@@ -38,7 +40,8 @@ function poolFor(difficulty: Difficulty): ItemEntry[] {
 }
 
 function generate(difficulty: Difficulty, level?: string): LevelData<Payload, string> {
-  if (level === 'L0') return generateKids(difficulty) as unknown as LevelData<Payload, string>;
+  // дошкілля: «Пліт для друга» (10.10); акваріум «тоне чи плаває» (kids.tsx) лишився, не підключений
+  if (level === 'L0') return generateRaft(difficulty) as unknown as LevelData<Payload, string>;
   const pool = shuffle(poolFor(difficulty));
   const rounds: Round<Payload, string>[] = [];
   for (let i = 0; i < 5; i++) {
@@ -54,6 +57,7 @@ function generate(difficulty: Difficulty, level?: string): LevelData<Payload, st
 
 function Component(props: GameComponentProps<Payload, string>) {
   const preschool = usePreschool();
+  if (preschool && (props.round.payload as unknown as RaftP).raft) return <RaftBoard {...(props as unknown as GameComponentProps<RaftP, typeof BOARD_DONE>)} />;
   if (preschool && (props.round.payload as unknown as KidSinkP).kid) return <KidsSink {...(props as unknown as GameComponentProps<KidSinkP, string>)} />;
   return <SchoolSink {...props} />;
 }
@@ -85,9 +89,11 @@ function SchoolSink({ round, disabled, answerState, onAnswer }: GameComponentPro
 
 const sinkFloat: GameDefinition<Payload, string> = {
   id: 'sink-float',
-  title: 'Тоне чи плаває',
+  title: 'Пліт для друга',
   subject: 'science',
   levels: ['L0'],
+  image: '/count/sf_boat.webp',
+  isCorrect: (r, a) => a === r.answer || (r.payload as unknown as RaftP).raft === true,
   icon: '🛟',
   description: 'Тоне чи плаває?',
   accent: '#CFFAFE',

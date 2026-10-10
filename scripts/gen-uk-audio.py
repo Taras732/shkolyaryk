@@ -171,6 +171,10 @@ def items() -> dict[str, tuple[str, str]]:
     out["ice.refreeze"] = ("Як знову зробити морозиво?", RATE_PHRASE)
     out["ice.freeze"] = ("Тепер — у морозилку!", RATE_PHRASE)
     out["ice.ready"] = ("Дзинь! Морозиво готове — для друга!", RATE_PHRASE)
+    out["raft.hello"] = ("Друг хоче на той берег! Кидай у воду — що плаває, стане плотом.", RATE_PHRASE)
+    out["raft.float"] = ("Плаває! Беремо на пліт.", RATE_PHRASE)
+    out["raft.sink"] = ("Бульк — потонуло!", RATE_PHRASE)
+    out["raft.done"] = ("Пліт готовий! Пливемо!", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
