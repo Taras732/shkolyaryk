@@ -146,6 +146,8 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_plant"] = ("Що потрібно квіточці?", RATE_PHRASE)
     out["br_in"] = ("Вдих…", RATE_PHRASE)
     out["br_out"] = ("Видих…", RATE_PHRASE)
+    out["plant_dry"] = ("Мені сухо!", RATE_PHRASE)
+    out["plant_dark"] = ("Мені темно!", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

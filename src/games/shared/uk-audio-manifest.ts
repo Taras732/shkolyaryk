@@ -207,6 +207,8 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'pet_tiger_head',
   'pet_tiger_hi',
   'pet_tiger_nose',
+  'plant_dark',
+  'plant_dry',
   'poc.morning',
   'poc.sleep',
   'poc.wake',

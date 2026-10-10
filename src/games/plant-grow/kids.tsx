@@ -6,63 +6,96 @@ import { sayUk } from '../shared/uk-audio';
 import { SceneTask } from '../shared/count-ui';
 
 /**
- * Дошкілля (10.10.2026): «Що потрібно квіточці?» — насінинка в горщику; тап по воді чи сонцю —
- * квіточка підростає (насінинка → паросток → соняшник), цукерка й мʼячик не допомагають — квітка хитається.
- * Було: «тапай стадії по порядку» емодзі — те саме, що «Сортування», рівень 3.
+ * Дошкілля (10.10.2026, v2 після рев'ю Тараса): «Що потрібно квіточці?» — три різні рослини
+ * (соняшник, помідор, яблунька), кожна стадія намальована разом із горщиком (земля не вилазить).
+ * Рівень 1: вода й сонце, 2 зайві предмети. Рівень 2: зайвих більше. Рівень 3: рослинка каже, чого бракує
+ * («Мені сухо!» — вода, «Мені темно!» — сонце) — треба дати саме те.
  */
-const GOOD = ['pg_can', 'pg_sun'];
-const BAD = ['candy', 'sf_ball'];
-const STAGES = ['cyc_seed', 'cyc_sprout', 'cyc_sunflower'];
+const SEED = 'pot_sunflower_1'; // насінинка в горщику — однакова для всіх: насінини 3-річна не розрізняє
+const PLANTS = [
+  { id: 'sunflower', stages: [SEED, 'pot_sunflower_2', 'pot_sunflower_3'] },
+  { id: 'tomato', stages: [SEED, 'pot_tomato_2', 'pot_tomato_3'] },
+  { id: 'apple', stages: [SEED, 'pot_apple_2', 'pot_apple_3'] },
+];
+const WATER = 'pg_can';
+const SUN = 'pg_sun';
+const BAD = ['candy', 'sf_ball', 'as_toothbrush', 'sf_key'];
 export const GROWN = 'grown';
 
-export interface KidPlantP { kid: true; options: string[] }
+export interface KidPlantP { kid: true; plant: string; options: string[]; /** рівень 3: що просить на кожній стадії */ asks?: ('water' | 'sun')[] }
 
 export function generateKids(d: Difficulty): LevelData<KidPlantP, string> {
-  return { difficulty: d, rounds: [0, 1, 2].map((i) => ({ id: `r${i}`, payload: { kid: true, options: shuffle([...GOOD, ...BAD]) }, answer: GROWN })) };
+  const bad = d === 1 ? 2 : 4;
+  return {
+    difficulty: d,
+    rounds: shuffle(PLANTS).map((p, i) => ({
+      id: `r${i}`,
+      payload: {
+        kid: true, plant: p.id,
+        options: shuffle([WATER, SUN, ...shuffle(BAD).slice(0, bad)]),
+        asks: d === 3 ? (shuffle(['water', 'sun']) as ('water' | 'sun')[]) : undefined,
+      },
+      answer: GROWN,
+    })),
+  };
 }
 
+const ASK = { water: { key: 'plant_dry', text: 'Мені сухо!' }, sun: { key: 'plant_dark', text: 'Мені темно!' } };
+
 export function KidsPlant({ round, disabled, onAnswer, onMistake }: GameComponentProps<KidPlantP, string>) {
+  const plant = PLANTS.find((p) => p.id === round.payload.plant)!;
+  const asks = round.payload.asks;
   const [stage, setStage] = useState(0);
   const [shake, setShake] = useState(false);
-  const [drops, setDrops] = useState<{ id: number; kind: string }[]>([]);
+  const [fx, setFx] = useState<{ id: number; kind: string }[]>([]);
   useEffect(() => { setStage(0); }, [round.id]);
+  // рівень 3: рослинка каже, чого бракує, на кожній стадії
+  useEffect(() => {
+    if (!asks || stage >= plant.stages.length - 1) return;
+    const t = window.setTimeout(() => sayUk(ASK[asks[stage]].key, ASK[asks[stage]].text), round.id === 'r0' && stage === 0 ? 1800 : 300);
+    return () => window.clearTimeout(t);
+  }, [stage, asks, plant.stages.length, round.id]);
   const say = (again?: boolean) => (again || round.id === 'r0') && sayUk('p_plant', 'Що потрібно квіточці?');
+
   const tap = (id: string) => {
-    if (disabled || stage >= STAGES.length - 1) return;
-    if (GOOD.includes(id)) {
-      const d = { id: Date.now(), kind: id };
-      setDrops((a) => [...a, d]);
-      window.setTimeout(() => setDrops((a) => a.filter((x) => x.id !== d.id)), 900);
-      const next = stage + 1;
-      window.setTimeout(() => setStage(next), 450);
-      if (next === STAGES.length - 1) window.setTimeout(() => onAnswer(GROWN), 1300);
-    } else {
+    if (disabled || stage >= plant.stages.length - 1) return;
+    const needed = asks ? (asks[stage] === 'water' ? WATER : SUN) : null;
+    const ok = needed ? id === needed : id === WATER || id === SUN;
+    if (!ok) {
       onMistake();
       setShake(true);
       window.setTimeout(() => setShake(false), 450);
+      return;
     }
+    const e = { id: Date.now(), kind: id };
+    setFx((a) => [...a, e]);
+    window.setTimeout(() => setFx((a) => a.filter((x) => x.id !== e.id)), 900);
+    const next = stage + 1;
+    window.setTimeout(() => setStage(next), 450);
+    if (next === plant.stages.length - 1) window.setTimeout(() => onAnswer(GROWN), 1500);
   };
+
+  const h = [130, 170, 230][stage];
   return (
-    <SceneTask question="Що потрібно квіточці?" say={say} sayKey={round.id} peek={false} sceneBg="linear-gradient(180deg, #EAF6FF 0%, #F3FAE8 70%, #DDEFC9 70%)">
-      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18, position: 'relative', zIndex: 1 }}>
-        {/* горщик з рослиною */}
-        <div style={{ position: 'relative', width: 200, height: 230, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
+    <SceneTask question={asks ? ASK[asks[Math.min(stage, asks.length - 1)]].text : 'Що потрібно квіточці?'} say={say} sayKey={round.id} peek={false}
+      sceneBg="linear-gradient(180deg, #EAF6FF 0%, #F3FAE8 66%, #DDEFC9 66%)">
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1 }}>
+        <div style={{ position: 'relative', height: 240, width: 240, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
           <AnimatePresence>
-            {drops.map((d) => (
-              <motion.span key={d.id} initial={{ y: -40, opacity: 0 }} animate={{ y: 40, opacity: [0, 1, 0] }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }}
-                style={{ position: 'absolute', top: 0, fontSize: 30 }}>{d.kind === 'pg_can' ? '💧' : '✨'}</motion.span>
+            {fx.map((e) => (
+              <motion.span key={e.id} initial={{ y: -30, opacity: 0 }} animate={{ y: 60, opacity: [0, 1, 0] }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }}
+                style={{ position: 'absolute', top: 0, fontSize: 30 }}>{e.kind === WATER ? '💧💧' : '☀️'}</motion.span>
             ))}
           </AnimatePresence>
-          <motion.img key={stage} src={`/count/${STAGES[stage]}.webp`} alt="" draggable={false}
-            initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1, rotate: shake ? [0, -8, 8, -4, 0] : 0 }} transition={{ type: 'spring', stiffness: 220, damping: 14 }}
-            style={{ height: stage === 2 ? 170 : stage === 1 ? 110 : 70, objectFit: 'contain', marginBottom: -10, transformOrigin: '50% 100%' }} />
-          <div style={{ width: 120, height: 70, background: 'linear-gradient(#E08A5A, #C2683F)', clipPath: 'polygon(0 0, 100% 0, 85% 100%, 15% 100%)', borderTop: '10px solid #F0A070' }} />
+          <motion.img key={`${round.id}-${stage}`} src={`/count/${plant.stages[stage]}.webp`} alt="" draggable={false}
+            initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1, rotate: shake ? [0, -6, 6, -3, 0] : 0 }}
+            transition={{ type: 'spring', stiffness: 220, damping: 15 }}
+            style={{ height: h, maxWidth: '100%', objectFit: 'contain', transformOrigin: '50% 100%', filter: 'drop-shadow(0 6px 4px rgba(90,60,20,.18))' }} />
         </div>
-        {/* що можна дати */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, width: '100%', maxWidth: 360 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${round.payload.options.length <= 4 ? 4 : 3}, 78px)`, gap: 10, justifyContent: 'center' }}>
           {round.payload.options.map((id) => (
             <motion.button key={id} type="button" aria-label={id} disabled={disabled} whileTap={{ scale: 0.9 }} onClick={() => tap(id)}
-              style={{ aspectRatio: '1', border: 0, borderRadius: 22, background: '#fff', boxShadow: '0 5px 0 #F1E3CF', cursor: 'pointer', display: 'grid', placeItems: 'center', padding: 6 }}>
+              style={{ width: 78, height: 78, border: 0, borderRadius: 22, background: '#fff', boxShadow: '0 5px 0 #F1E3CF', cursor: 'pointer', display: 'grid', placeItems: 'center', padding: 8 }}>
               <img src={`/count/${id}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </motion.button>
           ))}

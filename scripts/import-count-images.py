@@ -43,7 +43,7 @@ for png in sorted(p for p in SRC.glob("*.png") if not p.stem.startswith("_")):
     if png.stem in CROP_BOTTOM:
         im = im.crop((0, 0, im.width, int(im.height * CROP_BOTTOM[png.stem])))
     im = im.crop(im.getchannel("A").point(lambda v: 255 if v > 16 else 0).getbbox())
-    side = 512 if png.stem in HEROES or png.stem.startswith(("cyc_", "as_", "sym_")) else 256
+    side = 512 if png.stem in HEROES or png.stem.startswith(("cyc_", "as_", "sym_", "pot_")) else 256
     im.thumbnail((side, side))
     im.save(DST / f"{png.stem}.webp", "WEBP", quality=85, method=6)
     sheet.append(im)
