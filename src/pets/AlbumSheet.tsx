@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { KID_ANIMALS } from '@/games/animals-habitat/kids';
-import { KID_ITEMS } from '@/games/sink-float/kids';
-import { KID_SYMBOLS } from '@/games/ua-symbols';
+// «Моя Україна» і «Знахідки з води» прибрані разом з іграми з Саду (Тарас, 10.10: не продумано)
 import { WEATHER } from '@/games/dress-weather';
 import { getAlbum } from './album';
 import { getWardrobe } from './wardrobe';
@@ -16,8 +15,6 @@ export default function AlbumSheet({ profileId, onClose }: { profileId: string; 
   const clothes = [...new Set(Object.values(WEATHER).flatMap((w) => w.wear as readonly string[]))];
   const sections: { title: string; where: string; items: { id: string; node: ReactNode }[]; have: string[] }[] = [
     { title: 'Звірята', where: 'Де живе тварина', items: KID_ANIMALS.map((x) => ({ id: x.id, node: img(x.id) })), have: a.animals },
-    { title: 'Моя Україна', where: 'Символи України', items: KID_SYMBOLS.map((x) => ({ id: x.id, node: x.node ?? img(x.img!.replace('/count/', '').replace('.webp', '')) })), have: a.symbols },
-    { title: 'Знахідки з води', where: 'Тоне чи плаває', items: KID_ITEMS.map((x) => ({ id: x.id, node: img(x.id) })), have: a.finds },
     { title: 'Шафа', where: 'Що вдягнути?', items: clothes.map((id) => ({ id, node: img(id) })), have: wear },
   ];
   return (
