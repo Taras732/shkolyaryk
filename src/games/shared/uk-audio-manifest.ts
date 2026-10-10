@@ -140,6 +140,8 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'p_sort_cycle',
   'p_sort_size',
   'p_sum',
+  'pet.hungry',
+  'pet.yum',
   'pet_dragon_belly',
   'pet_dragon_head',
   'pet_dragon_hi',

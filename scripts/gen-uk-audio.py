@@ -109,6 +109,8 @@ def items() -> dict[str, tuple[str, str]]:
         if m:
             for k, t in zip(("hi", "head", "belly", "nose"), m.groups()):
                 out[f"pet_{pid}_{k}"] = (t, RATE_PHRASE)
+    out["pet.yum"] = ("Ням-ням! Смачно!", RATE_PHRASE)
+    out["pet.hungry"] = ("Кошик порожній. Пограй трішки, і я поїм!", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

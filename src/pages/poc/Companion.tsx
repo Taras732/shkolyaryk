@@ -1,9 +1,13 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { sayUk } from '@/games/shared/uk-audio';
 import { type Face, type Zone } from './Bunny';
 import PetPuppet from '@/pets/PetPuppet';
 import { usePet } from '@/pets/pets';
+import { earnedToday, eatenToday, markEaten } from '@/pets/food';
+import { useProfileStore } from '@/stores/useProfileStore';
+import { readLog } from '@/school/game-log';
+import { resolvePlan } from '@/school/plan-resolve';
 
 /**
  * PoC звірятка v2 — «Друг-учень» (концепція B) + дотики з A.
@@ -38,6 +42,11 @@ const askText = (r: Round, first: boolean) =>
 
 export default function Companion() {
   const pet = usePet(); // друг дитини, обраний на вході
+  const profile = useProfileStore((s) => s.activeProfile);
+  // їжа: зароблена сьогодні (кроки плану + вільні ігри) мінус уже з'їдена
+  const earned = useMemo(() => (profile ? earnedToday(readLog(profile.id), resolvePlan(profile).slice(0, 3).map((s) => s.gameId)) : 0), [profile]);
+  const [eaten, setEaten] = useState(() => (profile ? eatenToday(profile.id) : 0));
+  const left = Math.max(0, earned - eaten);
   const [mode, setMode] = useState<Mode>('friend');
   const [face, setFace] = useState<Face>('smile');
   const [bounce, setBounce] = useState(0);
@@ -72,7 +81,8 @@ export default function Companion() {
   const feed = (x: number, y: number) => {
     const r = bunnyBox.current?.getBoundingClientRect();
     if (!r || x < r.left || x > r.right || y < r.top || y > r.bottom) return;
-    react('chew', 'Ням-ням!', 1300, 'happy');
+    if (profile) setEaten(markEaten(profile.id));
+    react('chew', 'Ням-ням! Смачно!', 1300, 'happy', undefined, 'pet.yum');
     later(1300, () => { setBounce((b) => b + 1); setBubble('Смачно! Дякую!'); });
     later(3000, () => setFace('smile'));
   };
@@ -140,12 +150,6 @@ export default function Companion() {
           style={{ ...big, flex: 1, border: 0, borderRadius: 14, padding: '9px 0', fontSize: 14, background: mode === 'teach' ? '#1F2138' : 'rgba(255,255,255,.85)', color: mode === 'teach' ? '#fff' : '#1F2138', cursor: 'pointer' }}>
           🎓 Навчи {pet.acc}
         </button>
-        {mode === 'friend' && (
-          <button onClick={() => (face === 'sleep' ? react('o', 'Доброго ранку!', 1200) : sleep())} aria-label="Сон"
-            style={{ border: 0, borderRadius: 14, width: 42, fontSize: 18, background: 'rgba(255,255,255,.85)', cursor: 'pointer' }}>
-            {face === 'sleep' ? '☀️' : '🌙'}
-          </button>
-        )}
       </div>
 
       {/* бульбашка мови */}
@@ -167,6 +171,19 @@ export default function Companion() {
         <PetPuppet pet={pet} face={face} onZone={onZone} bounce={bounce} earFlop={ear} />
       </div>
 
+      {/* кнопки по боках: погладити й полоскотати зліва, спати справа */}
+      {mode === 'friend' && (
+        <>
+          <div style={{ position: 'absolute', left: 10, top: '40%', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 3 }}>
+            <SideBtn label="Погладити" onClick={() => onZone('head')}>🤚</SideBtn>
+            <SideBtn label="Полоскотати" onClick={() => onZone('belly')}>😄</SideBtn>
+          </div>
+          <div style={{ position: 'absolute', right: 10, top: '40%', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 3 }}>
+            <SideBtn label={face === 'sleep' ? 'Прокинутись' : 'Спати'} onClick={() => (face === 'sleep' ? react('o', 'Доброго ранку!', 1200) : sleep())}>{face === 'sleep' ? '☀️' : '🌙'}</SideBtn>
+          </div>
+        </>
+      )}
+
       {/* що зайчик уже знає */}
       {known.length > 0 && (
         <div style={{ position: 'absolute', top: '74%', left: 0, right: 0, textAlign: 'center', ...big, fontSize: 13, color: '#8a6a4a' }}>
@@ -177,13 +194,24 @@ export default function Companion() {
 
       {/* низ: морквина або відповіді */}
       <div style={{ position: 'absolute', bottom: '5%', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 12, zIndex: 3 }}>
-        {mode === 'friend' && face !== 'sleep' && (
-          <motion.div drag dragSnapToOrigin dragConstraints={zone} dragElastic={0.2}
-            onDragEnd={(_, info) => feed(info.point.x - window.scrollX, info.point.y - window.scrollY)}
-            whileDrag={{ scale: 1.25, rotate: -20 }}
-            style={{ width: 68, height: 68, borderRadius: 22, background: '#fff', display: 'grid', placeItems: 'center', fontSize: 40, boxShadow: '0 6px 16px -6px rgba(0,0,0,.3)', cursor: 'grab' }}>
-            🥕
-          </motion.div>
+        {/* кошик: своя їжа друга, стільки, скільки заробила сьогодні; тягнуть до рота */}
+        {mode === 'friend' && face !== 'sleep' && left > 0 && Array.from({ length: Math.min(left, 5) }, (_, k) => {
+          const f = pet.food[k % pet.food.length];
+          return (
+            <motion.div key={`${eaten}-${k}`} drag dragSnapToOrigin dragConstraints={zone} dragElastic={0.2} aria-label={f.name}
+              onDragEnd={(_, info) => feed(info.point.x - window.scrollX, info.point.y - window.scrollY)}
+              whileDrag={{ scale: 1.25, rotate: -15 }}
+              style={{ width: 62, height: 62, borderRadius: 20, background: '#fff', display: 'grid', placeItems: 'center', boxShadow: '0 6px 16px -6px rgba(0,0,0,.3)', cursor: 'grab', touchAction: 'none' }}>
+              <img src={`/count/${f.img}.webp`} alt="" draggable={false} style={{ width: 46, height: 46, objectFit: 'contain', pointerEvents: 'none' }} />
+            </motion.div>
+          );
+        })}
+        {mode === 'friend' && face !== 'sleep' && left === 0 && (
+          <motion.button whileTap={{ scale: 0.9 }} aria-label="Кошик порожній"
+            onClick={() => react('sad', 'Кошик порожній. Пограй трішки — і я поїм!', 1600, 'smile', undefined, 'pet.hungry')}
+            style={{ width: 62, height: 62, borderRadius: 20, border: 0, background: 'rgba(255,255,255,.7)', fontSize: 32, cursor: 'pointer' }}>
+            🧺
+          </motion.button>
         )}
         {mode === 'teach' && round?.kind === 'find' && round.options.map((l) => (
           <motion.button key={l + round.target} whileTap={{ scale: 0.9 }} onClick={() => answerFind(l)}
@@ -199,8 +227,17 @@ export default function Companion() {
         )}
       </div>
       {mode === 'friend' && face !== 'sleep' && (
-        <div style={{ position: 'absolute', bottom: '17%', left: 0, right: 0, textAlign: 'center', ...big, fontSize: 12.5, color: '#a0846a' }}>Погладь голову · полоскочи пузико · тицьни в носик чи вушко · дай морквину</div>
+        <div style={{ position: 'absolute', bottom: '17%', left: 0, right: 0, textAlign: 'center', ...big, fontSize: 12.5, color: '#a0846a' }}>Погладь голову · полоскочи пузико · тицьни в носик · дай {pet.food[0].name}{left === 0 ? ' — спершу пограй' : ''}</div>
       )}
     </div>
+  );
+}
+
+function SideBtn({ label, onClick, children }: { label: string; onClick: () => void; children: string }) {
+  return (
+    <motion.button type="button" aria-label={label} title={label} onClick={onClick} whileTap={{ scale: 0.88 }}
+      style={{ width: 52, height: 52, borderRadius: 18, border: 0, background: 'rgba(255,255,255,.92)', boxShadow: '0 4px 0 rgba(160,110,60,.25)', fontSize: 26, cursor: 'pointer' }}>
+      {children}
+    </motion.button>
   );
 }
