@@ -34,7 +34,7 @@ function Component({ round, onAnswer }: GameComponentProps<Payload, Answer>) {
 
   useEffect(() => {
     if (!done) return;
-    const t = window.setTimeout(() => onAnswer(BOARD_DONE), 1600);
+    const t = window.setTimeout(() => onAnswer(BOARD_DONE), 800);
     return () => window.clearTimeout(t);
   }, [done, onAnswer]);
 

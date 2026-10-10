@@ -1,17 +1,18 @@
 import type { CSSProperties } from 'react';
 
 /**
- * Картинки для пазлів — легкі копії (600px webp, 30–65 КБ) героїв із public/creatures
- * (оригінали по 1 МБ — задовго для телефона).
+ * Картинки для пазлів — повні сцени 600px webp (gen_shkolyaryk_puzzles.py, 10.10.2026).
+ * Тло намальоване до країв: на 3×3 у кожному шматку є своя деталь. Герої на прозорому тлі
+ * (zodiac_*) давали порожні сірі шматки, які не розрізнити, — з пазла прибрані, файли лишились.
  */
 export const PUZZLE_IMAGES = [
-  { src: '/puzzles/zodiac_rabbit_wood.webp', name: 'Зайчик' },
-  { src: '/puzzles/zodiac_monkey_fire.webp', name: 'Мавпочка' },
-  { src: '/puzzles/zodiac_horse_water.webp', name: 'Конячка' },
-  { src: '/puzzles/zodiac_ox_earth.webp', name: 'Бичок' },
-  { src: '/puzzles/zodiac_tiger_metal.webp', name: 'Тигреня' },
-  { src: '/puzzles/zodiac_dragon_fire.webp', name: 'Дракончик' },
-  { src: '/puzzles/hero_dragon.webp', name: 'Дракон' },
+  { src: '/puzzles/scene_bunny_garden.webp', name: 'Зайчик на городі' },
+  { src: '/puzzles/scene_bear_picnic.webp', name: 'Ведмедик на пікніку' },
+  { src: '/puzzles/scene_cat_room.webp', name: 'Котик з клубочком' },
+  { src: '/puzzles/scene_pony_meadow.webp', name: 'Поні на галявині' },
+  { src: '/puzzles/scene_train_town.webp', name: 'Паровозик' },
+  { src: '/puzzles/scene_dragon_castle.webp', name: 'Дракончик біля замку' },
+  { src: '/puzzles/scene_hedgehog_forest.webp', name: 'Їжачок у лісі' },
 ];
 
 /** Шматок картинки: фон із позицією клітинки (col, row) у сітці cols × rows. */
