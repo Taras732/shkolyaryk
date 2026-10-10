@@ -27,11 +27,11 @@ def flood_cut(img):
 SRC = Path("D:/Dev/kuznya-image-gen/output/shkolyaryk_counting")
 DST = Path(__file__).resolve().parent.parent / "public" / "count"
 DST.mkdir(parents=True, exist_ok=True)
-HEROES = {"bunny", "bear", "mouse", "chick", "hedgehog", "cat", "fox", "dog", "pig", "cow", "horse", "elephant"}
+HEROES = {"penguin", "polar_bear", "frog", "lion", "bunny", "bear", "mouse", "chick", "hedgehog", "cat", "fox", "dog", "pig", "cow", "horse", "elephant"}
 
 sheet = []
 for png in sorted(p for p in SRC.glob("*.png") if not p.stem.startswith("_")):
-    if png.stem.startswith("sea_"):  # сцени (пори року) — повна картинка, без вирізання тла
+    if png.stem.startswith(("sea_", "hab_")):  # сцени (пори року) — повна картинка, без вирізання тла
         im = Image.open(png).convert("RGB")
         im.thumbnail((320, 320))
         im.save(DST / f"{png.stem}.webp", "WEBP", quality=82, method=6)

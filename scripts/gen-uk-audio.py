@@ -135,6 +135,10 @@ def items() -> dict[str, tuple[str, str]]:
     for sid, say in (("winter", "зиму"), ("spring", "весну"), ("summer", "літо"), ("autumn", "осінь")):
         out[f"season_{sid}"] = (f"{say}.", RATE_NAME)
     out["p_sinkfloat"] = ("Плаває чи тоне? Торкнись, де воно буде!", RATE_PHRASE)
+    out["p_habitat"] = ("Де живе", RATE_PHRASE)
+    hsrc = (ROOT / "src" / "games" / "animals-habitat" / "kids.tsx").read_text(encoding="utf-8")
+    for aid, name in re.findall(r"\{ id: '(\w+)', name: '([^']+)', hab:", hsrc):
+        out[f"hab_an_{aid}"] = (f"{name}?", RATE_NAME)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
