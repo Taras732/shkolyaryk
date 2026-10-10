@@ -5,7 +5,8 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import { getGame } from '@/games/registry';
 import { resolvePlan } from '@/school/plan-resolve';
 import { sayUk } from '@/games/shared/uk-audio';
-import PuppetBunny from '@/pages/poc/PuppetBunny';
+import PetPuppet from '@/pets/PetPuppet';
+import { petById } from '@/pets/pets';
 import Companion from '@/pages/poc/Companion';
 import type { Face } from '@/pages/poc/Bunny';
 import { PLACES } from './places';
@@ -62,7 +63,7 @@ export default function PreschoolHome() {
             {/* звірятко + привітання */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 92, flex: 'none' }}>
-                <PuppetBunny face={face} bounce={bounce} onZone={poke} />
+                <PetPuppet pet={petById(activeProfile?.avatar_id)} face={face} bounce={bounce} onZone={poke} />
               </div>
               <div style={{ ...big, flex: 1, background: '#fff', borderRadius: 18, padding: '10px 12px', fontSize: 16, color: 'var(--c-ink)', boxShadow: '0 5px 0 #F1E3CF', position: 'relative' }}>
                 {hello}

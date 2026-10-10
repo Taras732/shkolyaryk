@@ -10,6 +10,7 @@ import { recordGameResult } from '@/school/mastery';
 import { fetchPrereqHint, type PrereqHint } from '@/school/hint';
 import { isWeakResult, buildPrereqHintMessage } from '@/school/hint-core';
 import { encouragementFor } from './shared/encouragement';
+import { usePet } from '@/pets/pets';
 import { CloseButton, FiveStars, PreschoolProvider, SKY, SkyScene } from './shared/preschool';
 import {
   type GameDefinition,
@@ -101,6 +102,7 @@ interface GameShellProps {
 export default function GameShell({ game, level, classLevel, profileId, onExit, onNext }: GameShellProps) {
   const { user } = useAuthStore();
   const { progress, updateProgress, profiles } = useProfileStore();
+  const pet = usePet();
 
   // Найвища відкрита складність для цієї гри в цього профілю (з level gate).
   const prevUnlocked = useMemo<Difficulty>(() => {
@@ -391,7 +393,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
         <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520, margin: '0 auto', padding: '16px 16px 28px' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
             <FiveStars filled={five} size={36} />
-            <img src="/creatures/zodiac_rabbit_wood.png" alt="" 
+            <img src={pet.img} alt="" 
               style={{ width: 180, animation: 'pk-float 1.6s ease-in-out infinite' }} />
             <div style={{ fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 32, color: 'var(--c-ink)' }}>Молодець!</div>
           </div>

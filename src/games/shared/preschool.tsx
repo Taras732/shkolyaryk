@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { motion } from 'motion/react';
+import { usePet } from '@/pets/pets';
 
 /**
  * Рамка гри дошкілля — концепт B2 «книжка-картинка» (рішення 09.10.2026, за референсами
@@ -56,6 +57,7 @@ function Speaker({ onClick }: { onClick: () => void }) {
  * з картинкою (children); зайчик визирає з кутка. Без картинки — зайчик по центру «слухає».
  */
 export function TaskBubble({ text, onSay, children, sceneBg = '#FFE9D2', sceneTop, peek = true }: { text: string; onSay?: () => void; children?: ReactNode; sceneBg?: string; sceneTop?: ReactNode; /** false — у сцені вже є свої герої, зайчик з кутка зайвий */ peek?: boolean }) {
+  const pet = usePet(); // у кутку визирає друг дитини, не завжди зайчик
   return (
     <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -64,9 +66,9 @@ export function TaskBubble({ text, onSay, children, sceneBg = '#FFE9D2', sceneTo
       </div>
       <div style={{ flex: 1, minHeight: 150, borderRadius: 34, background: sceneBg, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 12 }}>
         {sceneTop && <div style={{ position: 'absolute', top: 10, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>{sceneTop}</div>}
-        {children ?? <img src="/creatures/zodiac_rabbit_wood.png" alt="" style={{ height: '70%', maxHeight: 200, objectFit: 'contain' }} />}
+        {children ?? <img src={pet.img} alt="" style={{ height: '70%', maxHeight: 200, objectFit: 'contain' }} />}
         {children && peek && (
-          <img src="/creatures/zodiac_rabbit_wood.png" alt="" className="pk-anim"
+          <img src={pet.img} alt="" className="pk-anim"
             style={{ position: 'absolute', right: -14, bottom: -18, width: 104, animation: 'pk-peek 3.5s ease-in-out infinite' }} />
         )}
       </div>

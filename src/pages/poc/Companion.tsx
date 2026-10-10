@@ -2,7 +2,8 @@ import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { sayUk } from '@/games/shared/uk-audio';
 import { type Face, type Zone } from './Bunny';
-import PuppetBunny from './PuppetBunny';
+import PetPuppet from '@/pets/PetPuppet';
+import { usePet } from '@/pets/pets';
 
 /**
  * PoC звірятка v2 — «Друг-учень» (концепція B) + дотики з A.
@@ -36,11 +37,12 @@ const askText = (r: Round, first: boolean) =>
   r.kind === 'find' ? (first ? 'Покажи мені букву, яку я скажу 🔊' : 'А тепер — послухай, яку букву шукаємо 🔊') : 'Я думаю, ця буква звучить так 🔊 Правильно?';
 
 export default function Companion() {
+  const pet = usePet(); // друг дитини, обраний на вході
   const [mode, setMode] = useState<Mode>('friend');
   const [face, setFace] = useState<Face>('smile');
   const [bounce, setBounce] = useState(0);
   const [ear, setEar] = useState<'L' | 'R' | null>(null);
-  const [bubble, setBubble] = useState<string | null>('Привіт! Я Зайчик 🐰');
+  const [bubble, setBubble] = useState<string | null>(`Привіт! Я ${pet.name}!`);
   const [known, setKnown] = useState<string[]>([]);
   const [round, setRound] = useState<Round | null>(null);
   const zone = useRef<HTMLDivElement>(null);
@@ -135,7 +137,7 @@ export default function Companion() {
         </button>
         <button onClick={startTeach}
           style={{ ...big, flex: 1, border: 0, borderRadius: 14, padding: '9px 0', fontSize: 14, background: mode === 'teach' ? '#1F2138' : 'rgba(255,255,255,.85)', color: mode === 'teach' ? '#fff' : '#1F2138', cursor: 'pointer' }}>
-          🎓 Навчи зайчика
+          🎓 Навчи {pet.acc}
         </button>
         {mode === 'friend' && (
           <button onClick={() => (face === 'sleep' ? react('o', 'Доброго ранку!', 1200) : sleep())} aria-label="Сон"
@@ -161,13 +163,13 @@ export default function Companion() {
 
       {/* зайчик */}
       <div ref={bunnyBox} style={{ position: 'absolute', left: '4%', right: '4%', top: checkShown ? '32%' : '21%', height: 'auto', transition: 'top .3s' }}>
-        <PuppetBunny face={face} onZone={onZone} bounce={bounce} earFlop={ear} />
+        <PetPuppet pet={pet} face={face} onZone={onZone} bounce={bounce} earFlop={ear} />
       </div>
 
       {/* що зайчик уже знає */}
       {known.length > 0 && (
         <div style={{ position: 'absolute', top: '74%', left: 0, right: 0, textAlign: 'center', ...big, fontSize: 13, color: '#8a6a4a' }}>
-          Зайчик уже знає:{' '}
+          {pet.name} уже знає:{' '}
           {known.map((l) => <span key={l} style={{ display: 'inline-block', margin: '0 2px', padding: '1px 7px', borderRadius: 8, background: '#fff', color: '#7c3aed' }}>{l}</span>)}
         </div>
       )}
