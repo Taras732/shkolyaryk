@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import type { GameDefinition, GameComponentProps, Difficulty } from '../types';
+import type { GameDefinition, GameComponentProps, Difficulty, ProfileLevel } from '../types';
+import { usePreschool } from '../shared/preschool';
+import { KidsMaze, KID_PAIRS, type KidP } from './kids';
 import { Task, boardLevel, pickOne, useFinish, type Answer } from '../puzzles/shared';
 import { E, N, S, SIZE, W, generate, step, type Dir } from './core';
 
@@ -16,11 +18,22 @@ interface P {
   walls: number[];
   hero: string;
   goal: string;
+  /** Дошкільний лабіринт (намальовані герої, вести пальцем). */
+  kid?: boolean;
 }
+
+/** Розмір для малих: 4×4 → 5×5 → 6×6 (шкільний — 4/6/8). */
+const KID_SIZE: Record<Difficulty, number> = { 1: 4, 2: 5, 3: 6 };
 
 const ORDER: Dir[] = ['up', 'right', 'down', 'left'];
 
-function Component({ round, onAnswer }: GameComponentProps<P, Answer>) {
+function Component(props: GameComponentProps<P, Answer>) {
+  const preschool = usePreschool();
+  if (preschool && props.round.payload.kid) return <KidsMaze {...(props as GameComponentProps<KidP, Answer>)} />;
+  return <SchoolMaze {...props} />;
+}
+
+function SchoolMaze({ round, onAnswer }: GameComponentProps<P, Answer>) {
   const { n, walls, hero, goal } = round.payload;
   const [pos, setPos] = useState(0);
   const done = pos === n * n - 1;
@@ -93,10 +106,17 @@ const pzMaze: GameDefinition<P, Answer> = {
   icon: '🌀',
   description: 'Проведи звірятко через лабіринт до смаколика.',
   accent: '#DCFCE7',
-  generate: (d: Difficulty) => {
+  generate: (d: Difficulty, level: ProfileLevel) => {
+    // унікальний id: GameShell ключує раунд за id — зі сталим зміна рівня лишала старого героя на новій дошці
+    const id = `maze-${d}-${Math.random().toString(36).slice(2, 8)}`;
+    if (level === 'L0') {
+      const n = KID_SIZE[d];
+      const [hero, goal] = pickOne(KID_PAIRS);
+      return boardLevel(d, { n, walls: generate(n), hero, goal, kid: true }, id);
+    }
     const n = SIZE[d];
     const [hero, goal] = pickOne(HEROES);
-    return boardLevel(d, { n, walls: generate(n), hero, goal });
+    return boardLevel(d, { n, walls: generate(n), hero, goal }, id);
   },
   Component,
 };
