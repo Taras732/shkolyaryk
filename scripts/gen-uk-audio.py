@@ -156,6 +156,10 @@ def items() -> dict[str, tuple[str, str]]:
     out["dw_q"] = ("Що вдягнути другові?", RATE_PHRASE)
     for wid, say in (("sunny", "Сонечко пече!"), ("rainy", "Іде дощик!"), ("snowy", "Падає сніг!"), ("windy", "Дме вітер!")):
         out[f"dw_{wid}"] = (say, RATE_PHRASE)
+    out["p_who_sings"] = ("Хто так співає?", RATE_PHRASE)
+    asrc = (ROOT / "src" / "games" / "animal-sounds" / "index.tsx").read_text(encoding="utf-8")
+    for aid, snd in re.findall(r"\{ id: '(\w+)', name: '[^']+', sound: '([^']+)' \}", asrc):
+        out[f"snd_{aid}"] = (snd, RATE_WORD)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
