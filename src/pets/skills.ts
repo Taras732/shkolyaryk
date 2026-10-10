@@ -1,5 +1,5 @@
 import type { LogEntry } from '@/school/game-log';
-import { PLACES } from '@/pages/preschool/places';
+import { VISIBLE_PLACES as PLACES } from '@/pages/preschool/places';
 
 /** Що вміє друг по місцях: частка ігор місця, які дитина вже пройшла → 0–3 зірочки (концепція v2). */
 export function placeStars(log: LogEntry[]) {

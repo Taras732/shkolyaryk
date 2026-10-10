@@ -15,7 +15,7 @@ import { recLine, recommendPlace } from '@/pets/skills';
 import { readLog } from '@/school/game-log';
 import FriendTab from '@/pets/FriendTab';
 import type { Face } from '@/pages/poc/Bunny';
-import { PLACES } from './places';
+import { VISIBLE_PLACES as PLACES } from './places';
 import BottomNav from './BottomNav';
 
 /**
