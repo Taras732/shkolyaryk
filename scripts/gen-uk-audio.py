@@ -102,6 +102,13 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_maze"] = ("Проведи до смаколика!", RATE_PHRASE)
     out["p_sort_colors"] = ("Склади кульки за кольором!", RATE_PHRASE)
     out["p_assoc"] = ("Що з чим дружить?", RATE_PHRASE)
+    # Друзі-звірята (10.10): фрази на дотик з src/pets/pets.ts
+    psrc = (ROOT / "src" / "pets" / "pets.ts").read_text(encoding="utf-8")
+    for pid, body in re.findall(r"^  (\w+): \{ id: '\w+'(.*?)\} \}", psrc, re.S | re.M):
+        m = re.search(r"say: \{ hi: '([^']+)', head: '([^']+)', belly: '([^']+)', nose: '([^']+)'", body)
+        if m:
+            for k, t in zip(("hi", "head", "belly", "nose"), m.groups()):
+                out[f"pet_{pid}_{k}"] = (t, RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

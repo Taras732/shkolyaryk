@@ -42,7 +42,7 @@ export default function Companion() {
   const [face, setFace] = useState<Face>('smile');
   const [bounce, setBounce] = useState(0);
   const [ear, setEar] = useState<'L' | 'R' | null>(null);
-  const [bubble, setBubble] = useState<string | null>(`Привіт! Я ${pet.name}!`);
+  const [bubble, setBubble] = useState<string | null>(pet.say.hi);
   const [known, setKnown] = useState<string[]>([]);
   const [round, setRound] = useState<Round | null>(null);
   const zone = useRef<HTMLDivElement>(null);
@@ -50,22 +50,23 @@ export default function Companion() {
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const later = (ms: number, f: () => void) => { timers.current.push(setTimeout(f, ms)); };
-  const react = (f: Face, text: string | null, ms = 1500, after: Face = 'smile', voice?: string) => {
+  const react = (f: Face, text: string | null, ms = 1500, after: Face = 'smile', voice?: string, key = 'poc.bunny') => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
     setFace(f);
     setBubble(text);
     const v = voice ?? text;
-    if (v) sayUk('poc.bunny', v.replace(/[^\p{L}\p{N}\s!?,.'-]/gu, ''));
+    if (v) sayUk(key, v.replace(/[^\p{L}\p{N}\s!?,.'-]/gu, ''));
     later(ms, () => setFace(after));
   };
 
   const onZone = (z: Zone) => {
     if (face === 'sleep') { react('o', 'Ой, я спав… Доброго ранку!', 1800); return; }
     if (z === 'earL' || z === 'earR') { react('o', 'Ой, моє вушко!', 1000); setEar(z === 'earL' ? 'L' : 'R'); later(900, () => setEar(null)); }
-    if (z === 'nose') react('o', 'Апчхи!', 900);
-    if (z === 'belly') { react('laugh', 'Хі-хі, лоскотно!', 1600); setBounce((b) => b + 1); }
-    if (z === 'head') react('happy', 'Як приємно 💛', 1600);
+    // кожен друг реагує по-своєму (pets.ts → say), голос — файлом pet_<id>_<зона>
+    if (z === 'nose') react('o', pet.say.nose, 900, 'smile', undefined, `pet_${pet.id}_nose`);
+    if (z === 'belly') { react('laugh', pet.say.belly, 1600, 'smile', undefined, `pet_${pet.id}_belly`); setBounce((b) => b + 1); }
+    if (z === 'head') react('happy', pet.say.head, 1600, 'smile', undefined, `pet_${pet.id}_head`);
   };
 
   const feed = (x: number, y: number) => {
