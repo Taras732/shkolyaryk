@@ -56,7 +56,7 @@ export default function PetFinish({ gameId }: { gameId: string }) {
     const k = kind;
     if (k === 'wake') wakePet(profile.id);
     const t: ReturnType<typeof setTimeout>[] = [];
-    if (k === 'wake') { setFace('happy'); t.push(setTimeout(() => sayUk('pet.wake', 'Ура! Доброго ранку! Будемо дружити!'), 500)); }
+    if (k === 'wake') { setFace('happy'); t.push(setTimeout(() => sayUk('pet.woke_hi', 'Ура! Привіт! Будемо дружити!'), 500)); }
     if (k === 'meal') { t.push(setTimeout(() => setFace('chew'), 900), setTimeout(() => { setFace('happy'); sayUk(`learn_${place}`, learnedLine(place)); }, 1700)); }
     if (k === 'snack') t.push(setTimeout(() => { setFace('happy'); sayUk('pet.snack', 'Ласощі вже в кошику!'); }, 600));
     if (k === 'play') t.push(setTimeout(() => setFace('happy'), 400));
@@ -67,7 +67,7 @@ export default function PetFinish({ gameId }: { gameId: string }) {
 
   if (!profile || !kind) return <div style={{ height: 210 }} />;
   const pet = petById(getPetChoice(profile.id).petId);
-  const text = kind === 'pick' ? 'Обери свого друга на головній!' : kind === 'wake' ? 'Ура! Доброго ранку! Будемо дружити!'
+  const text = kind === 'pick' ? 'Обери свого друга на головній!' : kind === 'wake' ? 'Ура! Привіт! Будемо дружити!'
     : kind === 'meal' ? learnedLine(place) : kind === 'snack' ? 'Ласощі вже в кошику!' : 'Молодець!';
 
   return (

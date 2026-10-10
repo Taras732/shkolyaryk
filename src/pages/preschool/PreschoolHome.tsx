@@ -10,6 +10,7 @@ import { petById } from '@/pets/pets';
 import { usePetChoice } from '@/pets/state';
 import SleepyBasket from '@/pets/SleepyBasket';
 import PetPicker from '@/pets/PetPicker';
+import { useWakePlay } from '@/pets/useWakePlay';
 import { recLine, recommendPlace } from '@/pets/skills';
 import { readLog } from '@/school/game-log';
 import FriendTab from '@/pets/FriendTab';
@@ -43,6 +44,7 @@ export default function PreschoolHome() {
   const [bounce, setBounce] = useState(0);
   const [x0, setX0] = useState<number | null>(null);
   const [picking, setPicking] = useState(false);
+  const wakePlay = useWakePlay();
   const choice = usePetChoice(activeProfile?.id);
   if (!activeProfile) return null;
 
@@ -56,7 +58,7 @@ export default function PreschoolHome() {
 
   const poke = () => {
     if (!choice.petId) { setPicking(true); return; }
-    if (!choice.awake) { sayUk('pet.sleeping', 'Шшш, друг спить. Пограй, і він прокинеться!'); return; }
+    if (!choice.awake) { wakePlay(); return; }
     setFace('happy');
     setBounce((b) => b + 1);
     sayUk(`rec_${rec}`, hello);

@@ -42,7 +42,7 @@ export const PETS: Record<string, Pet> = {
     say: { hi: 'Привіт! Я Дракончик!', head: 'Мрр, як тепло!', belly: 'Хі-хі! Аж іскорки летять!', nose: 'Апчхи! Пф-ф-ф!' },
     face: { eyes: [[349, 440, 34, 48, '#F36C30'], [567, 437, 58, 60, '#F07A3A']], mouth: [507, 531, '#FBBA5D'] } },
   tiger: { id: 'tiger', name: 'Тигреня', acc: 'тигреня', img: '/puzzles/zodiac_tiger_metal.webp', full: '/creatures/zodiac_tiger_metal.png', color: '#E3EEFF',
-    food: [{ img: 'food_fish', name: 'рибка' }, { img: 'as_milk', name: 'молоко' }], pet: 'спинка — муркоче', sleeps: 'у кошику', place: 'mountain', trick: 'ловить метелика', peek: 0.42,
+    food: [{ img: 'food_fish', name: 'рибка' }, { img: 'as_milk', name: 'молоко' }], pet: 'спинка — муркоче', sleeps: 'у кошику', place: 'mountain', trick: 'ловить метелика', peek: 0.39,
     say: { hi: 'Привіт! Я Тигреня!', head: 'Мур-мур-мур…', belly: 'Хі-хі, лоскотно!', nose: 'Пчхи!' },
     face: { eyes: [[400, 487, 54, 54, '#D6F1FD'], [640, 487, 54, 54, '#E7FAFD']], mouth: [513, 587, '#BEEDFB'] } },
   horse: { id: 'horse', name: 'Конячка', acc: 'конячку', img: '/puzzles/zodiac_horse_water.webp', full: '/creatures/zodiac_horse_water.png', color: '#E0F2FF',

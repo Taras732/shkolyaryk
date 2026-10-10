@@ -11,6 +11,7 @@ import SleepyBasket from './SleepyBasket';
 import PetPicker from './PetPicker';
 import { petById } from './pets';
 import { usePetChoice } from './state';
+import { useWakePlay } from './useWakePlay';
 import { eatenToday, markEaten, snacksToday, tummyToday, PLAN_FOOD_MAX } from './food';
 
 /**
@@ -23,17 +24,24 @@ export default function FriendTab() {
   const profile = useProfileStore((s) => s.activeProfile);
   const choice = usePetChoice(profile?.id);
   const [picking, setPicking] = useState(false);
+  const wakePlay = useWakePlay();
   if (!profile) return null;
   if (!choice.petId || !choice.awake) {
     return (
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '24px 0' }}>
-        <button type="button" onClick={() => (choice.petId ? sayUk('pet.sleeping', 'Шшш, друг спить. Пограй, і він прокинеться!') : setPicking(true))}
+        <button type="button" onClick={() => (choice.petId ? wakePlay() : setPicking(true))}
           aria-label={choice.petId ? 'Друг спить' : 'Обрати друга'} style={{ border: 0, background: 'transparent', cursor: 'pointer' }}>
           <SleepyBasket pet={choice.petId ? petById(choice.petId) : undefined} size={220} glow={!choice.petId} />
         </button>
         <div style={{ fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 20, textAlign: 'center', color: 'var(--c-ink)', maxWidth: 300 }}>
-          {choice.petId ? 'Шшш… друг спить. Пограй у будь-яку гру — і він прокинеться!' : 'Хтось тут спить! Торкнись кошика й обери свого друга.'}
+          {choice.petId ? 'Шшш… друг спить. Пограй — і він прокинеться!' : 'Хтось тут спить! Торкнись кошика й обери свого друга.'}
         </div>
+        {choice.petId && (
+          <motion.button type="button" whileTap={{ scale: 0.93 }} onClick={() => wakePlay(undefined, 300)}
+            style={{ border: 0, borderRadius: 22, padding: '14px 28px', background: '#F08A24', color: '#fff', fontFamily: 'var(--font-round)', fontWeight: 900, fontSize: 20, boxShadow: '0 5px 0 #C2620A', cursor: 'pointer' }}>
+            ▶ Пограти
+          </motion.button>
+        )}
         {picking && <PetPicker profileId={profile.id} onDone={() => setPicking(false)} />}
       </div>
     );
@@ -73,7 +81,7 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
     later(ms, () => setFace('smile'));
   };
   const onZone = (z: Zone) => {
-    if (face === 'sleep') { react('o', 'Ой, я спав… Доброго ранку!', 1800, 'poc.wake'); return; }
+    if (face === 'sleep') { react('o', 'Ой, я спав… Привіт!', 1800, 'pet.woke'); return; }
     if (z === 'nose' || z === 'earL' || z === 'earR') react('o', pet.say.nose, 900, `pet_${pet.id}_nose`);
     if (z === 'belly') { react('laugh', pet.say.belly, 1600, `pet_${pet.id}_belly`); setBounce((b) => b + 1); }
     if (z === 'head') react('happy', pet.say.head, 1600, `pet_${pet.id}_head`);
@@ -126,7 +134,7 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
         <SideBtn label="Полоскотати" onClick={() => onZone('belly')}>😄</SideBtn>
       </div>
       <div style={{ position: 'absolute', right: 10, top: '34%', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 3 }}>
-        <SideBtn label={face === 'sleep' ? 'Прокинутись' : 'Спати'} onClick={() => (face === 'sleep' ? react('o', 'Доброго ранку!', 1200, 'poc.morning') : sleep())}>{face === 'sleep' ? '☀️' : '🌙'}</SideBtn>
+        <SideBtn label={face === 'sleep' ? 'Прокинутись' : 'Спати'} onClick={() => (face === 'sleep' ? react('o', 'Привіт!', 1200, 'pet.hi') : sleep())}>{face === 'sleep' ? '☀️' : '🌙'}</SideBtn>
         {hungry && <SideBtn label="Хочу яблучко" onClick={() => react('o', 'Пограймо «На сьогодні» — там ростуть яблучка!', 2000, 'pet.wantapple')}>🍏</SideBtn>}
       </div>
 

@@ -1,17 +1,19 @@
 import { motion } from 'motion/react';
-import { sayUk } from '@/games/shared/uk-audio';
 import SleepyBasket from './SleepyBasket';
 import { PETS } from './pets';
 import { choosePet } from './state';
+import { useWakePlay } from './useWakePlay';
 
 /**
  * Вибір друга дитиною (концепція v2, 10.10.2026): шість кошиків, з-під ковдрочки визирає верх —
  * дитина вгадує, хто там спить, і обирає. Імен немає: 3-річна не читає, а вгадування — частина радості.
  */
 export default function PetPicker({ profileId, onDone }: { profileId: string; onDone: () => void }) {
+  const wakePlay = useWakePlay();
   const pick = (id: string) => {
     choosePet(profileId, id);
-    sayUk('pet.chosen', 'Шшш, твій друг спить. Пограй, і він прокинеться!');
+    // голос «пограй» — і одразу в першу гру «На сьогодні»
+    wakePlay({ key: 'pet.chosen', text: 'Шшш, твій друг спить. Пограй, і він прокинеться!' }, 3000);
     onDone();
   };
   return (
