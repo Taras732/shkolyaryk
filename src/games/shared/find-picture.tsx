@@ -4,6 +4,8 @@ import { PromptCard, ChoiceGrid, shuffle } from './ui';
 import { hasUkAudio, sayUkSeq } from './uk-audio';
 import { motion } from 'motion/react';
 import { SceneTask } from './count-ui';
+import { addSticker, type AlbumSection } from '@/pets/album';
+import { useProfileStore } from '@/stores/useProfileStore';
 
 /**
  * «Знайди …» для дошкілля (10.10.2026): ціль лише звучить, варіанти — картинки (3-річна не читає).
@@ -37,14 +39,18 @@ export function makeFindRounds(items: FindItem[], d: Difficulty, rounds = 5, opt
   return { difficulty: d, rounds: out };
 }
 
-export function FindPicture({ round, disabled, answerState, onAnswer, items, phrase, prefix, big }: GameComponentProps<FindPayload, string> & {
+export function FindPicture({ round, disabled, answerState, onAnswer: answer, items, phrase, prefix, big, album }: GameComponentProps<FindPayload, string> & {
   /** Сцени (пори року): великі картки 2×2 прямо на сцені замість кружечків. */
   big?: boolean;
+  /** Знайдене правильно — наліпка в альбом друга. */
+  album?: AlbumSection;
   items: FindItem[];
   phrase: { key: string; text: string };
   /** Префікс ключів озвучки назв: `${prefix}_${id}`. */
   prefix: string;
 }) {
+  const profileId = useProfileStore((s) => s.activeProfile?.id);
+  const onAnswer = (id: string) => { if (album && id === round.answer) addSticker(profileId, album, id); answer(id); };
   const byId = new Map(items.map((x) => [x.id, x]));
   const t = byId.get(round.payload.target)!;
   const name = { key: `${prefix}_${t.id}`, text: t.say };

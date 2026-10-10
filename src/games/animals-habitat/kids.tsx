@@ -3,6 +3,8 @@ import type { Difficulty, GameComponentProps, LevelData } from '../types';
 import { shuffle } from '../shared/ui';
 import { sayUkSeq, hasUkAudio } from '../shared/uk-audio';
 import { SceneTask } from '../shared/count-ui';
+import { addSticker } from '@/pets/album';
+import { useProfileStore } from '@/stores/useProfileStore';
 
 /**
  * Дошкілля (10.10.2026): «Де живе ведмедик?» — намальоване звірятко, відповіді — великі картки-місця.
@@ -44,6 +46,7 @@ export function generateKids(d: Difficulty): LevelData<KidHabP, string> {
 
 export function KidsHabitat({ round, disabled, answerState, onAnswer }: GameComponentProps<KidHabP, string>) {
   const a = KID_ANIMALS.find((x) => x.id === round.payload.animal)!;
+  const profileId = useProfileStore((s) => s.activeProfile?.id);
   const name = { key: `hab_an_${a.id}`, text: a.name };
   const say = (again?: boolean) => hasUkAudio(name.key) && sayUkSeq(again || round.id !== 'r0' ? [name] : [{ key: 'p_habitat', text: 'Де живе' }, name]);
   return (
@@ -54,7 +57,7 @@ export function KidsHabitat({ round, disabled, answerState, onAnswer }: GameComp
           {round.payload.options.map((h) => {
             const right = answerState === 'correct' && h === round.answer;
             return (
-              <motion.button key={h} type="button" aria-label={h} disabled={disabled} whileTap={{ scale: 0.95 }} onClick={() => !disabled && onAnswer(h)}
+              <motion.button key={h} type="button" aria-label={h} disabled={disabled} whileTap={{ scale: 0.95 }} onClick={() => { if (disabled) return; if (h === round.answer) addSticker(profileId, 'animals', a.id); onAnswer(h); }}
                 style={{ aspectRatio: '1', border: 0, padding: 0, borderRadius: 20, overflow: 'hidden', cursor: 'pointer',
                   boxShadow: right ? '0 0 0 5px #22C55E, 0 6px 0 #9FDDB0' : '0 6px 0 #F1E3CF', opacity: answerState === 'correct' && !right ? 0.45 : 1 }}>
                 <img src={`/count/hab_${h}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />

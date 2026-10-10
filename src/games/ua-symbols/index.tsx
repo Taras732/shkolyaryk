@@ -15,7 +15,7 @@ const Flag = () => (
  * Дошкілля (10.10.2026): «Знайди прапор / соняшник / калину…» — намальовані символи, ціль звучить.
  * Тризуб свідомо не беремо: згенерований герб спотворюється, а з державним символом так не можна.
  */
-const KID_SYMBOLS: FindItem[] = [
+export const KID_SYMBOLS: FindItem[] = [
   { id: 'flag', say: 'прапор', node: <Flag /> },
   { id: 'sunflower', say: 'соняшник', img: '/count/sym_sunflower.webp' },
   { id: 'kalyna', say: 'калину', img: '/count/sym_kalyna.webp' },
@@ -206,7 +206,7 @@ function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payloa
 function Component(props: GameComponentProps<Payload, string>) {
   const preschool = usePreschool();
   if (preschool && (props.round.payload as unknown as FindPayload).kid)
-    return <FindPicture {...(props as unknown as GameComponentProps<FindPayload, string>)} items={KID_SYMBOLS} phrase={{ key: 'p_find_sym', text: 'Знайди' }} prefix="sym" />;
+    return <FindPicture {...(props as unknown as GameComponentProps<FindPayload, string>)} items={KID_SYMBOLS} phrase={{ key: 'p_find_sym', text: 'Знайди' }} prefix="sym" album="symbols" />;
   return <SchoolSymbols {...props} />;
 }
 

@@ -14,6 +14,7 @@ import { usePetChoice } from './state';
 import { useWakePlay } from './useWakePlay';
 import { eatenToday, markEaten, snacksToday, tummyToday, PLAN_FOOD_MAX } from './food';
 import { loadGarden, takeFromPantry } from './garden';
+import AlbumSheet from './AlbumSheet';
 
 /**
  * Вкладка «Друг» (концепція v2, 10.10.2026). Друг учиться з ігор, тож тут — не уроки, а стан і турбота:
@@ -67,6 +68,7 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
   const left = Math.max(0, snacks - eaten);
   // урожай з «Городу друга» чекає в коморі — теж у кошик (модель «результат живе», 10.10)
   const [pantry, setPantry] = useState(() => loadGarden(profileId).pantry);
+  const [album, setAlbum] = useState(false);
 
   const [face, setFace] = useState<Face>('smile');
   const [bounce, setBounce] = useState(0);
@@ -115,7 +117,10 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
           style={{ display: 'flex', gap: 2, background: 'rgba(255,255,255,.9)', borderRadius: 99, padding: '4px 10px' }}>
           {Array.from({ length: PLAN_FOOD_MAX }, (_, i) => <span key={i} style={{ fontSize: 20, opacity: i < tummy ? 1 : 0.25, filter: i < tummy ? undefined : 'grayscale(1)' }}>🍎</span>)}
         </div>
-        <div style={{ ...big, background: 'rgba(255,255,255,.9)', borderRadius: 99, padding: '6px 12px', fontSize: 13, color: '#8a6a4a' }}>🌱 Малюк · днів разом: {days}</div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ ...big, background: 'rgba(255,255,255,.9)', borderRadius: 99, padding: '6px 12px', fontSize: 13, color: '#8a6a4a' }}>🌱 Малюк · днів: {days}</div>
+          <button type="button" aria-label="Альбом" onClick={() => setAlbum(true)} style={{ ...big, border: 0, background: 'rgba(255,255,255,.9)', borderRadius: 99, padding: '4px 10px', fontSize: 18, cursor: 'pointer' }}>📒</button>
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
@@ -172,6 +177,7 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
           </motion.button>
         )}
       </div>
+      {album && <AlbumSheet profileId={profileId} onClose={() => setAlbum(false)} />}
     </div>
   );
 }

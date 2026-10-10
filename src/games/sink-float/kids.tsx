@@ -4,6 +4,8 @@ import type { Difficulty, GameComponentProps, LevelData } from '../types';
 import { shuffle } from '../shared/ui';
 import { sayUk } from '../shared/uk-audio';
 import { SceneTask } from '../shared/count-ui';
+import { addSticker } from '@/pets/album';
+import { useProfileStore } from '@/stores/useProfileStore';
 
 /**
  * Дошкілля (10.10.2026): предмет висить над акваріумом; дитина торкається, де він опиниться —
@@ -35,9 +37,10 @@ export function generateKids(d: Difficulty): LevelData<KidSinkP, string> {
 export function KidsSink({ round, disabled, answerState, onAnswer }: GameComponentProps<KidSinkP, string>) {
   const item = KID_ITEMS.find((x) => x.id === round.payload.item)!;
   const [dropped, setDropped] = useState(false);
+  const profileId = useProfileStore((s) => s.activeProfile?.id);
   useEffect(() => { if (answerState === 'idle') setDropped(false); }, [answerState]);
   const say = (again?: boolean) => (again || round.id === 'r0') && sayUk('p_sinkfloat', 'Плаває чи тоне? Торкнись, де воно буде!');
-  const pick = (v: 'float' | 'sink') => { if (disabled) return; setDropped(true); onAnswer(v); };
+  const pick = (v: 'float' | 'sink') => { if (disabled) return; setDropped(true); if ((v === 'float') === item.floats) addSticker(profileId, 'finds', item.id); onAnswer(v); };
   const SIZE = 84;
   // де предмет: над водою → після відповіді на поверхні або на дні
   const y = !dropped ? '4%' : item.floats ? '33%' : '78%';
