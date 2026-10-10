@@ -23,21 +23,28 @@ export interface Pet {
   /** Улюблене місце на карті (id з places.ts). */
   place: string;
   trick: string;
+  /** Обличчя на ілюстрації `full` (1024×1024): очі [cx, cy, rx, ry, колір повіки], рот [x, y, колір шкіри навколо]. */
+  face?: { eyes: [number, number, number, number, string][]; mouth: [number, number, string] };
 }
 
 export const PETS: Record<string, Pet> = {
   rabbit: { id: 'rabbit', name: 'Зайчик', acc: 'зайчика', img: '/puzzles/zodiac_rabbit_wood.webp', full: '/creatures/zodiac_rabbit_wood.png', color: '#E6F6E0',
     food: ['морквина', 'капуста'], pet: 'вушка — жмуриться', sleeps: 'у норці', place: 'island', trick: 'стрибає через пеньок' },
   dragon: { id: 'dragon', name: 'Дракончик', acc: 'дракончика', img: '/puzzles/zodiac_dragon_fire.webp', full: '/creatures/zodiac_dragon_fire.png', color: '#FFE3D6',
-    food: ['перчик', 'яблуко'], pet: 'живіт — чхає іскорками', sleeps: 'на купі скарбів', place: 'cave', trick: 'пускає кільця диму' },
+    food: ['перчик', 'яблуко'], pet: 'живіт — чхає іскорками', sleeps: 'на купі скарбів', place: 'cave', trick: 'пускає кільця диму',
+    face: { eyes: [[349, 440, 34, 48, '#F36C30'], [567, 437, 58, 60, '#F07A3A']], mouth: [507, 531, '#FBBA5D'] } },
   tiger: { id: 'tiger', name: 'Тигреня', acc: 'тигреня', img: '/puzzles/zodiac_tiger_metal.webp', full: '/creatures/zodiac_tiger_metal.png', color: '#E3EEFF',
-    food: ['рибка', 'молоко'], pet: 'спинка — муркоче', sleeps: 'у кошику', place: 'mountain', trick: 'ловить метелика' },
+    food: ['рибка', 'молоко'], pet: 'спинка — муркоче', sleeps: 'у кошику', place: 'mountain', trick: 'ловить метелика',
+    face: { eyes: [[400, 487, 54, 54, '#D6F1FD'], [640, 487, 54, 54, '#E7FAFD']], mouth: [513, 587, '#BEEDFB'] } },
   horse: { id: 'horse', name: 'Конячка', acc: 'конячку', img: '/puzzles/zodiac_horse_water.webp', full: '/creatures/zodiac_horse_water.png', color: '#E0F2FF',
-    food: ['яблуко', 'сіно'], pet: 'грива — тихо ірже', sleeps: 'у стайні', place: 'garden', trick: 'скаче галопом' },
+    food: ['яблуко', 'сіно'], pet: 'грива — тихо ірже', sleeps: 'у стайні', place: 'garden', trick: 'скаче галопом',
+    face: { eyes: [[357, 349, 20, 32, '#F4F6FD'], [509, 380, 40, 44, '#F4F6FD']], mouth: [413, 493, '#E6E1DF'] } },
   ox: { id: 'ox', name: 'Бичок', acc: 'бичка', img: '/puzzles/zodiac_ox_earth.webp', full: '/creatures/zodiac_ox_earth.png', color: '#F3EAD8',
-    food: ['трава', 'конюшина'], pet: 'лоб — мукає', sleeps: 'на сіні', place: 'forest', trick: 'бодає мʼячик' },
+    food: ['трава', 'конюшина'], pet: 'лоб — мукає', sleeps: 'на сіні', place: 'forest', trick: 'бодає мʼячик',
+    face: { eyes: [[411, 473, 44, 49, '#F89F5D'], [613, 473, 44, 49, '#F89F60']], mouth: [513, 587, '#D2AD8B'] } },
   monkey: { id: 'monkey', name: 'Мавпочка', acc: 'мавпочку', img: '/puzzles/zodiac_monkey_fire.webp', full: '/creatures/zodiac_monkey_fire.png', color: '#FFEFD6',
-    food: ['банан', 'горішки'], pet: 'щічки — сміється', sleeps: 'на гілці', place: 'meadow', trick: 'крутиться на хвості' },
+    food: ['банан', 'горішки'], pet: 'щічки — сміється', sleeps: 'на гілці', place: 'meadow', trick: 'крутиться на хвості',
+    face: { eyes: [[427, 464, 47, 49, '#FCE6BE'], [587, 451, 47, 49, '#FCE6BE']], mouth: [517, 547, '#FEE7BD'] } },
 };
 
 export const DEFAULT_PET = 'rabbit';

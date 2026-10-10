@@ -19,6 +19,7 @@ import ParentHome from './pages/ParentHome';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 const Poc = lazy(() => import('./pages/poc/Poc'));
+const PetsGallery = lazy(() => import('./pages/dev/PetsGallery'));
 const PlacePage = lazy(() => import('./pages/preschool/PlacePage'));
 // панель розробника — у vite dev і на дев-стенді (shkolyaryk-dev); на проді не показується
 const DEV_HOST = typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1|shkolyaryk-dev\.)/.test(window.location.hostname);
@@ -81,6 +82,7 @@ export default function App() {
         <Route path="/place/:id" element={<WebShell><Suspense fallback={null}><PlacePage /></Suspense></WebShell>} />
         {/* PoC анімації — лише за прямим посиланням, окремим чанком. */}
         <Route path="/poc" element={<WebShell><Suspense fallback={null}><Poc /></Suspense></WebShell>} />
+        <Route path="/dev/pets" element={<Suspense fallback={null}><PetsGallery /></Suspense>} />
         {/* Невідомий URL → на головну (без білого екрана). */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

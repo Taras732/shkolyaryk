@@ -33,6 +33,7 @@ const MAP: { title: string; items: Item[] }[] = [
     title: 'Дитина (дошкілля)',
     items: [
       { label: 'Хто грає?', to: '/onboarding?pick=1' },
+      { label: '🐾 Усі друзі (обличчя, дотики)', to: '/dev/pets' },
       { label: 'Головна', to: '/hub', kid: 'preschool' },
       { label: '🔤 Острів Слів', to: '/place/island', kid: 'preschool' },
       { label: '🔤 Острів Слів · English', to: '/place/island?lang=en', kid: 'preschool' },
