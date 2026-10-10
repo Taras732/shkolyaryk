@@ -1,9 +1,19 @@
 import { useState } from 'react';
-import type { GameDefinition, GameComponentProps, Difficulty } from '../types';
+import type { GameDefinition, GameComponentProps, Difficulty, ProfileLevel } from '../types';
+import { usePreschool } from '../shared/preschool';
+import { KidsSort, type KidSortP } from './kids';
 import { Task, boardLevel, useFinish, type Answer } from '../puzzles/shared';
-import { CAP, COLORS, canPour, generate, isSolved, pour, type Tubes } from './core';
+import { CAP, COLORS, KID_LEVELS, canPour, generate, isSolved, pour, type Tubes } from './core';
 
-function Component({ round, onAnswer }: GameComponentProps<{ tubes: Tubes }, Answer>) {
+type P = { tubes: Tubes; cap?: number; kid?: boolean };
+
+function Component(props: GameComponentProps<P, Answer>) {
+  const preschool = usePreschool();
+  if (preschool && props.round.payload.kid) return <KidsSort {...(props as GameComponentProps<KidSortP, Answer>)} />;
+  return <SchoolSort {...props} />;
+}
+
+function SchoolSort({ round, onAnswer }: GameComponentProps<P, Answer>) {
   const start = round.payload.tubes;
   const [t, setT] = useState(start);
   const [sel, setSel] = useState<number | null>(null);
@@ -62,7 +72,7 @@ function Component({ round, onAnswer }: GameComponentProps<{ tubes: Tubes }, Ans
   );
 }
 
-const pzSort: GameDefinition<{ tubes: Tubes }, Answer> = {
+const pzSort: GameDefinition<P, Answer> = {
   id: 'pz-sort',
   title: 'Сортуй кольори',
   subject: 'puzzles',
@@ -70,7 +80,11 @@ const pzSort: GameDefinition<{ tubes: Tubes }, Answer> = {
   icon: '🧪',
   description: 'Переливай кольори між пробірками, щоб у кожній був один колір.',
   accent: '#FCE7F3',
-  generate: (d: Difficulty) => boardLevel(d, { tubes: generate(d) }),
+  generate: (d: Difficulty, level: ProfileLevel) => {
+    const id = `sort-${d}-${Math.random().toString(36).slice(2, 8)}`; // унікальний: інакше зміна рівня лишає стару дошку
+    if (level === 'L0') return boardLevel(d, { tubes: generate(d, Math.random, true), cap: KID_LEVELS[d].cap, kid: true }, id);
+    return boardLevel(d, { tubes: generate(d) }, id);
+  },
   Component,
 };
 

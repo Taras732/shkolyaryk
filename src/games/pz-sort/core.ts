@@ -16,43 +16,51 @@ export const LEVELS: Record<Difficulty, { colors: number; empty: number }> = {
 
 export type Tubes = number[][];
 
-export function canPour(t: Tubes, from: number, to: number): boolean {
-  if (from === to || t[from].length === 0 || t[to].length >= CAP) return false;
+export function canPour(t: Tubes, from: number, to: number, cap = CAP): boolean {
+  if (from === to || t[from].length === 0 || t[to].length >= cap) return false;
   return t[to].length === 0 || t[to][t[to].length - 1] === t[from][t[from].length - 1];
 }
 
-export function pour(t: Tubes, from: number, to: number): Tubes {
-  if (!canPour(t, from, to)) return t;
+export function pour(t: Tubes, from: number, to: number, cap = CAP): Tubes {
+  if (!canPour(t, from, to, cap)) return t;
   const out = t.map((x) => [...x]);
   const color = out[from][out[from].length - 1];
-  while (out[from].length && out[from][out[from].length - 1] === color && out[to].length < CAP) out[to].push(out[from].pop()!);
+  while (out[from].length && out[from][out[from].length - 1] === color && out[to].length < cap) out[to].push(out[from].pop()!);
   return out;
 }
 
-export const isSolved = (t: Tubes) => t.every((x) => x.length === 0 || (x.length === CAP && x.every((c) => c === x[0])));
+export const isSolved = (t: Tubes, cap = CAP) => t.every((x) => x.length === 0 || (x.length === cap && x.every((c) => c === x[0])));
 
 /** Пошук у глибину з пам'яттю станів — перевірити, що розкладку можна розв'язати. */
-export function isSolvable(start: Tubes, limit = 50000): boolean {
+export function isSolvable(start: Tubes, limit = 50000, cap = CAP): boolean {
   const key = (t: Tubes) => t.map((x) => x.join('')).sort().join('|');
   const seen = new Set<string>();
   const stack = [start];
   while (stack.length && seen.size < limit) {
     const t = stack.pop()!;
-    if (isSolved(t)) return true;
+    if (isSolved(t, cap)) return true;
     const k = key(t);
     if (seen.has(k)) continue;
     seen.add(k);
-    for (let i = 0; i < t.length; i++) for (let j = 0; j < t.length; j++) if (canPour(t, i, j)) stack.push(pour(t, i, j));
+    for (let i = 0; i < t.length; i++) for (let j = 0; j < t.length; j++) if (canPour(t, i, j, cap)) stack.push(pour(t, i, j, cap));
   }
   return false;
 }
 
-export function generate(d: Difficulty, rng: () => number = Math.random): Tubes {
-  const { colors, empty } = LEVELS[d];
+/** Дошкілля (10.10.2026): менше кольорів і коротші пробірки — 2×3 → 3×3 → 3×4 кульки. */
+export const KID_LEVELS: Record<Difficulty, { colors: number; empty: number; cap: number }> = {
+  1: { colors: 2, empty: 1, cap: 3 },
+  2: { colors: 3, empty: 1, cap: 3 },
+  3: { colors: 3, empty: 2, cap: 4 },
+};
+
+export function generate(d: Difficulty, rng: () => number = Math.random, kid = false): Tubes {
+  const { colors, empty } = kid ? KID_LEVELS[d] : LEVELS[d];
+  const cap = kid ? KID_LEVELS[d].cap : CAP;
   for (;;) {
-    const units = shuffleWith(Array.from({ length: colors * CAP }, (_, i) => Math.floor(i / CAP)), rng);
-    const tubes: Tubes = Array.from({ length: colors }, (_, i) => units.slice(i * CAP, i * CAP + CAP));
+    const units = shuffleWith(Array.from({ length: colors * cap }, (_, i) => Math.floor(i / cap)), rng);
+    const tubes: Tubes = Array.from({ length: colors }, (_, i) => units.slice(i * cap, i * cap + cap));
     for (let e = 0; e < empty; e++) tubes.push([]);
-    if (!isSolved(tubes) && isSolvable(tubes)) return tubes;
+    if (!isSolved(tubes, cap) && isSolvable(tubes, 50000, cap)) return tubes;
   }
 }
