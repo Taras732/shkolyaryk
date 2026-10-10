@@ -110,13 +110,28 @@ function FacePuppet({ pet, face, onZone, bounce }: { pet: Pet; face: Face; onZon
         </div>
       ))}
 
+      {/* брови й сльозинка: щоб сум і здивування читались з першого погляду (гра «Хто сумує?», 10.10) */}
+      {(face === 'sad' || face === 'o') && eyes.map(([cx, cy, rx, ry], i) => {
+        const left = i === 0;
+        const y = cy - ry - (face === 'o' ? 38 : 16);
+        const d = face === 'o'
+          ? `M ${cx - rx * 0.9} ${y + 10} Q ${cx} ${y - 22} ${cx + rx * 0.9} ${y + 10}`
+          : left ? `M ${cx - rx * 0.9} ${y + 6} L ${cx + rx * 0.8} ${y - 12}` : `M ${cx - rx * 0.8} ${y - 12} L ${cx + rx * 0.9} ${y + 6}`;
+        return (
+          <svg key={`b${i}`} viewBox="0 0 1024 1024" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none' }}>
+            <path d={d} stroke="#3a2a35" strokeWidth={14} fill="none" strokeLinecap="round" />
+            {face === 'sad' && i === 1 && <path d={`M ${cx + rx * 0.3} ${cy + ry + 6} q 14 26 0 40 q -14 -14 0 -40 Z`} fill="#6EC6FF" stroke="#3A8FD0" strokeWidth={4} />}
+          </svg>
+        );
+      })}
+
       {/* ротик поверх намальованого */}
       {(face === 'laugh' || face === 'o' || face === 'chew' || face === 'sad') && (
         <svg viewBox="0 0 100 60" style={{ position: 'absolute', left: P(mouth[0] - 49), top: P(mouth[1] - 20), width: P(98), height: P(58), overflow: 'visible', pointerEvents: 'none' }}>
           <ellipse cx="50" cy="22" rx="44" ry="20" fill={mouth[2]} />
           {face === 'laugh' && <path d="M22 10 Q50 66 78 10 Z" fill="#c2456b" stroke="#7a3550" strokeWidth="4" strokeLinejoin="round" />}
-          {face === 'o' && <ellipse cx="50" cy="22" rx="11" ry="14" fill="#c2456b" stroke="#7a3550" strokeWidth="4" />}
-          {face === 'sad' && <path d="M28 32 Q50 12 72 32" stroke="#7a3550" strokeWidth="5" fill="none" strokeLinecap="round" />}
+          {face === 'o' && <ellipse cx="50" cy="24" rx="15" ry="19" fill="#c2456b" stroke="#7a3550" strokeWidth="4" />}
+          {face === 'sad' && <path d="M24 36 Q50 8 76 36" stroke="#7a3550" strokeWidth="7" fill="none" strokeLinecap="round" />}
           {face === 'chew' && (
             <motion.ellipse cx="50" cy="20" rx="16" fill="#c2456b" stroke="#7a3550" strokeWidth="4" animate={{ ry: [4, 11, 4, 11, 4] }} transition={{ duration: 0.8, repeat: 1 }} />
           )}

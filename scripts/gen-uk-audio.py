@@ -139,6 +139,8 @@ def items() -> dict[str, tuple[str, str]]:
     hsrc = (ROOT / "src" / "games" / "animals-habitat" / "kids.tsx").read_text(encoding="utf-8")
     for aid, name in re.findall(r"\{ id: '(\w+)', name: '([^']+)', hab:", hsrc):
         out[f"hab_an_{aid}"] = (f"{name}?", RATE_NAME)
+    for mid, ask in (("joy", "Хто радіє?"), ("sad", "Хто сумує?"), ("wow", "Хто дивується?"), ("sleepy", "Хто хоче спати?")):
+        out[f"mood_{mid}"] = (ask, RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

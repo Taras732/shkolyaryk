@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, ChoiceGrid } from '../shared/ui';
+import { usePreschool } from '../shared/preschool';
+import { KidsMoods, generateKids, type KidMoodP } from './kids';
 import {
   QUADRANTS,
   QUADRANT_IDS,
@@ -26,7 +28,8 @@ interface Payload {
  * баг Q2: дитина тисне туди, де щойно бачила відповідь, і отримує «помилку».
  * Раніше difficulty ще й ігнорувалась — тепер вона задає крок навчання.
  */
-function generate(difficulty: Difficulty): LevelData<Payload, string> {
+function generate(difficulty: Difficulty, level?: string): LevelData<Payload, string> {
+  if (level === 'L0') return generateKids(difficulty) as unknown as LevelData<Payload, string>;
   const kind = kindFor(difficulty);
   const rng = createRng(0x5eed ^ (difficulty * 7919));
   const tasks = buildRounds(kind, ROUNDS_PER_LEVEL, rng);
@@ -102,7 +105,13 @@ function RulesIntro({ onStart }: { onStart: () => void }) {
   );
 }
 
-function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
+function Component(props: GameComponentProps<Payload, string>) {
+  const preschool = usePreschool();
+  if (preschool && (props.round.payload as unknown as KidMoodP).kid) return <KidsMoods {...(props as unknown as GameComponentProps<KidMoodP, string>)} />;
+  return <SchoolMoods {...props} />;
+}
+
+function SchoolMoods({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
   const { kind, emotion, question, options } = round.payload;
   const [showIntro, setShowIntro] = useState(true);
 
