@@ -35,7 +35,7 @@ sheet = []
 for png in sorted(p for p in SRC.glob("*.png") if not p.stem.startswith("_")):
     if png.stem.startswith(("sea_", "hab_")):  # сцени (пори року) — повна картинка, без вирізання тла
         im = Image.open(png).convert("RGB")
-        im.thumbnail((320, 320))
+        im.thumbnail((640, 640) if png.stem == "sea_pond" else (320, 320))  # ставок — на весь екран гри
         im.save(DST / f"{png.stem}.webp", "WEBP", quality=82, method=6)
         print("ok", png.stem, im.size)
         continue
