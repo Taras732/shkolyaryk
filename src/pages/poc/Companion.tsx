@@ -227,7 +227,7 @@ export default function Companion() {
         )}
       </div>
       {mode === 'friend' && face !== 'sleep' && (
-        <div style={{ position: 'absolute', bottom: '17%', left: 0, right: 0, textAlign: 'center', ...big, fontSize: 12.5, color: '#a0846a' }}>Погладь голову · полоскочи пузико · тицьни в носик · дай {pet.food[0].name}{left === 0 ? ' — спершу пограй' : ''}</div>
+        <div style={{ position: 'absolute', bottom: '17%', left: 0, right: 0, textAlign: 'center', ...big, fontSize: 12.5, color: '#a0846a' }}>Погладь голову · полоскочи пузико · тицьни в носик · нагодуй{left === 0 ? ' — спершу пограй' : ''}</div>
       )}
     </div>
   );
