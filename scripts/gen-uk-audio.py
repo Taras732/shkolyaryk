@@ -113,6 +113,12 @@ def items() -> dict[str, tuple[str, str]]:
     out["pet.hungry"] = ("Кошик порожній. Пограй трішки, і я поїм!", RATE_PHRASE)
     out["pet.chosen"] = ("Шшш, твій друг спить. Пограй, і він прокинеться!", RATE_PHRASE)
     out["pet.sleeping"] = ("Шшш, друг спить. Пограй, і він прокинеться!", RATE_PHRASE)
+    out["pet.wake"] = ("Ура! Доброго ранку! Будемо дружити!", RATE_PHRASE)
+    out["pet.snack"] = ("Ласощі вже в кошику!", RATE_PHRASE)
+    out["pet.pick"] = ("Обери свого друга на головній!", RATE_PHRASE)
+    fsrc = (ROOT / "src" / "pets" / "PetFinish.tsx").read_text(encoding="utf-8")
+    for place, what in re.findall(r"^  (\w+): '([^']+)',$", re.search(r"LEARNED[^{]*\{(.*?)\};", fsrc, re.S).group(1), re.M):
+        out[f"learn_{place}"] = (f"Ням-ням! Тепер я теж трошки {what}!", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
