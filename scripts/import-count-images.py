@@ -4,7 +4,25 @@ rembg вирізає тло, обрізаємо по вмісту; предме�
 """
 from pathlib import Path
 from PIL import Image
+from PIL import ImageDraw
 from rembg import remove
+
+# rembg зрізає світлі деталі (пелюстки соняшника 10.10) — для чисто білого тла заливаємо від кутів
+FLOOD = {"sym_sunflower"}
+
+
+def flood_cut(img):
+    img = img.convert("RGBA")
+    rgb = img.convert("RGB")
+    w, h = img.size
+    for c in [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)]:
+        ImageDraw.floodfill(rgb, c, (255, 0, 255), thresh=40)
+    px, a = rgb.load(), img.load()
+    for y in range(h):
+        for x in range(w):
+            if px[x, y] == (255, 0, 255):
+                a[x, y] = (0, 0, 0, 0)
+    return img
 
 SRC = Path("D:/Dev/kuznya-image-gen/output/shkolyaryk_counting")
 DST = Path(__file__).resolve().parent.parent / "public" / "count"
@@ -13,9 +31,9 @@ HEROES = {"bunny", "bear", "mouse", "chick", "hedgehog", "cat", "fox", "dog", "p
 
 sheet = []
 for png in sorted(p for p in SRC.glob("*.png") if not p.stem.startswith("_")):
-    im = remove(Image.open(png).convert("RGBA"))
+    im = flood_cut(Image.open(png)) if png.stem in FLOOD else remove(Image.open(png).convert("RGBA"))
     im = im.crop(im.getchannel("A").point(lambda v: 255 if v > 16 else 0).getbbox())
-    side = 512 if png.stem in HEROES or png.stem.startswith(("cyc_", "as_")) else 256
+    side = 512 if png.stem in HEROES or png.stem.startswith(("cyc_", "as_", "sym_")) else 256
     im.thumbnail((side, side))
     im.save(DST / f"{png.stem}.webp", "WEBP", quality=85, method=6)
     sheet.append(im)

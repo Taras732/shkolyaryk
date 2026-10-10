@@ -1,5 +1,29 @@
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round, ProfileLevel } from '../types';
 import { PromptCard, ChoiceGrid, shuffle } from '../shared/ui';
+import { usePreschool } from '../shared/preschool';
+import { FindPicture, makeFindRounds, type FindItem, type FindPayload } from '../shared/find-picture';
+
+/** Прапор кодом — точні кольори й пропорції 2:3 (емодзі-прапор Windows малює як «UA»). */
+const Flag = () => (
+  <svg viewBox="0 0 90 60" width={78} height={52} style={{ display: 'block', borderRadius: 4, boxShadow: '0 1px 2px rgba(0,0,0,.25)' }}>
+    <rect width="90" height="30" fill="#0057B7" />
+    <rect y="30" width="90" height="30" fill="#FFD700" />
+  </svg>
+);
+
+/**
+ * Дошкілля (10.10.2026): «Знайди прапор / соняшник / калину…» — намальовані символи, ціль звучить.
+ * Тризуб свідомо не беремо: згенерований герб спотворюється, а з державним символом так не можна.
+ */
+const KID_SYMBOLS: FindItem[] = [
+  { id: 'flag', say: 'прапор', node: <Flag /> },
+  { id: 'sunflower', say: 'соняшник', img: '/count/sym_sunflower.webp' },
+  { id: 'kalyna', say: 'калину', img: '/count/sym_kalyna.webp' },
+  { id: 'vyshyvanka', say: 'вишиванку', img: '/count/sym_vyshyvanka.webp' },
+  { id: 'pysanka', say: 'писанку', img: '/count/sym_pysanka.webp' },
+  { id: 'nightingale', say: 'соловейка', img: '/count/sym_nightingale.webp' },
+];
+export const KID_SYMBOL_SAYS = KID_SYMBOLS.map((x) => [x.id, x.say] as const);
 
 interface Payload {
   question: string;
@@ -137,6 +161,7 @@ export const ROUNDS_PER_LEVEL = 5;
  * краще менше раундів, ніж повтори.
  */
 function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payload, string> {
+  if (level === 'L0') return makeFindRounds(KID_SYMBOLS, difficulty) as unknown as LevelData<Payload, string>;
   const cfg = configFor(difficulty, level);
   const rounds: Round<Payload, string>[] = [];
 
@@ -178,7 +203,14 @@ function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payloa
   return { difficulty, rounds };
 }
 
-function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
+function Component(props: GameComponentProps<Payload, string>) {
+  const preschool = usePreschool();
+  if (preschool && (props.round.payload as unknown as FindPayload).kid)
+    return <FindPicture {...(props as unknown as GameComponentProps<FindPayload, string>)} items={KID_SYMBOLS} phrase={{ key: 'p_find_sym', text: 'Знайди' }} prefix="sym" />;
+  return <SchoolSymbols {...props} />;
+}
+
+function SchoolSymbols({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
   const { question, emoji, options } = round.payload;
   const choices = options.map((opt) => ({ value: opt }));
   return (

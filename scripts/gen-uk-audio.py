@@ -127,6 +127,10 @@ def items() -> dict[str, tuple[str, str]]:
     ssk = (ROOT / "src" / "pets" / "skills.ts").read_text(encoding="utf-8")
     for place, to in re.findall(r"^  (\w+): '([^']+)',$", re.search(r"GO_TO[^{]*\{(.*?)\};", ssk, re.S).group(1), re.M):
         out[f"rec_{place}"] = (f"Ходімо {to}! Я там ще мало вмію.", RATE_PHRASE)
+    out["p_find_sym"] = ("Знайди", RATE_PHRASE)
+    usrc = (ROOT / "src" / "games" / "ua-symbols" / "index.tsx").read_text(encoding="utf-8")
+    for sid, say in re.findall(r"\{ id: '(\w+)', say: '([^']+)'", usrc):
+        out[f"sym_{sid}"] = (f"{say}.", RATE_NAME)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
