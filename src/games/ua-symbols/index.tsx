@@ -1,9 +1,10 @@
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round, ProfileLevel } from '../types';
+import { BOARD_DONE } from '../types';
 import { PromptCard, ChoiceGrid, shuffle } from '../shared/ui';
 import { usePreschool } from '../shared/preschool';
 import { FindPicture, type FindItem, type FindPayload } from '../shared/find-picture';
-import { HutBoard, generateHut, getHut, type HutP } from './hut';
-import { useProfileStore } from '@/stores/useProfileStore';
+import { HutBoard, type HutP } from './hut';
+import { GiftsBoard, generateGifts, type GiftsP } from './gifts';
 
 /** Прапор кодом — точні кольори й пропорції 2:3 (емодзі-прапор Windows малює як «UA»). */
 const Flag = () => (
@@ -164,7 +165,8 @@ export const ROUNDS_PER_LEVEL = 5;
  */
 function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payload, string> {
   // дошкілля: «Прикрась хатинку друга» (10.10); «Знайди…» лишився в коді
-  if (level === 'L0') return generateHut(difficulty, getHut(useProfileStore.getState().activeProfile?.id ?? 'none')) as unknown as LevelData<Payload, string>;
+  // v2: подарунки в хатинці (вибір Тараса, 10.10); «обери й постав» (hut.tsx) лишився в коді
+  if (level === 'L0') return generateGifts(difficulty) as unknown as LevelData<Payload, string>;
   const cfg = configFor(difficulty, level);
   const rounds: Round<Payload, string>[] = [];
 
@@ -208,6 +210,7 @@ function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payloa
 
 function Component(props: GameComponentProps<Payload, string>) {
   const preschool = usePreschool();
+  if (preschool && (props.round.payload as unknown as GiftsP).gifts) return <GiftsBoard {...(props as unknown as GameComponentProps<GiftsP, typeof BOARD_DONE>)} />;
   if (preschool && (props.round.payload as unknown as HutP).hut) return <HutBoard {...(props as unknown as GameComponentProps<HutP, string>)} />;
   if (preschool && (props.round.payload as unknown as FindPayload).kid)
     return <FindPicture {...(props as unknown as GameComponentProps<FindPayload, string>)} items={KID_SYMBOLS} phrase={{ key: 'p_find_sym', text: 'Знайди' }} prefix="sym" album="symbols" />;
@@ -238,6 +241,7 @@ const uaSymbols: GameDefinition<Payload, string> = {
   title: 'Хатинка друга: Україна',
   subject: 'world',
   levels: ['L0', 'L3'],
+  isCorrect: (r, a) => a === r.answer || (r.payload as unknown as GiftsP).gifts === true,
   icon: '🌻',
   description: 'Символи України.',
   accent: '#FEF9C3',

@@ -189,6 +189,9 @@ def items() -> dict[str, tuple[str, str]]:
     out["hut.fact_nightingale"] = ("Соловейко співає найкрасивіше.", RATE_PHRASE)
     out["pys.hello"] = ("Розпишемо писанку! Обери візерунок і торкнись пояска.", RATE_PHRASE)
     out["pys.done"] = ("Яка гарна писанка! Покладемо в хатинку друга.", RATE_PHRASE)
+    out["gift.hello"] = ("Тобі подарунок! Відкрий коробку.", RATE_PHRASE)
+    out["gift.none"] = ("Подивись, яка в нас гарна хатинка! Новий подарунок — після наступних занять.", RATE_PHRASE)
+    out["gift.placed"] = ("Як гарно стало!", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
