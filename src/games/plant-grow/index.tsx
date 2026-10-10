@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { PromptCard, shuffle } from '../shared/ui';
+import { usePreschool } from '../shared/preschool';
+import { KidsPlant, generateKids, type KidPlantP } from './kids';
 
 /** Сентінел-відповідь раунду: саму перевірку виконує Component при завершенні ряду. */
 const SORTED = 'sorted' as const;
@@ -32,7 +34,8 @@ function buildRound(index: number, count: number): Round<Payload, SortAnswer> {
   return { id: `r${index}`, payload: { items, correctOrder }, answer: SORTED };
 }
 
-function generate(difficulty: Difficulty): LevelData<Payload, SortAnswer> {
+function generate(difficulty: Difficulty, level?: string): LevelData<Payload, SortAnswer> {
+  if (level === 'L0') return generateKids(difficulty) as unknown as LevelData<Payload, SortAnswer>;
   const count = stageCountFor(difficulty);
   const rounds: Round<Payload, SortAnswer>[] = [];
   for (let i = 0; i < 5; i++) rounds.push(buildRound(i, count));
@@ -41,7 +44,13 @@ function generate(difficulty: Difficulty): LevelData<Payload, SortAnswer> {
 
 const WRONG_FEEDBACK_MS = 450;
 
-function Component({ round, disabled, answerState, onAnswer, onMistake }: GameComponentProps<Payload, SortAnswer>) {
+function Component(props: GameComponentProps<Payload, SortAnswer>) {
+  const preschool = usePreschool();
+  if (preschool && (props.round.payload as unknown as KidPlantP).kid) return <KidsPlant {...(props as unknown as GameComponentProps<KidPlantP, string>)} />;
+  return <SchoolPlant {...props} />;
+}
+
+function SchoolPlant({ round, disabled, answerState, onAnswer, onMistake }: GameComponentProps<Payload, SortAnswer>) {
   const { items, correctOrder } = round.payload;
   const [taken, setTaken] = useState<string[]>([]);
   const [wrongId, setWrongId] = useState<string | null>(null);

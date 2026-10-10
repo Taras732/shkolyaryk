@@ -141,6 +141,9 @@ def items() -> dict[str, tuple[str, str]]:
         out[f"hab_an_{aid}"] = (f"{name}?", RATE_NAME)
     for mid, ask in (("joy", "Хто радіє?"), ("sad", "Хто сумує?"), ("wow", "Хто дивується?"), ("sleepy", "Хто хоче спати?")):
         out[f"mood_{mid}"] = (ask, RATE_PHRASE)
+    out["p_plant"] = ("Що потрібно квіточці?", RATE_PHRASE)
+    out["br_in"] = ("Вдих…", RATE_PHRASE)
+    out["br_out"] = ("Видих…", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

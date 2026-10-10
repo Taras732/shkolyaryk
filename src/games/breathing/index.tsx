@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import type { GameDefinition, GameComponentProps, Difficulty, LevelData, Round } from '../types';
 import { BOARD_DONE } from '../types';
 import { PromptCard } from '../shared/ui';
+import { sayUk } from '../shared/uk-audio';
+import { usePreschool } from '../shared/preschool';
 
 type Answer = typeof BOARD_DONE;
 
@@ -27,6 +29,9 @@ function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
 function Component({ round, answerState, onAnswer }: GameComponentProps<Payload, Answer>) {
   const { cycles } = round.payload;
   const [phase, setPhase] = useState<'inhale' | 'exhale'>('inhale');
+  const preschool = usePreschool();
+  // дошкільня не читає «Вдих… / Видих…» — фаза звучить (10.10)
+  useEffect(() => { if (preschool) sayUk(phase === 'inhale' ? 'br_in' : 'br_out', phase === 'inhale' ? 'Вдих…' : 'Видих…'); }, [phase, preschool]);
 
   useEffect(() => {
     let cancelled = false;

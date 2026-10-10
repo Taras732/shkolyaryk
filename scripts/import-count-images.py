@@ -8,7 +8,9 @@ from PIL import ImageDraw
 from rembg import remove
 
 # rembg зрізає світлі деталі (пелюстки соняшника 10.10) — для чисто білого тла заливаємо від кутів
-FLOOD = {"sym_sunflower"}
+FLOOD = {"sym_sunflower", "pg_sun"}
+# генератор інколи дописує текст унизу — обрізаємо частку висоти знизу (pg_sun 10.10)
+CROP_BOTTOM = {"pg_sun": 0.8}
 
 
 def flood_cut(img):
@@ -38,6 +40,8 @@ for png in sorted(p for p in SRC.glob("*.png") if not p.stem.startswith("_")):
         print("ok", png.stem, im.size)
         continue
     im = flood_cut(Image.open(png)) if png.stem in FLOOD else remove(Image.open(png).convert("RGBA"))
+    if png.stem in CROP_BOTTOM:
+        im = im.crop((0, 0, im.width, int(im.height * CROP_BOTTOM[png.stem])))
     im = im.crop(im.getchannel("A").point(lambda v: 255 if v > 16 else 0).getbbox())
     side = 512 if png.stem in HEROES or png.stem.startswith(("cyc_", "as_", "sym_")) else 256
     im.thumbnail((side, side))

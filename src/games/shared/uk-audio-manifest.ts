@@ -3,6 +3,8 @@
  * Генерується scripts/gen-uk-audio.py — руками не правити.
  */
 export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
+  'br_in',
+  'br_out',
   'c_В',
   'c_З',
   'c_Л',
@@ -160,6 +162,7 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'p_more',
   'p_more_who',
   'p_odd',
+  'p_plant',
   'p_pour',
   'p_remember',
   'p_share',
