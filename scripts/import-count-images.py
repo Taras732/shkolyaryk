@@ -31,6 +31,12 @@ HEROES = {"bunny", "bear", "mouse", "chick", "hedgehog", "cat", "fox", "dog", "p
 
 sheet = []
 for png in sorted(p for p in SRC.glob("*.png") if not p.stem.startswith("_")):
+    if png.stem.startswith("sea_"):  # сцени (пори року) — повна картинка, без вирізання тла
+        im = Image.open(png).convert("RGB")
+        im.thumbnail((320, 320))
+        im.save(DST / f"{png.stem}.webp", "WEBP", quality=82, method=6)
+        print("ok", png.stem, im.size)
+        continue
     im = flood_cut(Image.open(png)) if png.stem in FLOOD else remove(Image.open(png).convert("RGBA"))
     im = im.crop(im.getchannel("A").point(lambda v: 255 if v > 16 else 0).getbbox())
     side = 512 if png.stem in HEROES or png.stem.startswith(("cyc_", "as_", "sym_")) else 256

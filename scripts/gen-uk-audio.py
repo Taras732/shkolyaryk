@@ -131,6 +131,9 @@ def items() -> dict[str, tuple[str, str]]:
     usrc = (ROOT / "src" / "games" / "ua-symbols" / "index.tsx").read_text(encoding="utf-8")
     for sid, say in re.findall(r"\{ id: '(\w+)', say: '([^']+)'", usrc):
         out[f"sym_{sid}"] = (f"{say}.", RATE_NAME)
+    out["p_find_season"] = ("Знайди", RATE_PHRASE)
+    for sid, say in (("winter", "зиму"), ("spring", "весну"), ("summer", "літо"), ("autumn", "осінь")):
+        out[f"season_{sid}"] = (f"{say}.", RATE_NAME)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
