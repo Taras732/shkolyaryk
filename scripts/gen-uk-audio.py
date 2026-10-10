@@ -134,6 +134,7 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_find_season"] = ("Знайди", RATE_PHRASE)
     for sid, say in (("winter", "зиму"), ("spring", "весну"), ("summer", "літо"), ("autumn", "осінь")):
         out[f"season_{sid}"] = (f"{say}.", RATE_NAME)
+    out["p_sinkfloat"] = ("Плаває чи тоне? Торкнись, де воно буде!", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
