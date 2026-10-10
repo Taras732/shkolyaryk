@@ -38,3 +38,17 @@ export function markEaten(profileId: string, now = Date.now()): number {
   }
   return eaten;
 }
+
+/** Животик (v2): яблучка-знання за кроки плану сьогодні — друг з'їдає їх на фініші гри. */
+export function tummyToday(log: LogEntry[], planIds: string[], now = Date.now()): number {
+  const day = localDay(now);
+  const plan = new Set(planIds);
+  return Math.min(PLAN_FOOD_MAX, new Set(log.filter((e) => localDay(e.at) === day && plan.has(e.gameId)).map((e) => e.gameId)).size);
+}
+
+/** Ласощі в кошику (v2): кожні 2 вільні гри сьогодні — одна, до 2. Годують руками на вкладці «Друг». */
+export function snacksToday(log: LogEntry[], planIds: string[], now = Date.now()): number {
+  const day = localDay(now);
+  const plan = new Set(planIds);
+  return Math.min(FREE_FOOD_MAX, Math.floor(log.filter((e) => localDay(e.at) === day && !plan.has(e.gameId)).length / FREE_GAMES_PER_FOOD));
+}

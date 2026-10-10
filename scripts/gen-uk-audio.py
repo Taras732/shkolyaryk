@@ -119,6 +119,11 @@ def items() -> dict[str, tuple[str, str]]:
     fsrc = (ROOT / "src" / "pets" / "PetFinish.tsx").read_text(encoding="utf-8")
     for place, what in re.findall(r"^  (\w+): '([^']+)',$", re.search(r"LEARNED[^{]*\{(.*?)\};", fsrc, re.S).group(1), re.M):
         out[f"learn_{place}"] = (f"Ням-ням! Тепер я теж трошки {what}!", RATE_PHRASE)
+    out["poc.wake"] = ("Ой, я спав… Доброго ранку!", RATE_PHRASE)
+    out["poc.morning"] = ("Доброго ранку!", RATE_PHRASE)
+    out["poc.sleep"] = ("Добраніч. Завтра пограємо", RATE_PHRASE)
+    out["pet.wantapple"] = ("Пограймо «На сьогодні» — там ростуть яблучка!", RATE_PHRASE)
+    out["pet.nosnack"] = ("Ласощі зʼявляються за ігри. Пограй ще трішки!", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

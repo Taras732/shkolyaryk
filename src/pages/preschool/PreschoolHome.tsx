@@ -10,7 +10,7 @@ import { petById } from '@/pets/pets';
 import { usePetChoice } from '@/pets/state';
 import SleepyBasket from '@/pets/SleepyBasket';
 import PetPicker from '@/pets/PetPicker';
-import Companion from '@/pages/poc/Companion';
+import FriendTab from '@/pets/FriendTab';
 import type { Face } from '@/pages/poc/Bunny';
 import { PLACES } from './places';
 import BottomNav from './BottomNav';
@@ -65,7 +65,7 @@ export default function PreschoolHome() {
     <div style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', background: '#FFF8EE', overflow: 'hidden' }}>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', padding: '10px 16px 8px', maxWidth: 520, width: '100%', margin: '0 auto' }}>
         {tab === 'friend' ? (
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center' }}><Companion /></div>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center' }}><FriendTab /></div>
         ) : (
           <>
             {/* звірятко + привітання */}
