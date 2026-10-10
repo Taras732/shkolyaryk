@@ -97,6 +97,8 @@ def items() -> dict[str, tuple[str, str]]:
     for sid, name in re.findall(r"(\w+): '([^']+)'", re.search(r"SHAPE_NAMES[^{]*\{(.*?)\};", ssrc2, re.S).group(1)):
         out[f"shape_{sid}"] = (f"{name}.", RATE_NAME)
     out["p_heavy"] = ("Хто важчий?", RATE_PHRASE)
+    out["p_sort_size"] = ("Від маленького до великого!", RATE_PHRASE)
+    out["p_sort_cycle"] = ("Що спочатку, а що потім?", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
