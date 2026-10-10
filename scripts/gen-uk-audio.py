@@ -164,6 +164,8 @@ def items() -> dict[str, tuple[str, str]]:
     out["dress.hello_empty"] = ("Одягни мене! Ще речі — у грі «Що вдягнути?»", RATE_PHRASE)
     out["xylo.hello"] = ("Послухай і повтори за мною!", RATE_PHRASE)
     out["color.hello"] = ("Обери фарбу й торкнись малюнка!", RATE_PHRASE)
+    out["gears.rule"] = ("Зубчики штовхають сусіда — тому він крутиться в інший бік. Куди крутитиметься остання?", RATE_PHRASE)
+    out["gears.q"] = ("Куди крутитиметься остання?", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):

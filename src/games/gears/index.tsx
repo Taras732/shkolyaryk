@@ -10,6 +10,8 @@ import type {
 } from '../types';
 import { classBand, gradeBandFor } from '../types';
 import { PromptCard, ChoiceGrid } from '../shared/ui';
+import { usePreschool } from '../shared/preschool';
+import { KidsGears, generateKids, type KidGearP } from './kids';
 import {
   generateChain,
   allDirections,
@@ -36,6 +38,7 @@ function bandFor(level: ProfileLevel, difficulty: Difficulty, classLevel?: Class
 }
 
 function generate(difficulty: Difficulty, level: ProfileLevel, classLevel?: ClassLevel): LevelData<Payload, string> {
+  if (level === 'L0') return generateKids(difficulty) as unknown as LevelData<Payload, string>;
   const band = bandFor(level, difficulty, classLevel);
   const rng = createRng(0x9ea7 ^ (difficulty * 7919) ^ band.charCodeAt(1) * 131);
   const rounds: Round<Payload, string>[] = Array.from({ length: ROUNDS_PER_LEVEL }, (_, i) => {
@@ -140,7 +143,13 @@ function RulesIntro({ onStart }: { onStart: () => void }) {
   );
 }
 
-function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
+function Component(props: GameComponentProps<Payload, string>) {
+  const preschool = usePreschool();
+  if (preschool && (props.round.payload as unknown as KidGearP).kid) return <KidsGears {...(props as unknown as GameComponentProps<KidGearP, string>)} />;
+  return <SchoolGears {...props} />;
+}
+
+function SchoolGears({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, string>) {
   const { chain } = round.payload;
   const [showIntro, setShowIntro] = useState(true);
 

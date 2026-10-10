@@ -50,6 +50,8 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'garden.hello',
   'garden.nowater',
   'garden.planted',
+  'gears.q',
+  'gears.rule',
   'hab_an_bear',
   'hab_an_chick',
   'hab_an_cow',
