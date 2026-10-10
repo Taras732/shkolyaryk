@@ -9,10 +9,10 @@ from rembg import remove
 SRC = Path("D:/Dev/kuznya-image-gen/output/shkolyaryk_counting")
 DST = Path(__file__).resolve().parent.parent / "public" / "count"
 DST.mkdir(parents=True, exist_ok=True)
-HEROES = {"bunny", "bear"}
+HEROES = {"bunny", "bear", "mouse", "chick", "hedgehog", "cat", "fox", "dog", "pig", "cow", "horse", "elephant"}
 
 sheet = []
-for png in sorted(SRC.glob("*.png")):
+for png in sorted(p for p in SRC.glob("*.png") if not p.stem.startswith("_")):
     im = remove(Image.open(png).convert("RGBA"))
     im = im.crop(im.getchannel("A").point(lambda v: 255 if v > 16 else 0).getbbox())
     side = 512 if png.stem in HEROES else 256
@@ -23,7 +23,7 @@ for png in sorted(SRC.glob("*.png")):
 
 # аркуш для огляду
 W = 180
-board = Image.new("RGB", (W * 6, W * 2), (255, 243, 214))
+board = Image.new("RGB", (W * 6, W * 4), (255, 243, 214))
 for i, im in enumerate(sheet):
     t = im.copy()
     t.thumbnail((W - 20, W - 20))
