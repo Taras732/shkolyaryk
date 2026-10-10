@@ -5,7 +5,7 @@ import type { Face, Zone } from '@/pages/poc/Bunny';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { readLog, localDay } from '@/school/game-log';
 import { resolvePlan } from '@/school/plan-resolve';
-import { PLACES } from '@/pages/preschool/places';
+import { placeStars } from './skills';
 import PetPuppet from './PetPuppet';
 import SleepyBasket from './SleepyBasket';
 import PetPicker from './PetPicker';
@@ -47,16 +47,11 @@ function AwakeFriend({ profileId, petId }: { profileId: string; petId: string })
   const { tummy, snacks, places, days } = useMemo(() => {
     const log = readLog(profileId);
     const plan = resolvePlan(profile).slice(0, 3).map((s) => s.gameId);
-    const played = new Set(log.map((e) => e.gameId));
     return {
       tummy: tummyToday(log, plan),
       snacks: snacksToday(log, plan),
       days: new Set(log.map((e) => localDay(e.at))).size,
-      // що вміє друг по місцях: частка ігор місця, які дитина вже пройшла → 0–3 зірочки
-      places: PLACES.filter((p) => p.games.length).map((p) => {
-        const share = p.games.filter((g) => played.has(g)).length / p.games.length;
-        return { id: p.id, title: p.title, image: p.image, emoji: p.emoji, stars: share === 0 ? 0 : share < 0.5 ? 1 : share < 1 ? 2 : 3 };
-      }),
+      places: placeStars(log),
     };
   }, [profileId, profile]);
   const [eaten, setEaten] = useState(() => eatenToday(profileId));

@@ -10,6 +10,8 @@ import { petById } from '@/pets/pets';
 import { usePetChoice } from '@/pets/state';
 import SleepyBasket from '@/pets/SleepyBasket';
 import PetPicker from '@/pets/PetPicker';
+import { recLine, recommendPlace } from '@/pets/skills';
+import { readLog } from '@/school/game-log';
 import FriendTab from '@/pets/FriendTab';
 import type { Face } from '@/pages/poc/Bunny';
 import { PLACES } from './places';
@@ -48,14 +50,16 @@ export default function PreschoolHome() {
   const pages = Array.from({ length: Math.ceil(PLACES.length / PER_PAGE) }, (_, i) => PLACES.slice(i * PER_PAGE, i * PER_PAGE + PER_PAGE));
   // без імені: кличний відмінок («Маріє») автоматично не утворити
   // друг v2: не обрано → кошик світиться; обрано, але спить → «пограй, і прокинеться»
-  const hello = !choice.petId ? 'Хтось тут спить! Обери свого друга.' : !choice.awake ? 'Шшш… друг спить. Пограй, і він прокинеться!' : 'Привіт! Пограємо?';
+  // друг прокинувся → радить місце, де вміє найменше (тап по бульбашці веде туди)
+  const rec = choice.petId && choice.awake ? recommendPlace(readLog(activeProfile.id), petById(choice.petId).place) : null;
+  const hello = !choice.petId ? 'Хтось тут спить! Обери свого друга.' : !choice.awake ? 'Шшш… друг спить. Пограй, і він прокинеться!' : recLine(rec!);
 
   const poke = () => {
     if (!choice.petId) { setPicking(true); return; }
     if (!choice.awake) { sayUk('pet.sleeping', 'Шшш, друг спить. Пограй, і він прокинеться!'); return; }
     setFace('happy');
     setBounce((b) => b + 1);
-    sayUk('pre.hello', hello);
+    sayUk(`rec_${rec}`, hello);
     setTimeout(() => setFace('smile'), 1400);
   };
 
@@ -79,9 +83,10 @@ export default function PreschoolHome() {
                     </button>
                   )}
               </div>
-              <div style={{ ...big, flex: 1, background: '#fff', borderRadius: 18, padding: '10px 12px', fontSize: 16, color: 'var(--c-ink)', boxShadow: '0 5px 0 #F1E3CF', position: 'relative' }}>
-                {hello}
-              </div>
+              <button type="button" onClick={() => (rec ? navigate(`/place/${rec}`) : poke())}
+                style={{ ...big, flex: 1, border: 0, textAlign: 'left', cursor: 'pointer', background: '#fff', borderRadius: 18, padding: '10px 12px', fontSize: 16, color: 'var(--c-ink)', boxShadow: '0 5px 0 #F1E3CF', position: 'relative' }}>
+                {hello}{rec && <span style={{ marginLeft: 6, color: '#F08A24' }}>▶</span>}
+              </button>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 {/* хто грає: аватарка дитини; кілька дітей — тап змінює, одна — просто показ */}
                 <button onClick={profiles.length > 1 ? () => navigate('/onboarding?pick=1') : undefined} disabled={profiles.length < 2}

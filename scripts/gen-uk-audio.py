@@ -124,6 +124,9 @@ def items() -> dict[str, tuple[str, str]]:
     out["poc.sleep"] = ("Добраніч. Завтра пограємо", RATE_PHRASE)
     out["pet.wantapple"] = ("Пограймо «На сьогодні» — там ростуть яблучка!", RATE_PHRASE)
     out["pet.nosnack"] = ("Ласощі зʼявляються за ігри. Пограй ще трішки!", RATE_PHRASE)
+    ssk = (ROOT / "src" / "pets" / "skills.ts").read_text(encoding="utf-8")
+    for place, to in re.findall(r"^  (\w+): '([^']+)',$", re.search(r"GO_TO[^{]*\{(.*?)\};", ssk, re.S).group(1), re.M):
+        out[f"rec_{place}"] = (f"Ходімо {to}! Я там ще мало вмію.", RATE_PHRASE)
     out["p_good"] = ("Молодець!", RATE_PHRASE)
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
