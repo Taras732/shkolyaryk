@@ -27,6 +27,7 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'col_red',
   'col_white',
   'col_yellow',
+  'color.hello',
   'd_0',
   'd_1',
   'd_2',
