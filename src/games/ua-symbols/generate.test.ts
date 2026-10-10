@@ -31,7 +31,8 @@ describe('ua-symbols — раунди не повторюються в межа�
       for (const d of DIFFS) {
         for (let i = 0; i < 40; i++) {
           const { rounds } = uaSymbols.generate(d, level);
-          const keys = rounds.map((r) => `${r.payload.question}|${r.payload.emoji ?? ''}`);
+          // дошкільні раунди («Знайди…») несуть ціль у target
+          const keys = rounds.map((r) => `${r.payload.question}|${r.payload.emoji ?? ''}|${(r.payload as { target?: string }).target ?? ''}`);
           expect(new Set(keys).size, `повтор у ${level}/d${d}: ${keys}`).toBe(keys.length);
         }
       }
