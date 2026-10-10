@@ -1,10 +1,10 @@
 import type { Difficulty } from '../types';
 
-/** Розмір пазла за рівнем: 2×2 → 2×3 → 3×3. */
+/** Розмір пазла за рівнем: 2×2 → 3×3 → 4×4 (рішення Тараса 10.10). */
 export const SIZE: Record<Difficulty, { cols: number; rows: number }> = {
   1: { cols: 2, rows: 2 },
-  2: { cols: 2, rows: 3 },
-  3: { cols: 3, rows: 3 },
+  2: { cols: 3, rows: 3 },
+  3: { cols: 4, rows: 4 },
 };
 
 export const isSolved = (order: number[]) => order.every((v, i) => v === i);

@@ -16,11 +16,15 @@ type Answer = typeof BOARD_DONE;
 
 /** Пазл без «програшу»: для малих важливо дійти до картинки, а не не помилитись. */
 function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
-  const img = PUZZLE_IMAGES[Math.floor(Math.random() * PUZZLE_IMAGES.length)];
   const { cols, rows } = SIZE[difficulty];
+  const pool = cols >= 4 ? PUZZLE_IMAGES.filter((i) => i.fine) : PUZZLE_IMAGES;
+  const { src, name } = pool[Math.floor(Math.random() * pool.length)];
+  const img = { src, name };
+  const start = scramble(cols * rows);
   const round: Round<Payload, Answer> = {
-    id: 'pp',
-    payload: { ...img, cols, rows, start: scramble(cols * rows), hint: difficulty === 1 },
+    // унікальний id: GameShell ключує раунд за id — з постійним 'pp' зміна рівня лишала старі шматки
+    id: `pp-${cols}x${rows}-${start.join('.')}`,
+    payload: { ...img, cols, rows, start, hint: difficulty === 1 },
     answer: BOARD_DONE,
   };
   return { difficulty, rounds: [round] };

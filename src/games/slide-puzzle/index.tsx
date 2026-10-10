@@ -16,10 +16,11 @@ type Answer = typeof BOARD_DONE;
 function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
   const img = PUZZLE_IMAGES[Math.floor(Math.random() * PUZZLE_IMAGES.length)];
   const { n, moves } = LEVELS[difficulty];
+  const start = shuffleByMoves(n, moves);
   const round: Round<Payload, Answer> = {
-    id: 'sp',
+    id: `sp-${n}-${start.join('.')}`, // унікальний: зі сталим id зміна рівня лишала стару дошку
     // номери-підказки в куточку — на перших рівнях, щоб було за що зачепитись
-    payload: { ...img, n, start: shuffleByMoves(n, moves), numbers: difficulty < 3 },
+    payload: { ...img, n, start, numbers: difficulty < 3 },
     answer: BOARD_DONE,
   };
   return { difficulty, rounds: [round] };
