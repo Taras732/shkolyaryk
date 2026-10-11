@@ -208,7 +208,8 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   // старші математичні теми — не раніше відповідного класу НУШ
   'times-tables': ['grade2', 'grade3', 'grade4'],
   'fractions-compare': ['grade2', 'grade3', 'grade4'],
-  'column-arithmetic': ['grade1', 'grade2', 'grade3', 'grade4'],
+  // стовпчик — не в програмі 1 класу (Савченко, звірка 10.10): лише з 2 класу
+  'column-arithmetic': ['grade2', 'grade3', 'grade4'],
   'perimeter-area': ['grade2', 'grade3', 'grade4'],
   'magic-square': ['grade3', 'grade4'],
   // розгортки куба — просторова тема 3–4 класу

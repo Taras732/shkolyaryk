@@ -22,6 +22,7 @@ describe('gamesForClass (G3) — доступність ігор за класо
 
   it('множення/дроби — з 2 класу, не з 1', () => {
     expect(idsFor('grade1')).not.toContain('times-tables');
+    expect(idsFor('grade1')).not.toContain('column-arithmetic');
     expect(idsFor('grade2')).toContain('times-tables');
     expect(idsFor('grade2')).toContain('fractions-compare');
   });
