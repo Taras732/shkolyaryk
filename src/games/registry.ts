@@ -235,6 +235,8 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   // числа до 100 — 2 півріччя 1 класу; у план дня поки не додано (жовтень)
   'tens-ones': ['grade1', 'grade2'],
   'pictograms': ['grade1'],
+  // «Склади слово» — і 1 класу (читання слів)
+  'syllable-build': ['preschool', 'grade1'],
   'uk-sounds': ['grade1'],
   'uk-sentences': ['grade1'],
   'uk-words': ['grade1'],

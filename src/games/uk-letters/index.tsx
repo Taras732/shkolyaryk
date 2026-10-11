@@ -313,7 +313,7 @@ const ukLetters: GameDefinition<BoardPayload, Answer> = {
   description: 'Буквар групами: почуй звук, знайди букву й картинку; хто знає — проходить швидко.',
   accent: '#FEF3C7',
   // 11.10: мовні навички 1 класу (гра без класової осі)
-  skillIds: { 1: ['language.sounds.l1.letter-sound-match', 'language.sounds.l1.vowels-consonants'], 2: ['language.sounds.l1.letter-sound-match', 'language.sounds.l1.vowels-consonants'], 3: ['language.sounds.l1.letter-sound-match', 'language.sounds.l1.vowels-consonants'] },
+  skillIds: { 1: ['language.sounds.l1.letter-sound-match', 'language.sounds.l1.vowels-consonants', 'language.sounds.l1.alphabet'], 2: ['language.sounds.l1.letter-sound-match', 'language.sounds.l1.vowels-consonants', 'language.sounds.l1.alphabet'], 3: ['language.sounds.l1.letter-sound-match', 'language.sounds.l1.vowels-consonants', 'language.sounds.l1.alphabet'] },
   generate,
   Component,
 };

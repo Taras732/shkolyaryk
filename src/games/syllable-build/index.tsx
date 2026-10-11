@@ -166,6 +166,8 @@ const syllableBuild: GameDefinition<BoardPayload, Answer> = {
   icon: '🔡',
   description: 'Почуй слово й склади його з плиток по порядку.',
   accent: '#EEEBFF',
+  // 11.10: читання слів (1 клас) — дитина складає й читає слово по буквах
+  skillIds: { 1: ['language.reading.l1.word-reading'], 2: ['language.reading.l1.word-reading'], 3: ['language.reading.l1.word-reading'] },
   generate,
   Component,
 };

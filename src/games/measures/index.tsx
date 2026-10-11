@@ -202,7 +202,8 @@ const measures: GameDefinition<Payload, string> = {
     const units = cl === 'preschool'
       ? ['math.measure.l1.length-units', 'math.measure.l1.mass-units']
       : ['math.measure.l1.length-units', 'math.measure.l1.mass-units', 'math.measure.l1.capacity-litre'];
-    return d === 2 ? [...units, 'math.measure.l3.named-numbers-convert'] : units;
+    if (d === 2) return [...units, 'math.measure.l3.named-numbers-convert'];
+    return d === 1 && cl === 'grade1' ? [...units, 'math.measure.l1.measure-intro'] : units;
   },
   generate,
   Component,
