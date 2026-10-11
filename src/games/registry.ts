@@ -237,6 +237,8 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'pictograms': ['grade1'],
   // «Склади слово» — і 1 класу (читання слів)
   'syllable-build': ['preschool', 'grade1'],
+  // «Додавання» на предметах — і 1 класу (у межах 10)
+  'addition': ['preschool', 'grade1'],
   'uk-sounds': ['grade1'],
   'uk-sentences': ['grade1'],
   'uk-words': ['grade1'],

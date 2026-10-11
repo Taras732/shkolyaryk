@@ -1,4 +1,4 @@
-import type { Difficulty, GradeBand, LevelData, ProfileLevel, Round } from '../types';
+import type { ClassLevel, Difficulty, GradeBand, LevelData, ProfileLevel, Round } from '../types';
 import { gradeBandFor } from '../types';
 import { randInt } from '../shared/ui';
 
@@ -28,8 +28,10 @@ export const LIMITS_BY_BAND: Record<GradeBand, Limits> = {
   L4: { maxA: 10, maxB: 9, maxSum: 20 },
 };
 
-export function generate(difficulty: Difficulty, level: ProfileLevel): LevelData<Payload, number> {
-  const { maxA, maxB, maxSum } = LIMITS_BY_BAND[gradeBandFor(level, difficulty)];
+export function generate(difficulty: Difficulty, level: ProfileLevel, classLevel?: ClassLevel): LevelData<Payload, number> {
+  // 11.10: 1 клас — на предметах лише в межах 10 (програма Савченко), не до 15–20, як дав би шкільний трек
+  const band = classLevel === 'grade1' ? (['L1', 'L2', 'L2'] as const)[difficulty - 1] : gradeBandFor(level, difficulty);
+  const { maxA, maxB, maxSum } = LIMITS_BY_BAND[band];
   const used = new Set<string>();
   const rounds: Round<Payload, number>[] = [];
   for (let i = 0; i < ROUNDS_PER_LEVEL; i++) {
