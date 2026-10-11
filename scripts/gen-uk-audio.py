@@ -204,6 +204,13 @@ def items() -> dict[str, tuple[str, str]]:
                      ("polyline", "ламану"), ("closed", "замкнену ламану")):
         out[f"line_{lid}"] = (f"{say}.", RATE_NAME)
     out["p_measure"] = ("Яка довжина відрізка?", RATE_PHRASE)
+    # Звуки в слові, 1 клас (11.10)
+    out["p_snd_vc"] = ("Голосний чи приголосний?", RATE_PHRASE)
+    out["p_snd_hs"] = ("Твердий чи мʼякий?", RATE_PHRASE)
+    out["p_snd_stress"] = ("Де наголос?", RATE_PHRASE)
+    wsrc = (ROOT / "src" / "games" / "uk-sounds" / "words.ts").read_text(encoding="utf-8")
+    for w in set(re.findall(r"word: '([^']+)'", wsrc)):
+        out.setdefault(f"w_{w}", (f"{w.capitalize()}!", RATE_WORD))
     # Склад числа, 1 клас (11.10)
     out["p_parts_hidden"] = ("Скільки сховалось?", RATE_PHRASE)
     out["p_parts_pair"] = ("Що разом дає", RATE_PHRASE)

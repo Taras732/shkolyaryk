@@ -33,6 +33,7 @@ import ukSyllables from './uk-syllables';
 import syllableWords from './syllable-words';
 import ukReading from './uk-reading';
 import ukSpelling from './uk-spelling';
+import ukSounds from './uk-sounds';
 // --- Англійська ---
 import lettersFindEn from './letters-find-en';
 import englishWordPicture from './english-word-picture';
@@ -99,7 +100,7 @@ export const GAMES: GameDefinition[] = [
   counting, addition, compare, pzShare, pourKids, pzScales, pzPath, mathExamples, timesTables, mathCompare,
   geoLines, numberParts, columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
-  ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, lettersFind, syllableBuild, readingSpeed, grammarParts,
+  ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, ukSounds, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
   englishWords, enReading, enInstructions, lettersFindEn, englishWordPicture, enTopics,
   // Наука
@@ -222,6 +223,7 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   // лінії й відрізки — геометрія 1 класу (11.10)
   'geo-lines': ['grade1', 'grade2'],
   'number-parts': ['grade1'],
+  'uk-sounds': ['grade1'],
   // мова/світ для старших
   'reading-speed': ['grade2', 'grade3', 'grade4'],
   // 11.10: 1 клас — варіант з питаннями хто? що? / який? / що робить? (без термінів)
