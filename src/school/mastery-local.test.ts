@@ -18,15 +18,37 @@ describe('masteryFromAttempts', () => {
   const skills = [{ id: 'a', mastery_threshold: 0.8 }, { id: 'b', mastery_threshold: 0.8 }];
   const prereqs = [{ skill_id: 'b', prerequisite_id: 'a' }];
 
-  it('EMA по спробах у хронології; b відкривається, коли a засвоєна', () => {
+  it('EMA по спробах у хронології; b відкривається одразу, а «засвоєно» для a — ще ні (один день)', () => {
     const rows = masteryFromAttempts('p', [
       { skillId: 'a', correct: 5, total: 5, at: 2 },
       { skillId: 'a', correct: 4, total: 5, at: 1 },
     ], {}, skills, prereqs);
     const a = rows.find((r) => r.skill_id === 'a')!;
     expect(a.mastery).toBeCloseTo(0.8 + 0.4 * (1 - 0.8));
-    expect(a.status).toBe('mastered');
+    expect(a.status).toBe('frontier');
     expect(rows.find((r) => r.skill_id === 'b')!.status).toBe('frontier');
+  });
+
+  // 11.10.2026: стійкість — «засвоєно» лише після вдалих повторів через 1 і 3 дні
+  const D = 24 * 60 * 60 * 1000;
+  const ok = (at: number) => ({ skillId: 'a', correct: 5, total: 5, at });
+  it('стійкість: день 0 → +1 → +3 дає «засвоєно»; ще +7 — стійко', () => {
+    const two = masteryFromAttempts('p', [ok(0), ok(1 * D), ok(4 * D)], {}, skills, prereqs).find((r) => r.skill_id === 'a')!;
+    expect(two.stability).toBe(2);
+    expect(two.status).toBe('mastered');
+    const three = masteryFromAttempts('p', [ok(0), ok(1 * D), ok(4 * D), ok(11 * D)], {}, skills, prereqs).find((r) => r.skill_id === 'a')!;
+    expect(three.stability).toBe(3);
+  });
+  it('стійкість: зарано (той самий день) не рахується; невдача скидає', () => {
+    const early = masteryFromAttempts('p', [ok(0), ok(D / 2), ok(D * 0.9)], {}, skills, prereqs).find((r) => r.skill_id === 'a')!;
+    expect(early.stability).toBe(0);
+    const reset = masteryFromAttempts('p', [ok(0), ok(1 * D), ok(4 * D), { skillId: 'a', correct: 1, total: 5, at: 5 * D }], {}, skills, prereqs).find((r) => r.skill_id === 'a')!;
+    expect(reset.stability).toBe(0);
+    expect(reset.status).not.toBe('mastered');
+  });
+  it('тест на рівень: стартова точка вважається стійкою', () => {
+    const f = masteryFromAttempts('p', [], { a: 0.9 }, skills, prereqs).find((r) => r.skill_id === 'a')!;
+    expect(f.status).toBe('mastered');
   });
 
   it('тест на рівень — стартова точка, а не стеля', () => {
