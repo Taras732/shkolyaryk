@@ -31,6 +31,7 @@ import spaceTime from './space-time';
 import writeDigits from './write-digits';
 import makeProblem from './make-problem';
 import multMeaning from './mult-meaning';
+import windowOps from './window-ops';
 // --- Мова ---
 import lettersFind from './letters-find';
 import syllableBuild from './syllable-build';
@@ -109,7 +110,7 @@ import pzRiver from './pz-river';
 export const GAMES: GameDefinition[] = [
   // Математика
   counting, addition, compare, pzShare, pourKids, pzScales, pzPath, mathExamples, timesTables, mathCompare,
-  geoLines, numberParts, numberLine, geoShapes, tensOnes, pictograms, spaceTime, writeDigits, makeProblem, multMeaning, columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
+  geoLines, numberParts, numberLine, geoShapes, tensOnes, pictograms, spaceTime, writeDigits, makeProblem, multMeaning, windowOps, columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
   ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, ukSounds, ukSentences, ukWords, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
@@ -247,6 +248,7 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'write-digits': ['grade1'],
   'make-problem': ['grade1'],
   'mult-meaning': ['grade2'],
+  'window-ops': ['grade2'],
   // «Склади слово» — і 1 класу (читання слів)
   'syllable-build': ['preschool', 'grade1'],
   // «Додавання» на предметах — і 1 класу (у межах 10)
