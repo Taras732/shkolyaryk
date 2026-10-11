@@ -48,6 +48,8 @@ const readingSpeed: GameDefinition<Payload, string> = {
   description: 'Читай уважно і розумій зміст: обери слово чи картинку за змістом, а не за схожістю літер.',
   accent: '#EEEBFF',
   // TODO: мапінг на мовні skills коли зʼявляться
+  // 11.10: читання на швидкість з розумінням — плавне свідоме читання (2 клас)
+  skillsFor: () => ['language.reading.l2.fluent-reading'],
   generate,
   Component,
 };

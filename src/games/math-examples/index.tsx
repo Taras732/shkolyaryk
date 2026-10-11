@@ -108,7 +108,7 @@ const mathExamples: GameDefinition<Payload, number> = {
   skillsFor: (d, cl) => {
     if (cl === 'grade1' || cl === 'preschool') return d === 1 ? ['math.ops.l1.add-sub-10'] : ['math.ops.l1.add-sub-no-carry-20'];
     if (cl === 'grade2') {
-      if (d === 1) return ['math.ops.l2.add-sub-no-carry-100', 'math.ops.l2.add-sub-carry-100'];
+      if (d === 1) return ['math.ops.l2.add-sub-no-carry-100', 'math.ops.l2.add-sub-carry-100', 'math.ops.l2.add-sub-carry-20'];
       if (d === 2) return ['math.ops.l2.add-sub-carry-100', 'math.ops.l2.mult-table-2-3'];
       return ['math.ops.l2.add-sub-carry-100', 'math.ops.l2.mult-table-2-3', 'math.ops.l2.division-table'];
     }
