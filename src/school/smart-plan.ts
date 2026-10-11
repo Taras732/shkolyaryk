@@ -27,7 +27,7 @@ export const POOLS: Record<ClassLevel, Partial<Record<Subject, string[]>>> = {
   },
   grade2: {
     math: ['column-arithmetic', 'word-problems', 'math-examples', 'times-tables', 'clock-time', 'money-basics', 'mult-meaning', 'window-ops', 'geo-2'],
-    language: ['uk-spelling', 'uk-reading', 'grammar-parts', 'alpha-hyphen', 'words-2'],
+    language: ['uk-spelling', 'uk-reading', 'grammar-parts', 'alpha-hyphen', 'words-2', 'text-2'],
     english: ['en-reading', 'english-words'],
   },
   grade3: {
