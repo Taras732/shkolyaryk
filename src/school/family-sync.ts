@@ -25,6 +25,7 @@ export const BLOCKS: Record<string, string> = {
   day: 'shk.day.v1.',
   // 11.10: дошкілля й англійська — щоб друг, город і прогрес були однакові на всіх пристроях
   enTopics: 'shk.ent.v1.',
+  enBuild: 'shk.enb.v1.',
   ukSyllables: 'shk.uks.v1.',
   syllableBuild: 'shk.sb.v1.',
   autoplan: 'shk.autoplan.v1.',

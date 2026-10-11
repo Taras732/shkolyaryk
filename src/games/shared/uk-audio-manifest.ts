@@ -253,6 +253,7 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'p_changed',
   'p_count',
   'p_draw_seg',
+  'p_en_build',
   'p_en_find',
   'p_en_know',
   'p_en_new',

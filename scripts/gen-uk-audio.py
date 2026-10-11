@@ -235,6 +235,7 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_en_find"] = ("Послухай і знайди!", RATE_PHRASE)
     out["p_en_new"] = ("Нове слово!", RATE_PHRASE)
     out["p_en_know"] = ("Ти вже знаєш ці слова!", RATE_PHRASE)
+    out["p_en_build"] = ("Склади слово!", RATE_PHRASE)
     esrc = (ROOT / "src" / "games" / "en-topics" / "words.ts").read_text(encoding="utf-8")
     for w in re.findall(r"W\('([^']+)', '", esrc):
         out[f"en_w_{w}"] = (f"{w.capitalize()}.", EN_RATE)
