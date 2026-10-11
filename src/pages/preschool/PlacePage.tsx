@@ -44,7 +44,7 @@ export default function PlacePage() {
   };
 
   return (
-    <div style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', background: '#FFF8EE', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#FFF8EE', overflow: 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 6px', maxWidth: 520, width: '100%', margin: '0 auto' }}>
         <motion.button whileTap={{ scale: 0.9 }} onClick={() => navigate('/hub')} aria-label="Додому"
           style={{ width: 46, height: 46, borderRadius: 14, border: 0, background: '#fff', fontSize: 22, boxShadow: '0 5px 0 #F1E3CF', cursor: 'pointer' }}>🏠</motion.button>

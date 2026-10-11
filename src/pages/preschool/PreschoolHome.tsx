@@ -68,7 +68,7 @@ export default function PreschoolHome() {
   const big = { fontFamily: 'var(--font-round)', fontWeight: 900 } as const;
 
   return (
-    <div style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', background: '#FFF8EE', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#FFF8EE', overflow: 'hidden' }}>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', padding: '10px 16px 8px', maxWidth: 520, width: '100%', margin: '0 auto' }}>
         {tab === 'friend' ? (
           <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center' }}><FriendTab /></div>

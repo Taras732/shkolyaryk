@@ -251,7 +251,7 @@ export default function Start() {
   const levels = role === 'student' ? CLASS_LEVELS.filter((l) => l !== 'preschool') : CLASS_LEVELS;
 
   return (
-    <div style={{ width: '100%', height: '100dvh', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+    <div style={{ width: '100%', height: '100%', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <style>{SCENE_CSS}</style>
       <Meadow />
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12, position: 'relative', zIndex: 1, padding: '14px 16px calc(56px + env(safe-area-inset-bottom))', maxWidth: 520, width: '100%', margin: '0 auto' }}>

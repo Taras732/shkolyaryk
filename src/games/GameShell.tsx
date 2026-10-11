@@ -223,7 +223,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
     const isBoard = round.answer === BOARD_DONE;
     const carrots = isBoard ? boardFilled : Math.round((state.roundIndex / total) * 5);
     return (
-      <div style={{ position: 'relative', width: '100%', height: '100dvh', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <SkyScene />
         <div style={{ position: 'relative', zIndex: 1, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520, margin: '0 auto', padding: '12px 16px 8px' }}>
           {/* угорі лише ← (у місце) і 5 зірочок прогресу */}
@@ -370,7 +370,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
       : onNext ?? again;
     const icon = { height: 84, borderRadius: 24, border: 0, background: '#fff', boxShadow: 'var(--c-shadow)', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', gap: 2, fontSize: 34, cursor: 'pointer', fontFamily: 'var(--font-round)', fontWeight: 900 };
     return (
-      <div style={{ position: 'relative', width: '100%', height: '100dvh', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', background: SKY, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <SkyScene />
         <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520, margin: '0 auto', padding: '16px 16px 28px' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>

@@ -476,9 +476,11 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 1;
-  /* safe-area: не дати контенту (топбар/кнопки) залізти під чубчик/home-indicator */
+  /* safe-area: не дати контенту (топбар/кнопки) залізти під чубчик/home-indicator.
+     Низ (11.10): відступ під home-indicator дають самі екрани з кнопками внизу (BottomNav, місце, вхід) —
+     у своєму кольорі; тут він давав подвійний відступ і смугу іншого кольору. Діти обгортки — height 100%, не 100dvh:
+     інакше на iPhone екран вищий за видиму область на висоту відступів і низ зрізається. */
   padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
 }
