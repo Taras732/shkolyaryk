@@ -15,6 +15,7 @@ import { counts as wordCounts } from '@/games/english-words/core';
 import { LETTERS } from '@/games/uk-letters/letters';
 import { isKnown as letterKnown, type LetterProgress } from '@/games/uk-letters/core';
 import { HOMEWORK_API, loadFamilyCode, saveFamilyCode } from '@/school/homework';
+import { readSyncStatus } from '@/school/family-sync';
 import { fetchTodayReport, linkTelegram } from '@/school/report-sync';
 import { runFamilySync } from '@/school/family-sync-run';
 import { loadReading } from '@/games/uk-reading';
@@ -279,6 +280,18 @@ function RewardEditor({ child }: { child: ChildProfile }) {
  * Звіт у Telegram і сімейний код ЦЬОГО пристрою. Код треба ввести на кожному
  * пристрої дитини один раз — без нього ігри не надсилають подій для звіту.
  */
+/** Остання синхронізація: коли й чи вдалась — збій не має бути мовчазним. */
+function SyncLine() {
+  const st = readSyncStatus();
+  if (!st) return <div style={{ ...small, marginTop: 4 }}>Синхронізації ще не було.</div>;
+  const t = new Date(st.at).toLocaleString('uk-UA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return (
+    <div style={{ ...small, marginTop: 4, color: st.ok ? 'var(--c-mut)' : '#B42318', fontWeight: st.ok ? undefined : 800 }}>
+      {st.ok ? `Остання синхронізація: ${t} ✓` : `Синхронізація не вдалась (${t}): ${st.error}`}
+    </div>
+  );
+}
+
 function ReportPanel() {
   const [code, setCode] = useState(loadFamilyCode);
   const [draft, setDraft] = useState('');
@@ -297,6 +310,7 @@ function ReportPanel() {
       {code ? (
         <>
           <div style={small}>✅ Цей пристрій у сім'ї: прогрес дітей спільний з іншими пристроями, події йдуть у вечірній звіт о 20:00.</div>
+          <SyncLine />
           <button
             className="g-btn soft"
             style={{ marginTop: 10, padding: 10, fontSize: 14 }}

@@ -23,6 +23,20 @@ export const BLOCKS: Record<string, string> = {
   // 11.10: навчальне ядро без Supabase (db.ts) — результат тесту на рівень і план дня
   place: 'shk.place.v1.',
   day: 'shk.day.v1.',
+  // 11.10: дошкілля й англійська — щоб друг, город і прогрес були однакові на всіх пристроях
+  enTopics: 'shk.ent.v1.',
+  ukSyllables: 'shk.uks.v1.',
+  syllableBuild: 'shk.sb.v1.',
+  autoplan: 'shk.autoplan.v1.',
+  pet: 'shk.pet.v1.',
+  petChoice: 'shk.pet.choice.v1.',
+  garden: 'shk.garden.v1.',
+  wardrobe: 'shk.wardrobe.v1.',
+  outfit: 'shk.outfit.v1.',
+  album: 'shk.album.v1.',
+  pysanky: 'shk.pysanky.v1.',
+  hut: 'shk.hut.v1.',
+  placementDone: 'shk_placement_done_',
 };
 
 const GUEST_PROFILES = 'shk_guest_profiles';
@@ -184,6 +198,27 @@ export function mergeLogs(a: string, b: string): string {
   }
 }
 
+const STATUS = 'shk.sync.status.v1';
+
+/** Остання спроба синхронізації — щоб збій не був мовчазним (сторінка «Сімʼя»). */
+export interface SyncStatus {
+  at: number;
+  ok: boolean;
+  error?: string;
+}
+
+function saveStatus(st: SyncStatus) {
+  set(STATUS, JSON.stringify(st));
+}
+
+export function readSyncStatus(): SyncStatus | null {
+  try {
+    return JSON.parse(get(STATUS) ?? 'null') as SyncStatus | null;
+  } catch {
+    return null;
+  }
+}
+
 let running: Promise<boolean> | null = null;
 
 /**
@@ -204,9 +239,15 @@ export function syncFamily(isGuest: boolean, profileIds: string[] = []): Promise
         headers: { 'Content-Type': 'application/json', 'X-Family-Code': code },
         body: JSON.stringify(body),
       });
-      if (!res.ok) return false;
-      return applyDoc(await res.json(), isGuest);
+      if (!res.ok) {
+        saveStatus({ at: Date.now(), ok: false, error: res.status === 401 ? 'код не прийнято' : `сервер відповів ${res.status}` });
+        return false;
+      }
+      const changed = applyDoc(await res.json(), isGuest);
+      saveStatus({ at: Date.now(), ok: true });
+      return changed;
     } catch {
+      saveStatus({ at: Date.now(), ok: false, error: 'немає звʼязку' });
       return false;
     }
   })().finally(() => {
