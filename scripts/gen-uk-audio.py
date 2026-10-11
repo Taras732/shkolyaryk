@@ -256,6 +256,7 @@ def items() -> dict[str, tuple[str, str]]:
     for pi, pa in enumerate(["ранку", "дня", "вечора", "ночі"]):
         out[f"q_part_{pi}"] = (f"Що буває після {pa}?", RATE_PHRASE)
     out["p_rib_long"] = ("Яка стрічка найдовша?", RATE_PHRASE)
+    out["p_write_digit"] = ("Обведи цифру", RATE_PHRASE)
     out["p_rib_short"] = ("Яка стрічка найкоротша?", RATE_PHRASE)
     # Десятки й одиниці, 1 клас (11.10)
     out["p_to_build"] = ("Яке це число?", RATE_PHRASE)

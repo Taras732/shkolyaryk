@@ -309,6 +309,7 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'p_words_multi',
   'p_words_opp',
   'p_words_swap',
+  'p_write_digit',
   'pet.chosen',
   'pet.hi',
   'pet.hungry',
