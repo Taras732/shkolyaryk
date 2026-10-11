@@ -6,7 +6,6 @@ import { recordActivity } from '@/utils/activity';
 import { logGame } from '@/school/game-log';
 import { sendGameEvent } from '@/school/report-sync';
 import { scheduleFamilySync } from '@/school/family-sync-run';
-import { recordGameResult } from '@/school/mastery';
 import { fetchPrereqHint, type PrereqHint } from '@/school/hint';
 import { isWeakResult, buildPrereqHintMessage } from '@/school/hint-core';
 import { encouragementFor } from './shared/encouragement';
@@ -184,7 +183,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
     const newUnlocked = unlockedAfter(state.difficulty, state.stars, prevUnlocked);
     confetti({ particleCount: 140, spread: 80, origin: { y: 0.5 }, disableForReducedMotion: true });
     recordActivity(profileId);
-    logGame(profileId, { at: Date.now(), gameId: game.id, difficulty: state.difficulty, mistakes: state.mistakes, stars: state.stars });
+    logGame(profileId, { at: Date.now(), gameId: game.id, difficulty: state.difficulty, mistakes: state.mistakes, stars: state.stars, total, cls: classLevel });
     const kid = profiles.find((p) => p.id === profileId);
     if (kid) sendGameEvent(kid, game, state.difficulty, state.mistakes);
     scheduleFamilySync();
@@ -197,24 +196,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
       user?.id,
     );
 
-    // A4: mastery-движок. Пишемо attempt + перераховуємо frontier лише для
-    // ігор зі skillIds на цій складності і для синхронізованих профілів
-    // (гість не має рядка profiles у БД → attempt впав би на FK). Fire-and-forget:
-    // не блокує екран результату й не ламає гру, якщо офлайн.
-    // Пишемо результат гри у навчальне ядро для аналітики кабінету — для ВСІХ
-    // ігор (не лише math зі skillIds) і для будь-якого синхронізованого профілю
-    // (гість = анонім-сесія теж має user.id). recordGameResult сам вирішує:
-    // mastery оновлюється лише де є skillIds, інакше — загальний attempt.
-    if (user?.id) {
-      recordGameResult({
-        profileId,
-        skillIds: game.skillIds?.[state.difficulty] ?? [],
-        gameId: game.id,
-        difficulty: state.difficulty,
-        correct: Math.max(0, total - state.mistakes),
-        total,
-      }).catch((e) => console.warn('[mastery] запис пропущено:', e));
-    }
+    // Засвоєння (11.10): окремого запису немає — db.ts рахує його з журналу logGame вище.
 
     // EP12: підказка про непокриту передумову. Скидаємо попередню одразу (щоб
     // не лишити з минулого проходження на цьому ж екрані фінішу), тоді, якщо
@@ -223,7 +205,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
     // рядка в БД).
     setPrereqHint(null);
     const skillIds = game.skillIds?.[state.difficulty] ?? [];
-    if (user?.id && skillIds.length > 0 && isWeakResult(state.stars)) {
+    if (skillIds.length > 0 && isWeakResult(state.stars)) {
       fetchPrereqHint(profileId, skillIds)
         .then(setPrereqHint)
         .catch((e) => console.warn('[hint] підказку пропущено:', e));

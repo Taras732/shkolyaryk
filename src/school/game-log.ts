@@ -9,6 +9,10 @@ export interface LogEntry {
   difficulty: number;
   mistakes: number;
   stars: number;
+  /** Скільки раундів мала гра (з 11.10; раніше не писалось — засвоєння бере 5). */
+  total?: number;
+  /** Клас дитини на момент гри (з 11.10) — щоб навички рахувались за класом. */
+  cls?: string;
 }
 
 const MAX = 1000;

@@ -20,6 +20,9 @@ export const BLOCKS: Record<string, string> = {
   log: 'shk.log.v1.',
   activity: 'shk_activity_',
   check: 'shk.check.v1.',
+  // 11.10: навчальне ядро без Supabase (db.ts) — результат тесту на рівень і план дня
+  place: 'shk.place.v1.',
+  day: 'shk.day.v1.',
 };
 
 const GUEST_PROFILES = 'shk_guest_profiles';
@@ -146,8 +149,11 @@ export function applyDoc(doc: { profiles: Profile[]; states: States }, isGuest: 
     const local = readBlocks(pid, isGuest);
     for (const [name, b] of Object.entries(blocks)) {
       const fp = fingerprint(b.data);
-      if (local[name] !== b.data) {
-        writeBlock(pid, name, b.data);
+      // журнал ігор — джерело засвоєння: записи з двох пристроїв обʼєднуємо, а не затираємо.
+      // Обʼєднане відрізняється від серверного → наступна синхронізація віддасть його назад.
+      const data = name === 'log' && local.log ? mergeLogs(local.log, b.data) : b.data;
+      if (local[name] !== data) {
+        writeBlock(pid, name, data);
         changed = true;
       }
       (meta[pid] ??= {})[name] = fp;
@@ -155,6 +161,27 @@ export function applyDoc(doc: { profiles: Profile[]; states: States }, isGuest: 
   }
   set(META, JSON.stringify(meta));
   return changed;
+}
+
+const LOG_MAX = 1000;
+
+/** Обʼєднати два журнали ігор: без дублів (час + гра), за часом, не довше LOG_MAX. */
+export function mergeLogs(a: string, b: string): string {
+  try {
+    const all = [...(JSON.parse(a) as { at: number; gameId: string }[]), ...(JSON.parse(b) as { at: number; gameId: string }[])];
+    const seen = new Set<string>();
+    const out = all
+      .sort((x, y) => x.at - y.at)
+      .filter((e) => {
+        const k = `${e.at}|${e.gameId}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+    return JSON.stringify(out.slice(-LOG_MAX));
+  } catch {
+    return b;
+  }
 }
 
 let running: Promise<boolean> | null = null;

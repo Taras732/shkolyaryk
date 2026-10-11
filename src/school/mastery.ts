@@ -10,14 +10,11 @@
 // mastered) — похідні, авторитетно перераховуються recomputeFrontier.
 
 import {
-  fetchSkills,
-  fetchSkillPrerequisites,
   fetchMastery,
   insertAttempt,
   upsertMastery,
-  upsertMasteryMany,
 } from './db';
-import { attemptRate, nextMastery, computeStatuses } from './mastery-core';
+import { attemptRate, nextMastery } from './mastery-core';
 import type { SkillMastery } from './types';
 
 export interface GameResult {
@@ -89,34 +86,7 @@ export async function recordGameResult(r: GameResult): Promise<void> {
  * (відсутність запису = locked за замовчуванням). Оновлює тільки те, що змінилось.
  */
 export async function recomputeFrontier(profileId: string): Promise<void> {
-  const [skills, prereqs, mastery] = await Promise.all([
-    fetchSkills(),
-    fetchSkillPrerequisites(),
-    fetchMastery(profileId),
-  ]);
-
-  const masteryById = new Map<string, number>(mastery.map((m) => [m.skill_id, m.mastery]));
-  const existingById = new Map<string, SkillMastery>(mastery.map((m) => [m.skill_id, m]));
-
-  const statuses = computeStatuses(
-    skills.map((s) => ({ id: s.id, mastery_threshold: s.mastery_threshold })),
-    prereqs,
-    masteryById,
-  );
-
-  const updates: Array<Partial<SkillMastery> & { profile_id: string; skill_id: string }> = [];
-  for (const { skillId, status } of statuses) {
-    const existing = existingById.get(skillId);
-    if (status === 'locked') continue; // locked не матеріалізуємо
-    if (existing && existing.status === status) continue; // без змін
-    updates.push({
-      profile_id: profileId,
-      skill_id: skillId,
-      mastery: existing?.mastery ?? 0,
-      status,
-      last_practiced_at: existing?.last_practiced_at ?? null,
-    });
-  }
-
-  await upsertMasteryMany(updates);
+  // 11.10: статуси рахуються під час читання (db.ts → mastery-local-core.ts), матеріалізувати нічого.
+  // Інакше поточні значення записались би як стартова точка тесту на рівень і «заморозили» засвоєння.
+  void profileId;
 }
