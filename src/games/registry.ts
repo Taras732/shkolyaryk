@@ -25,6 +25,7 @@ import geoLines from './geo-lines';
 import numberParts from './number-parts';
 import numberLine from './number-line';
 import geoShapes from './geo-shapes';
+import tensOnes from './tens-ones';
 // --- Мова ---
 import lettersFind from './letters-find';
 import syllableBuild from './syllable-build';
@@ -103,7 +104,7 @@ import pzRiver from './pz-river';
 export const GAMES: GameDefinition[] = [
   // Математика
   counting, addition, compare, pzShare, pourKids, pzScales, pzPath, mathExamples, timesTables, mathCompare,
-  geoLines, numberParts, numberLine, geoShapes, columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
+  geoLines, numberParts, numberLine, geoShapes, tensOnes, columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
   ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, ukSounds, ukSentences, ukWords, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
@@ -230,6 +231,8 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'number-parts': ['grade1'],
   'number-line': ['grade1'],
   'geo-shapes': ['grade1'],
+  // числа до 100 — 2 півріччя 1 класу; у план дня поки не додано (жовтень)
+  'tens-ones': ['grade1', 'grade2'],
   'uk-sounds': ['grade1'],
   'uk-sentences': ['grade1'],
   'uk-words': ['grade1'],

@@ -299,6 +299,8 @@ export const UK_AUDIO_FILES: ReadonlySet<string> = new Set<string>([
   'p_sort_cycle',
   'p_sort_size',
   'p_sum',
+  'p_to_build',
+  'p_to_compare',
   'p_who_sings',
   'p_words_close',
   'p_words_multi',
