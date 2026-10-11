@@ -266,9 +266,11 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
   }, [state.finished]);
 
   const GameComponent = game.Component;
-  const preschool = classLevel === 'preschool';
   /** Дев-стенд або localhost — показуємо інструменти перевірки (перемикач рівня). */
   const DEV_HOST = import.meta.env.DEV || /^(localhost|127\.0\.0\.1|shkolyaryk-dev\.)/.test(window.location.hostname);
+  // 11.10: примірка вигляду (варіант А) — на дев-стенді ?frame=kids відкриває будь-яку гру в дошкільній рамці
+  const kidsFrame = DEV_HOST && new URLSearchParams(window.location.search).get('frame') === 'kids';
+  const preschool = classLevel === 'preschool' || kidsFrame;
 
   if (!state.finished && preschool) {
     const isBoard = round.answer === BOARD_DONE;
