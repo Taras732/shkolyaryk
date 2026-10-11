@@ -86,11 +86,11 @@ const perimeterArea: GameDefinition<Payload, number> = {
   // складені фігури (обидва навички разом), узгоджено зі skill-graph.
   skillIds: {
     1: ['math.measure.l2.perimeter'],
-    2: ['math.measure.l3.area'],
-    3: ['math.measure.l2.perimeter', 'math.measure.l3.area'],
+    2: ['math.measure.l4.area'],
+    3: ['math.measure.l2.perimeter', 'math.measure.l4.area'],
   },
   // 11.10: 2 клас — лише периметр (CLASS_CONFIG), площа — з 3–4 класу
-  skillsFor: (d, cl) => (cl === 'grade2' ? ['math.measure.l2.perimeter'] : d === 1 ? ['math.measure.l2.perimeter'] : d === 2 ? ['math.measure.l3.area'] : ['math.measure.l2.perimeter', 'math.measure.l3.area']),
+  skillsFor: (d, cl) => (cl === 'grade2' ? ['math.measure.l2.perimeter'] : d === 1 ? ['math.measure.l2.perimeter'] : d === 2 ? ['math.measure.l4.area'] : ['math.measure.l2.perimeter', 'math.measure.l4.area']),
   generate,
   Component,
 };
