@@ -204,6 +204,13 @@ def items() -> dict[str, tuple[str, str]]:
                      ("polyline", "ламану"), ("closed", "замкнену ламану")):
         out[f"line_{lid}"] = (f"{say}.", RATE_NAME)
     out["p_measure"] = ("Яка довжина відрізка?", RATE_PHRASE)
+    # Слова, 1 клас (11.10): усі слова гри — w_<слово>
+    out["p_words_opp"] = ("Знайди протилежне за значенням.", RATE_PHRASE)
+    out["p_words_close"] = ("Знайди близьке за значенням.", RATE_PHRASE)
+    out["p_words_swap"] = ("Послухай уважно і знайди картинку.", RATE_PHRASE)
+    wdsrc = (ROOT / "src" / "games" / "uk-words" / "data.ts").read_text(encoding="utf-8")
+    for w in set(re.findall(r"(?:a|b|opp|word|pair): '([^']+)'", wdsrc)):
+        out.setdefault(f"w_{w}", (f"{w.capitalize()}!", RATE_WORD))
     # Речення, 1 клас (11.10): повні речення, інтонація зі знака в кінці
     out["p_sen_count"] = ("Скільки слів у реченні?", RATE_PHRASE)
     out["p_sen_fill"] = ("Доповни речення.", RATE_PHRASE)

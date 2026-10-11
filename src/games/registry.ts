@@ -37,6 +37,7 @@ import ukReading from './uk-reading';
 import ukSpelling from './uk-spelling';
 import ukSounds from './uk-sounds';
 import ukSentences from './uk-sentences';
+import ukWords from './uk-words';
 // --- Англійська ---
 import lettersFindEn from './letters-find-en';
 import englishWordPicture from './english-word-picture';
@@ -104,7 +105,7 @@ export const GAMES: GameDefinition[] = [
   counting, addition, compare, pzShare, pourKids, pzScales, pzPath, mathExamples, timesTables, mathCompare,
   geoLines, numberParts, numberLine, geoShapes, columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
-  ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, ukSounds, ukSentences, lettersFind, syllableBuild, readingSpeed, grammarParts,
+  ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, ukSounds, ukSentences, ukWords, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
   englishWords, enReading, enInstructions, lettersFindEn, englishWordPicture, enTopics, enBuild,
   // Наука
@@ -231,6 +232,7 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'geo-shapes': ['grade1'],
   'uk-sounds': ['grade1'],
   'uk-sentences': ['grade1'],
+  'uk-words': ['grade1'],
   // мова/світ для старших
   'reading-speed': ['grade2', 'grade3', 'grade4'],
   // 11.10: 1 клас — варіант з питаннями хто? що? / який? / що робить? (без термінів)
