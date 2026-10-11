@@ -11,13 +11,30 @@ import { hasUkAudio, sayUkSeq } from '../shared/uk-audio';
  * Фраза завдання — раз на гру (r0).
  */
 
-const ORDINALS = ['перший', 'другий', 'третій', 'четвертий', 'пʼятий', 'шостий', 'сьомий', 'восьмий', 'девʼятий', 'десятий'];
-const ANIMALS = ['🐰', '🦊', '🐻', '🐸', '🐷', '🐱', '🐶', '🦔', '🐭'];
-const ANIMAL_NAMES: Record<string, string> = { '🐰': 'зайчик', '🦊': 'лисичка', '🐻': 'ведмедик', '🐸': 'жабка', '🐷': 'порося', '🐱': 'котик', '🐶': 'песик', '🦔': 'їжачок', '🐭': 'мишка' };
+/** Звірята черги: імʼя, рід (для «котрий / котра / котре» і порядкового числівника), ключ озвучки. */
+type Gender = 'm' | 'f' | 'n';
+export const ANIMALS: Record<string, { id: string; name: string; g: Gender }> = {
+  '🐰': { id: 'bunny', name: 'зайчик', g: 'm' }, '🦊': { id: 'fox', name: 'лисичка', g: 'f' }, '🐻': { id: 'bear', name: 'ведмедик', g: 'm' },
+  '🐸': { id: 'frog', name: 'жабка', g: 'f' }, '🐷': { id: 'pig', name: 'порося', g: 'n' }, '🐱': { id: 'cat', name: 'котик', g: 'm' },
+  '🐶': { id: 'dog', name: 'песик', g: 'm' }, '🦔': { id: 'hedgehog', name: 'їжачок', g: 'm' }, '🐭': { id: 'mouse', name: 'мишка', g: 'f' },
+};
+const EMOJIS = Object.keys(ANIMALS);
+const WHICH: Record<Gender, string> = { m: 'Котрий', f: 'Котра', n: 'Котре' };
+const ORD: Record<Gender, string[]> = {
+  m: ['перший', 'другий', 'третій', 'четвертий', 'пʼятий', 'шостий'],
+  f: ['перша', 'друга', 'третя', 'четверта', 'пʼята', 'шоста'],
+  n: ['перше', 'друге', 'третє', 'четверте', 'пʼяте', 'шосте'],
+};
+/** Закінчення скороченого порядкового числа: 4-й, 4-а, 4-е (третій: 3-й, 3-я, 3-є). */
+const ordEnd = (n: number, g: Gender) => (g === 'm' ? '-й' : g === 'f' ? (n === 3 ? '-я' : '-а') : n === 3 ? '-є' : '-е');
+export const orderQuestion = (emoji: string) => {
+  const a = ANIMALS[emoji];
+  return `${WHICH[a.g]} за рахунком ${a.name}?`;
+};
 
 type Payload =
   | { mode: 'gap'; start: number; dir: 1 | -1; hole: number; options: number[] }
-  | { mode: 'order'; row: string[]; target: string; options: string[] }
+  | { mode: 'order'; row: string[]; target: string; options: number[] }
   | { mode: 'parity'; n: number; options: string[] };
 type Answer = number | string;
 
@@ -41,11 +58,11 @@ export function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
     });
   } else if (difficulty === 2) {
     rounds = Array.from({ length: ROUNDS }, (_, i) => {
-      // 6 звірят — більше не вміщається в картку на телефоні
-      const row = shuffle(ANIMALS).slice(0, 6);
-      const k = randInt(0, 5);
-      const options = shuffle([k, ...shuffle([k - 1, k + 1, k + 2, k - 2].filter((x) => x >= 0 && x <= 5)).slice(0, 2)]).map((x) => ORDINALS[x]);
-      return { id: `r${i}`, payload: { mode: 'order', row, target: row[k], options }, answer: ORDINALS[k] };
+      // 6 звірят — більше не вміщається в картку на телефоні; відповідь — номер місця (1–6), цифрою
+      const row = shuffle(EMOJIS).slice(0, 6);
+      const k = randInt(1, 6);
+      const options = shuffle([k, ...shuffle([k - 1, k + 1, k + 2, k - 2].filter((x) => x >= 1 && x <= 6)).slice(0, 2)]);
+      return { id: `r${i}`, payload: { mode: 'order', row, target: row[k - 1], options }, answer: k };
     });
   } else {
     const ns = shuffle([2, 3, 4, 5, 6, 7, 8, 9, 10]).slice(0, ROUNDS);
@@ -131,7 +148,11 @@ const PHRASES = {
 function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, Answer>) {
   const p = round.payload;
   const phrase = PHRASES[p.mode];
-  const say = hasUkAudio(phrase.key) ? (again?: boolean) => (round.id === 'r0' || again ? sayUkSeq([phrase]) : undefined) : undefined;
+  // «котрий за рахунком» звучить щоразу повністю — звірятко щоразу інше, без імені питання незрозуміле
+  const orderQ = p.mode === 'order' ? { key: `q_order_${ANIMALS[p.target].id}`, text: orderQuestion(p.target) } : null;
+  const say = orderQ
+    ? (hasUkAudio(orderQ.key) ? () => sayUkSeq([orderQ]) : undefined)
+    : hasUkAudio(phrase.key) ? (again?: boolean) => (round.id === 'r0' || again ? sayUkSeq([phrase]) : undefined) : undefined;
 
   if (p.mode === 'gap') {
     const nums = seq(p);
@@ -150,10 +171,11 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   if (p.mode === 'order') {
     return (
       <>
-        <PromptCard question={`Котрий за рахунком ${ANIMAL_NAMES[p.target]} ${p.target}? Рахуй від хатинки.`} answerState={answerState} say={say} sayKey={round.id}>
+        <PromptCard question={`${orderQuestion(p.target)} ${p.target} Рахуй від хатинки.`} answerState={answerState} say={say} sayKey={round.id}>
           <Queue row={p.row} />
         </PromptCard>
-        <ChoiceGrid options={p.options.map((o) => ({ value: o }))} correct={round.answer} disabled={disabled} answerState={answerState} onPick={onAnswer} columns={3} />
+        <ChoiceGrid options={p.options.map((n) => ({ value: n, node: <span>{n}<small style={{ fontSize: '0.5em' }}>{ordEnd(n, ANIMALS[p.target].g)}</small></span> }))}
+          correct={round.answer} disabled={disabled} answerState={answerState} onPick={onAnswer} columns={3} />
       </>
     );
   }
@@ -191,7 +213,8 @@ const numberLine: GameDefinition<Payload, Answer> = {
     }
     if (p.mode === 'order') {
       const k = p.row.indexOf(p.target);
-      return { steps: [`Від хатинки: ${p.row.slice(0, k + 1).map((_, i) => ORDINALS[i]).join(', ')}.`, `${ANIMAL_NAMES[p.target]} — ${ORDINALS[k]}.`] };
+      const a = ANIMALS[p.target];
+      return { steps: [`Від хатинки: ${p.row.slice(0, k + 1).map((e, i) => `${ORD[ANIMALS[e].g][i]} ${e}`).join(', ')}.`, `${a.name[0].toUpperCase()}${a.name.slice(1)} — ${ORD[a.g][k]}.`] };
     }
     return p.n % 2 === 0
       ? { steps: [`${p.n} фішок стали парами — кожна має пару.`, `${p.n} — парне.`] }

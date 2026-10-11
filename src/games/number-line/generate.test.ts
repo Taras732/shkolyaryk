@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generate, seq } from './index';
+import { generate, seq, orderQuestion } from './index';
 
 describe('number-line', () => {
   it('d1: ряд у межах 0–10, відповідь = число на дірці, серед варіантів', () => {
@@ -13,12 +13,18 @@ describe('number-line', () => {
       expect(new Set(p.options).size).toBe(p.options.length);
     }
   });
-  it('d2: ціль у черзі, відповідь — її порядковий номер', () => {
-    for (const r of generate(2).rounds) {
-      const p = r.payload as { row: string[]; target: string; options: string[] };
+  it('d2: відповідь — місце цілі в черзі (1–6), серед варіантів', () => {
+    for (let i = 0; i < 30; i++) for (const r of generate(2).rounds) {
+      const p = r.payload as { row: string[]; target: string; options: number[] };
+      expect(p.row.indexOf(p.target) + 1).toBe(r.answer);
       expect(p.options).toContain(r.answer);
       expect(new Set(p.row).size).toBe(6);
     }
+  });
+  it('d2: питання узгоджене з родом', () => {
+    expect(orderQuestion('🦊')).toBe('Котра за рахунком лисичка?');
+    expect(orderQuestion('🐻')).toBe('Котрий за рахунком ведмедик?');
+    expect(orderQuestion('🐷')).toBe('Котре за рахунком порося?');
   });
   it('d3: парність правильна', () => {
     for (const r of generate(3).rounds) {

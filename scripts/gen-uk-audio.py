@@ -226,6 +226,11 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_nl_gap"] = ("Яке число пропущено?", RATE_PHRASE)
     out["p_nl_order"] = ("Котрий за рахунком?", RATE_PHRASE)
     out["p_nl_parity"] = ("Парне чи непарне?", RATE_PHRASE)
+    # «Котрий / котра / котре за рахунком <звірятко>?» — з іменем, узгоджено з родом
+    nsrc = (ROOT / "src" / "games" / "number-line" / "index.tsx").read_text(encoding="utf-8")
+    which = {"m": "Котрий", "f": "Котра", "n": "Котре"}
+    for aid, name, g in re.findall(r"\{ id: '(\w+)', name: '([^']+)', g: '([mfn])' \}", nsrc):
+        out[f"q_order_{aid}"] = (f"{which[g]} за рахунком {name}?", RATE_PHRASE)
     # Склад числа, 1 клас (11.10)
     out["p_parts_hidden"] = ("Скільки сховалось?", RATE_PHRASE)
     out["p_parts_pair"] = ("Що разом дає", RATE_PHRASE)
