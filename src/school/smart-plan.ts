@@ -31,13 +31,13 @@ export const POOLS: Record<ClassLevel, Partial<Record<Subject, string[]>>> = {
     english: ['en-reading', 'english-words'],
   },
   grade3: {
-    math: ['times-tables', 'word-problems', 'math-examples', 'column-arithmetic', 'measures', 'perimeter-area', 'fractions-compare'],
-    language: ['uk-spelling', 'uk-reading', 'grammar-parts'],
+    math: ['numbers-1000', 'remainder-eq', 'shop-time', 'circle-3', 'fraction-strip', 'data-charts', 'times-tables', 'word-problems', 'math-examples', 'column-arithmetic', 'measures', 'perimeter-area', 'fractions-compare'],
+    language: ['parts-3', 'sentence-3', 'words-3', 'reading-3', 'word-parts', 'uk-spelling', 'uk-reading', 'grammar-parts'],
     english: ['english-words', 'en-reading'],
   },
   grade4: {
-    math: ['times-tables', 'word-problems', 'math-examples', 'column-arithmetic', 'measures', 'perimeter-area', 'fractions-compare'],
-    language: ['uk-spelling', 'uk-reading', 'grammar-parts'],
+    math: ['big-numbers', 'written-ops', 'equations-4', 'motion-4', 'geometry-4', 'fraction-strip', 'data-charts', 'times-tables', 'word-problems', 'math-examples', 'column-arithmetic', 'measures', 'perimeter-area', 'fractions-compare'],
+    language: ['cases-4', 'verbs-4', 'text-4', 'words-4', 'word-parts', 'uk-spelling', 'uk-reading', 'grammar-parts'],
     english: ['english-words', 'en-reading'],
   },
 };

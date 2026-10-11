@@ -37,6 +37,27 @@ import alphaHyphen from './alpha-hyphen';
 import words2 from './words-2';
 import text2 from './text-2';
 import reading2 from './reading-2';
+// 3–4 клас (11.10.2026)
+import numbers1000 from './numbers-1000';
+import remainderEq from './remainder-eq';
+import shopTime from './shop-time';
+import circle3 from './circle-3';
+import parts3 from './parts-3';
+import sentence3 from './sentence-3';
+import words3 from './words-3';
+import reading3 from './reading-3';
+import fractionStrip from './fraction-strip';
+import dataCharts from './data-charts';
+import wordParts from './word-parts';
+import bigNumbers from './big-numbers';
+import writtenOps from './written-ops';
+import equations4 from './equations-4';
+import motion4 from './motion-4';
+import geometry4 from './geometry-4';
+import cases4 from './cases-4';
+import verbs4 from './verbs-4';
+import text4 from './text-4';
+import words4 from './words-4';
 // --- Мова ---
 import lettersFind from './letters-find';
 import syllableBuild from './syllable-build';
@@ -115,7 +136,7 @@ import pzRiver from './pz-river';
 export const GAMES: GameDefinition[] = [
   // Математика
   counting, addition, compare, pzShare, pourKids, pzScales, pzPath, mathExamples, timesTables, mathCompare,
-  geoLines, numberParts, numberLine, geoShapes, tensOnes, pictograms, spaceTime, writeDigits, makeProblem, multMeaning, windowOps, geo2, alphaHyphen, words2, text2, reading2, columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
+  geoLines, numberParts, numberLine, geoShapes, tensOnes, pictograms, spaceTime, writeDigits, makeProblem, multMeaning, windowOps, geo2, alphaHyphen, words2, text2, reading2, numbers1000, remainderEq, shopTime, circle3, parts3, sentence3, words3, reading3, fractionStrip, dataCharts, wordParts, bigNumbers, writtenOps, equations4, motion4, geometry4, cases4, verbs4, text4, words4, columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
   ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, ukSounds, ukSentences, ukWords, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
@@ -259,6 +280,27 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'words-2': ['grade2'],
   'text-2': ['grade2'],
   'reading-2': ['grade2'],
+  // 3–4 клас за програмою Савченко 3–4 (11.10.2026)
+  'numbers-1000': ['grade3'],
+  'remainder-eq': ['grade3'],
+  'shop-time': ['grade3'],
+  'circle-3': ['grade3'],
+  'parts-3': ['grade3'],
+  'sentence-3': ['grade3'],
+  'words-3': ['grade3'],
+  'reading-3': ['grade3'],
+  'fraction-strip': ['grade3', 'grade4'],
+  'data-charts': ['grade3', 'grade4'],
+  'word-parts': ['grade3', 'grade4'],
+  'big-numbers': ['grade4'],
+  'written-ops': ['grade4'],
+  'equations-4': ['grade4'],
+  'motion-4': ['grade4'],
+  'geometry-4': ['grade4'],
+  'cases-4': ['grade4'],
+  'verbs-4': ['grade4'],
+  'text-4': ['grade4'],
+  'words-4': ['grade4'],
   // «Склади слово» — і 1 класу (читання слів)
   'syllable-build': ['preschool', 'grade1'],
   // «Додавання» на предметах — і 1 класу (у межах 10)

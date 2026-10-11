@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { GAMES } from './registry';
 
 // 11.10.2026: у грі 1 класу є «💡 Чому так?» — пояснення не має бути порожнім ні для якого завдання
-const IDS = ['geo-lines', 'number-parts', 'number-line', 'geo-shapes', 'uk-words', 'tens-ones', 'pictograms', 'space-time', 'make-problem', 'mult-meaning', 'window-ops', 'geo-2', 'alpha-hyphen', 'words-2', 'text-2', 'reading-2', 'uk-sounds', 'uk-sentences', 'math-examples', 'math-compare', 'clock-time', 'grammar-parts'];
+const IDS = ['geo-lines', 'number-parts', 'number-line', 'geo-shapes', 'uk-words', 'tens-ones', 'pictograms', 'space-time', 'make-problem', 'mult-meaning', 'window-ops', 'geo-2', 'alpha-hyphen', 'words-2', 'text-2', 'reading-2', 'numbers-1000', 'remainder-eq', 'shop-time', 'circle-3', 'parts-3', 'sentence-3', 'words-3', 'reading-3', 'fraction-strip', 'data-charts', 'word-parts', 'big-numbers', 'written-ops', 'equations-4', 'motion-4', 'geometry-4', 'cases-4', 'verbs-4', 'text-4', 'words-4', 'uk-sounds', 'uk-sentences', 'math-examples', 'math-compare', 'clock-time', 'grammar-parts'];
 
 describe('пояснення «чому так»', () => {
   for (const id of IDS) {
