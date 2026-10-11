@@ -91,8 +91,10 @@ describe('clock-time: paramsForClass (G2b, клас-вісь)', () => {
   });
 
   it('grade1 — лише чверті години (0/15/30/45 на Medium/Hard), 12h (перенесено зі старого paramsFor)', () => {
-    expect(paramsForClass(1, 'grade1')).toEqual({ steps: [0, 30], use24h: false, hourRange: [1, 12] });
-    expect(paramsForClass(2, 'grade1')).toEqual({ steps: [0, 15, 30, 45], use24h: false, hourRange: [1, 12] });
+    // 11.10: d1 — лише цілі години (програма 1 класу), d2 — половини, d3 — чверті
+    expect(paramsForClass(1, 'grade1')).toEqual({ steps: [0], use24h: false, hourRange: [1, 12] });
+    expect(paramsForClass(2, 'grade1')).toEqual({ steps: [0, 30], use24h: false, hourRange: [1, 12] });
+    expect(paramsForClass(3, 'grade1')).toEqual({ steps: [0, 15, 30, 45], use24h: false, hourRange: [1, 12] });
     expect(paramsForClass(3, 'grade1').use24h).toBe(false);
   });
 

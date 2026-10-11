@@ -1,4 +1,4 @@
-import type { Difficulty, GradeBand, LevelData, ProfileLevel, Round } from '../types';
+import type { ClassLevel, Difficulty, GradeBand, LevelData, ProfileLevel, Round } from '../types';
 import { gradeBandFor } from '../types';
 import { shuffle } from '../shared/ui';
 
@@ -11,6 +11,8 @@ export interface Payload {
   target: string;
   /** Завжди всі 3 категорії, у перемішаному порядку. */
   options: Pos[];
+  /** 1 клас (11.10, програма Савченко): без термінів — питання хто? що? / який? / що робить? */
+  asQuestions?: boolean;
 }
 
 const ROUNDS_PER_LEVEL = 5;
@@ -168,13 +170,15 @@ function draw(band: GradeBand, pool: Entry[], count: number): Entry[] {
   return drawn;
 }
 
-export function generate(difficulty: Difficulty, level: ProfileLevel = 'L3'): LevelData<Payload, Pos> {
-  const band = gradeBandFor(level, difficulty);
+export function generate(difficulty: Difficulty, level: ProfileLevel = 'L3', classLevel?: ClassLevel): LevelData<Payload, Pos> {
+  const asQuestions = classLevel === 'grade1';
+  // 1 клас — найпростіші речення на будь-якій складності
+  const band = asQuestions ? 'L1' : gradeBandFor(level, difficulty);
   const pool = POOL_BY_BAND[band];
   const chosen = draw(band, pool, ROUNDS_PER_LEVEL);
   const rounds: Round<Payload, Pos>[] = chosen.map((entry, i) => ({
     id: `r${i}`,
-    payload: { sentence: entry.sentence, target: entry.target, options: shuffle(POS_OPTIONS) },
+    payload: { sentence: entry.sentence, target: entry.target, options: shuffle(POS_OPTIONS), asQuestions },
     answer: entry.pos,
   }));
   return { difficulty, rounds };

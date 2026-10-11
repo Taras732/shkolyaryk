@@ -4,7 +4,7 @@ import { PromptCard, ChoiceGrid, shuffle, numberDecoys } from '../shared/ui';
 import { generate, correctFor, fmt, type Payload } from './generate';
 
 /** Правдоподібні обманки: та ж хвилина з іншою годиною, або та ж година з іншою хвилиною. */
-function timeChoices(h: number, m: number, count: number): string[] {
+function timeChoices(h: number, m: number, count: number, steps?: number[]): string[] {
   const correct = fmt(h, m);
   const hourDeltas = [1, 2, 3, -1, -2, -3, 4, 5];
   const minuteDeltas = [15, 30, 45, -15, -30, -45, 5, 10, 20, 25, 35, 40, 50, 55];
@@ -15,7 +15,8 @@ function timeChoices(h: number, m: number, count: number): string[] {
   }
   for (const dm of minuteDeltas) {
     const nm = ((m + dm) % 60 + 60) % 60;
-    pool.add(fmt(h, nm));
+    // відволікач з поділок, яких рівень ще не вчить, підказує відповідь (і вимагає незнаного)
+    if (!steps || steps.includes(nm)) pool.add(fmt(h, nm));
   }
   pool.delete(correct);
   const decoys = shuffle(Array.from(pool)).slice(0, count);
@@ -101,7 +102,7 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
     if (payload.mode === 'elapsed') {
       return timeChoices(payload.resultH, payload.resultM, 3).map((value) => ({ value }));
     }
-    return timeChoices(payload.h, payload.m, 3).map((value) => ({ value }));
+    return timeChoices(payload.h, payload.m, 3, payload.steps).map((value) => ({ value }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [round.id]);
 
@@ -204,7 +205,7 @@ const clockTime: GameDefinition<Payload, string> = {
     3: ['math.measure.l2.time-units'],
   },
   // 11.10: 1 клас на d1 — цілі години (+ половини), далі — хвилини (2 клас)
-  skillsFor: (d, cl) => ((cl === 'grade1' || cl === 'preschool') && d === 1 ? ['math.measure.l1.clock-hours'] : ['math.measure.l2.time-units']),
+  skillsFor: (d, cl) => ((cl === 'grade1' || cl === 'preschool') && d <= 2 ? ['math.measure.l1.clock-hours'] : ['math.measure.l2.time-units']),
   generate,
   Component,
 };

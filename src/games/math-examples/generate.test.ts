@@ -81,9 +81,33 @@ describe('math-examples: classBandConfigFor (G2b, обрій за класом)'
     }
   });
 
-  it('grade1 — лише додавання на всіх difficulty (не як для малят, але без ×÷ у 1 класі)', () => {
-    expect(classBandConfigFor('grade1', 1).ops).toEqual(['+']);
+  // 11.10.2026: програма Савченко — у 1 класі + і − у межах 10, до 20 лише без переходу через десяток
+  it('grade1 — + і − у межах 10 на d1, без ×÷', () => {
+    const c = classBandConfigFor('grade1', 1);
+    expect(c.ops).toEqual(['+', '−']);
+    expect(c.max).toBe(10);
     expect(classBandConfigFor('grade1', 3).ops.every((o) => o === '+' || o === '−')).toBe(true);
+  });
+
+  it('grade1 d2–3 — до 20 без переходу через десяток', () => {
+    for (let i = 0; i < 40; i++) {
+      for (const r of generate(2, 'L3', 'grade1').rounds) {
+        const { a, b, op } = r.payload;
+        expect(op === '+' ? (a % 10) + (b % 10) : (a % 10) - (b % 10)).toBeLessThan(op === '+' ? 10 : 10);
+        if (op === '−') expect(a % 10).toBeGreaterThanOrEqual(b % 10);
+        expect(Math.max(a, b, r.answer)).toBeLessThanOrEqual(20);
+      }
+    }
+  });
+
+  it('grade2 — множення й ділення лише на 2 і 3', () => {
+    for (let i = 0; i < 40; i++) {
+      for (const r of generate(3, 'L3', 'grade2').rounds) {
+        const { a, b, op } = r.payload;
+        if (op === '×') expect([a, b].some((x) => x === 2 || x === 3)).toBe(true);
+        if (op === '÷') expect([2, 3]).toContain(b);
+      }
+    }
   });
 
   it('grade3 difficulty=1 не має ÷, а grade4 difficulty=1 вже має повний набір дій (складніше при тому самому max)', () => {

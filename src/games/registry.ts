@@ -219,7 +219,8 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'number-tiles': ['grade1', 'grade2'],
   // мова/світ для старших
   'reading-speed': ['grade2', 'grade3', 'grade4'],
-  'grammar-parts': ['grade2', 'grade3', 'grade4'],
+  // 11.10: 1 клас — варіант з питаннями хто? що? / який? / що робить? (без термінів)
+  'grammar-parts': ['grade1', 'grade2', 'grade3', 'grade4'],
   'uk-spelling': ['grade2', 'grade3', 'grade4'],
   'continents-oceans': ['grade3', 'grade4'],
   'world-flags': ['grade2', 'grade3', 'grade4'],

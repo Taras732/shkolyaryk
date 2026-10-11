@@ -18,13 +18,20 @@ function renderSentence(sentence: string, target: string): ReactNode {
   );
 }
 
+/** 1 клас: замість термінів — питання до слова (програма: «ставить до слів питання хто? що? який? що робить?»). */
+const AS_QUESTION: Record<Pos, string> = {
+  Іменник: 'хто? що?',
+  Прикметник: 'який? яка? яке?',
+  Дієслово: 'що робить? що роблять?',
+};
+
 function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, Pos>) {
-  const { sentence, target, options } = round.payload;
-  const choices = options.map((o) => ({ value: o }));
+  const { sentence, target, options, asQuestions } = round.payload;
+  const choices = options.map((o) => ({ value: o, node: asQuestions ? <span style={{ fontSize: 17 }}>{AS_QUESTION[o]}</span> : undefined }));
 
   return (
     <>
-      <PromptCard question={`Яка частина мови слово «${target}»?`} answerState={answerState}>
+      <PromptCard question={asQuestions ? `На яке питання відповідає слово «${target}»?` : `Яка частина мови слово «${target}»?`} answerState={answerState}>
         <div
           style={{
             fontSize: 21,
@@ -58,7 +65,10 @@ const grammarParts: GameDefinition<Payload, Pos> = {
   icon: '📝',
   description: 'Визнач іменник, дієслово чи прикметник у реченні.',
   accent: '#E0E7FF',
-  // TODO: мапінг на мовні skills коли зʼявляться
+  // 11.10: 1 клас — слова-назви за питаннями, з 2 класу — частини мови (ознайомлення)
+  skillsFor: (_d, cl) => (cl === 'grade1' || cl === 'preschool'
+    ? ['language.word.l1.word-questions']
+    : ['language.word.l2.noun-intro', 'language.word.l2.adjective-intro', 'language.word.l2.verb-intro']),
   generate,
   Component,
 };

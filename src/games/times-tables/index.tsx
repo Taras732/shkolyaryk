@@ -65,9 +65,9 @@ function Dots({ known, total }: { known: number; total: number }) {
   );
 }
 
-function Picker({ stats, onPick, parentTable }: { stats: FactStats; onPick: (m: Mode) => void; parentTable: number | null }) {
+function Picker({ stats, onPick, parentTable, maxTable }: { stats: FactStats; onPick: (m: Mode) => void; parentTable: number | null; maxTable: number }) {
   // таблиця, яку обрали батьки, важливіша за автоматичну рекомендацію
-  const rec = parentTable ?? recommendedTable(stats);
+  const rec = parentTable ?? recommendedTable(stats, maxTable);
   const weakCount = weakFacts(stats).length;
   return (
     <>
@@ -77,7 +77,7 @@ function Picker({ stats, onPick, parentTable }: { stats: FactStats; onPick: (m: 
         </div>
       </PromptCard>
       <div className="g-choices" style={{ ['--g-cols' as string]: 4, marginTop: 0 }}>
-        {TABLES.map((n) => {
+        {TABLES.filter((n) => n <= maxTable).map((n) => {
           const p = tableProgress(stats, n);
           return (
             <button
@@ -92,6 +92,19 @@ function Picker({ stats, onPick, parentTable }: { stats: FactStats; onPick: (m: 
           );
         })}
       </div>
+      {maxTable < 9 && (
+        <>
+          {/* 11.10: програма 2 класу — таблиці на 2 і 3; решта доступна, але як «3 клас» */}
+          <div style={{ fontSize: 13, color: 'var(--c-mut)', fontWeight: 700, margin: '14px 0 6px' }}>3 клас</div>
+          <div className="g-choices" style={{ ['--g-cols' as string]: 6, marginTop: 0, opacity: 0.6 }}>
+            {TABLES.filter((n) => n > maxTable).map((n) => (
+              <button key={n} className="g-choice" style={{ fontSize: 16, padding: '8px 0' }} onClick={() => onPick({ kind: 'table', n })}>
+                ×{n}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 18 }}>
         <button className="g-btn soft" onClick={() => onPick({ kind: 'mix' })}>
           🎲 Мікс — усе, що вже вчили
@@ -213,12 +226,15 @@ function Drill({
 
 function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPayload, Answer>) {
   const profileId = useProfileStore((s) => s.activeProfile?.id) ?? 'guest';
+  const cls = useProfileStore((s) => s.activeProfile?.class_level ?? null);
+  // 11.10: у 2 класі за програмою — таблиці на 2 і 3
+  const maxTable = cls === 'grade2' || cls === 'grade1' || cls === 'preschool' ? 3 : 9;
   const [stats, setStats] = useState<FactStats>(() => loadStats(profileId));
   const [parentTable] = useState(() => loadParentTable(profileId));
   const [mode, setMode] = useState<Mode | null>(null);
   const difficulty = round.payload.difficulty;
 
-  const queue = useMemo(() => (mode ? buildSession(mode, difficulty, stats) : []), [mode]); // eslint-disable-line react-hooks/exhaustive-deps
+  const queue = useMemo(() => (mode ? buildSession(mode, difficulty, stats, Math.random, maxTable) : []), [mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFact = (fact: string, firstTry: boolean) => {
     setStats((prev) => {
@@ -231,7 +247,7 @@ function Component({ round, onAnswer, onMistake }: GameComponentProps<BoardPaylo
   // стабільний колбек: інакше таймер переходу в Drill перезапускається з кожним ре-рендером
   const handleDone = useCallback(() => onAnswer(BOARD_DONE), [onAnswer]);
 
-  if (!mode || queue.length === 0) return <Picker stats={stats} onPick={setMode} parentTable={parentTable} />;
+  if (!mode || queue.length === 0) return <Picker stats={stats} onPick={setMode} parentTable={parentTable} maxTable={maxTable} />;
   return <Drill queue={queue} onFact={handleFact} onMistake={onMistake} onDone={handleDone} />;
 }
 
@@ -249,6 +265,11 @@ const timesTables: GameDefinition<BoardPayload, Answer> = {
     1: ['math.ops.l2.mult-table-2-3', 'math.ops.l3.mult-table-4-9'],
     2: ['math.ops.l2.mult-table-2-3', 'math.ops.l3.mult-table-4-9'],
     3: ['math.ops.l3.mult-table-4-9', 'math.ops.l2.division-table'],
+  },
+  // 11.10: навички за класом — дитина сама обирає таблицю, тож це наближення: 2 клас тренує ×2 і ×3
+  skillsFor: (d, cl) => {
+    const base = cl === 'grade3' || cl === 'grade4' ? ['math.ops.l3.mult-table-4-9'] : ['math.ops.l2.mult-table-2-3'];
+    return d === 3 ? [...base, 'math.ops.l2.division-table'] : base;
   },
   generate,
   Component,

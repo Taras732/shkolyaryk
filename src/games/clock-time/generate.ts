@@ -10,6 +10,8 @@ export interface ReadPayload {
   /** 1-12 (band-вісь, класична 12h) або 0-23 (клас-вісь grade3 Hard/grade4, 24h). */
   h: number;
   m: number; // 0-59
+  /** Дозволені хвилини рівня (11.10): відволікачі беруться з них — у 1 класі лише цілі години. */
+  steps?: number[];
 }
 
 export interface ElapsedPayload {
@@ -81,7 +83,7 @@ export function genRead(steps: number[], used: Set<string>, hourRange: [number, 
     guard++;
   }
   used.add(`${h}:${m}`);
-  return { mode: 'read', h, m };
+  return { mode: 'read', h, m, steps };
 }
 
 export interface ClassClockConfig {
@@ -106,8 +108,10 @@ export function paramsForClass(difficulty: Difficulty, classLevel: ClassLevel): 
     if (difficulty <= 1) return { steps: [0], use24h: false, hourRange: [1, 12] };
     return { steps: [0, 30], use24h: false, hourRange: [1, 12] };
   }
+  // 11.10 програма Савченко: 1 клас — годинник у межах цілих годин; половини й чверті — сходинки вгору
   if (classLevel === 'grade1') {
-    if (difficulty <= 1) return { steps: [0, 30], use24h: false, hourRange: [1, 12] };
+    if (difficulty <= 1) return { steps: [0], use24h: false, hourRange: [1, 12] };
+    if (difficulty === 2) return { steps: [0, 30], use24h: false, hourRange: [1, 12] };
     return { steps: [0, 15, 30, 45], use24h: false, hourRange: [1, 12] };
   }
   if (classLevel === 'grade2') {

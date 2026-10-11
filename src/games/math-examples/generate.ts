@@ -66,6 +66,10 @@ interface ClassBandConfig extends BandConfig {
    * повні тризначні лишаються грі «Стовпчик». Відсутнє = 1 (будь-які числа).
    */
   roundTo?: number;
+  /** Без переходу через десяток (11.10, програма Савченко: у 1 класі перехід ще не вчать). */
+  noCarry?: boolean;
+  /** Таблиці множення класу (11.10: у 2 класі лише на 2 і 3): один множник з них, другий 2–10. */
+  tables?: number[];
 }
 
 /**
@@ -102,15 +106,17 @@ const CLASS_BAND: Record<ClassLevel, Record<Difficulty, ClassBandConfig>> = {
     2: { ops: ['+', '−'], min: 1, max: 10, tableMax: 10 },
     3: { ops: ['+', '−'], min: 1, max: 10, tableMax: 10 },
   },
+  // 11.10 за програмою Савченко: 1 клас — у межах 10, далі до 20 лише на основі нумерації (без переходу)
   grade1: {
-    1: { ops: ['+'], min: 1, max: 20, tableMax: 10 },
-    2: { ops: ['+', '−'], min: 1, max: 20, tableMax: 10 },
-    3: { ops: ['+', '−'], min: 1, max: 20, tableMax: 10 },
+    1: { ops: ['+', '−'], min: 1, max: 10, tableMax: 10 },
+    2: { ops: ['+', '−'], min: 1, max: 20, tableMax: 10, noCarry: true },
+    3: { ops: ['+', '−'], min: 1, max: 20, tableMax: 10, noCarry: true },
   },
+  // 2 клас — таблиці множення й ділення лише на 2 і 3; решта таблиць — 3 клас
   grade2: {
     1: { ops: ['+', '−'], min: 10, max: 100, tableMax: 7 },
-    2: { ops: ['×', '+', '−'], min: 10, max: 100, tableMax: 9 },
-    3: { ops: ['×', '÷', '+', '−'], min: 10, max: 100, tableMax: 10 },
+    2: { ops: ['×', '+', '−'], min: 10, max: 100, tableMax: 10, tables: [2, 3] },
+    3: { ops: ['×', '÷', '+', '−'], min: 10, max: 100, tableMax: 10, tables: [2, 3] },
   },
   grade3: {
     1: { ops: ['×', '+', '−'], min: 100, max: 1000, tableMax: 9, roundTo: 100 },
@@ -176,21 +182,37 @@ function buildOpSequence(pool: Op[]): Op[] {
   return shuffle(seq);
 }
 
-function genPair(op: Op, min: number, max: number, tableMax: number, r = 1): { a: number; b: number; correct: number } {
+/** Чи є перехід через десяток в одиницях. */
+const carries = (op: Op, a: number, b: number) => (op === '+' ? (a % 10) + (b % 10) >= 10 : a % 10 < b % 10);
+
+function genPair(
+  op: Op, min: number, max: number, tableMax: number, r = 1,
+  opts: { noCarry?: boolean; tables?: number[] } = {},
+): { a: number; b: number; correct: number } {
   if (op === '×') {
+    if (opts.tables) {
+      const t = opts.tables[randInt(0, opts.tables.length - 1)];
+      const k = randInt(MULT_MIN_FACTOR, tableMax);
+      const [a, b] = Math.random() < 0.5 ? [t, k] : [k, t];
+      return { a, b, correct: a * b };
+    }
     const { a, b } = genMultiplication(tableMax);
     return { a, b, correct: a * b };
   }
   if (op === '÷') {
+    if (opts.tables) {
+      const b = opts.tables[randInt(0, opts.tables.length - 1)];
+      const q = randInt(MULT_MIN_FACTOR, tableMax);
+      return { a: b * q, b, correct: q };
+    }
     const { a, b } = genDivision(tableMax);
     return { a, b, correct: a / b };
   }
-  if (op === '+') {
-    const { a, b } = genAddition(min, max, r);
-    return { a, b, correct: a + b };
+  for (let tries = 0; ; tries++) {
+    const { a, b } = op === '+' ? genAddition(min, max, r) : genSubtraction(min, max, r);
+    if (opts.noCarry && carries(op, a, b) && tries < 200) continue;
+    return { a, b, correct: op === '+' ? a + b : a - b };
   }
-  const { a, b } = genSubtraction(min, max, r);
-  return { a, b, correct: a - b };
 }
 
 export function generate(
@@ -201,12 +223,12 @@ export function generate(
   // Fallback (без classLevel, G2b): min=1 зберігає стару поведінку профільного
   // TRACK_BY_LEVEL один-в-один — цей шлях мертвий у проді (GameShell завжди
   // передає classLevel), тримається лише заради зворотної сумісності API/тестів.
-  const { ops: pool, min, max, tableMax, roundTo } = classLevel
+  const { ops: pool, min, max, tableMax, roundTo, noCarry, tables } = classLevel
     ? classBandConfigFor(classLevel, difficulty)
-    : { ...bandConfigFor(level, difficulty), min: 1, tableMax: 10, roundTo: 1 };
+    : { ...bandConfigFor(level, difficulty), min: 1, tableMax: 10, roundTo: 1, noCarry: false, tables: undefined };
   const sequence = buildOpSequence(pool);
   const rounds: Round<Payload, number>[] = sequence.map((op, i) => {
-    const { a, b, correct } = genPair(op, min, max, tableMax, roundTo ?? 1);
+    const { a, b, correct } = genPair(op, min, max, tableMax, roundTo ?? 1, { noCarry, tables });
     return { id: `r${i}`, payload: { a, b, op, correct }, answer: correct };
   });
   return { difficulty, rounds };

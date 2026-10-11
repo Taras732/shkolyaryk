@@ -77,8 +77,9 @@ export function tableProgress(stats: FactStats, n: number): { known: number; tot
 }
 
 /** Перша таблиця, яку ще не вивчено. null — вивчено все. */
-export function recommendedTable(stats: FactStats): number | null {
+export function recommendedTable(stats: FactStats, maxTable = 9): number | null {
   for (const n of TABLES) {
+    if (n > maxTable) break;
     const { known, total } = tableProgress(stats, n);
     if (known < total) return n;
   }
@@ -156,8 +157,8 @@ function toQuestion(fact: string, difficulty: Difficulty, rng: Rng, table?: numb
 }
 
 /** Факти, які вже «в роботі»: усе з таблиць до рекомендованої включно. */
-function mixPool(stats: FactStats): string[] {
-  const upTo = recommendedTable(stats) ?? TABLES[TABLES.length - 1];
+function mixPool(stats: FactStats, maxTable = 9): string[] {
+  const upTo = recommendedTable(stats, maxTable) ?? Math.min(maxTable, TABLES[TABLES.length - 1]);
   const keys = new Set<string>();
   for (const n of TABLES) {
     if (n > upTo) break;
@@ -170,7 +171,7 @@ function mixPool(stats: FactStats): string[] {
  * Зібрати сесію з SESSION_LEN питань. Порожній масив — у режимі «Мої помилки»
  * помилок немає (UI каже про це, а не підсовує випадкове).
  */
-export function buildSession(mode: Mode, difficulty: Difficulty, stats: FactStats, rng: Rng = Math.random): Question[] {
+export function buildSession(mode: Mode, difficulty: Difficulty, stats: FactStats, rng: Rng = Math.random, maxTable = 9): Question[] {
   if (mode.kind === 'table') {
     const facts = tableFacts(mode.n);
     const main = difficulty === 1 ? facts : shuffleWith(facts, rng);
@@ -190,7 +191,7 @@ export function buildSession(mode: Mode, difficulty: Difficulty, stats: FactStat
     return shuffleWith(seq, rng).map((f) => toQuestion(f, Math.max(2, difficulty) as Difficulty, rng));
   }
 
-  const pool = mixPool(stats);
+  const pool = mixPool(stats, maxTable);
   const seq: string[] = [];
   while (seq.length < SESSION_LEN) seq.push(weightedPick(pool, stats, rng, seq[seq.length - 1]));
   return seq.map((f) => toQuestion(f, Math.max(2, difficulty) as Difficulty, rng));
