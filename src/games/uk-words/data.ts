@@ -53,9 +53,20 @@ export const SWAPS: { word: string; emoji: string; pair: string; pairEmoji: stri
   { word: 'нора', emoji: '🕳️', pair: 'гора', pairEmoji: '⛰️' },
 ];
 
+/** Слова з кількома значеннями (11.10): показуємо одне значення — дитина знаходить друге. */
+export const MULTI: { word: string; shown: string; other: string; shownName: string; otherName: string }[] = [
+  { word: 'кран', shown: '🚰', other: '🏗️', shownName: 'водопровідний кран', otherName: 'будівельний кран' },
+  { word: 'мишка', shown: '🐭', other: '🖱️', shownName: 'звірятко', otherName: 'компʼютерна мишка' },
+  { word: 'лисичка', shown: '🦊', other: '🍄', shownName: 'звірятко', otherName: 'гриб лисичка' },
+  { word: 'ключ', shown: '🔑', other: '🎼', shownName: 'ключ від дверей', otherName: 'скрипковий ключ у нотах' },
+  { word: 'листок', shown: '🍃', other: '📄', shownName: 'листок на дереві', otherName: 'аркуш паперу' },
+  { word: 'голка', shown: '🪡', other: '🦔', shownName: 'швейна голка', otherName: 'голки на їжачку' },
+];
+
 /** Усі слова, які звучать (scripts/gen-uk-audio.py збирає звідси `w_<слово>`). */
 export const SPOKEN = [
   ...OPPOSITES.flatMap((o) => [o.a, o.b]),
   ...CLOSE.flatMap((c) => [c.a, c.b, c.opp]),
   ...SWAPS.map((s) => s.word),
+  ...MULTI.map((m) => m.word),
 ];

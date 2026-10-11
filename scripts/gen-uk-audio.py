@@ -208,6 +208,7 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_words_opp"] = ("Знайди протилежне за значенням.", RATE_PHRASE)
     out["p_words_close"] = ("Знайди близьке за значенням.", RATE_PHRASE)
     out["p_words_swap"] = ("Послухай уважно і знайди картинку.", RATE_PHRASE)
+    out["p_words_multi"] = ("Що ще так називають?", RATE_PHRASE)
     wdsrc = (ROOT / "src" / "games" / "uk-words" / "data.ts").read_text(encoding="utf-8")
     for w in set(re.findall(r"(?:a|b|opp|word|pair): '([^']+)'", wdsrc)):
         out.setdefault(f"w_{w}", (f"{w.capitalize()}!", RATE_WORD))

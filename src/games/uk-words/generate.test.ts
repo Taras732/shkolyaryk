@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generate } from './index';
-import { CLOSE, OPPOSITES, SWAPS } from './data';
+import { CLOSE, MULTI, OPPOSITES, SWAPS } from './data';
 
 describe('uk-words', () => {
   it('d1: три різні варіанти, правильний — пара до слова', () => {
@@ -21,8 +21,22 @@ describe('uk-words', () => {
       expect(new Set(p.options).size).toBe(3);
     }
   });
+  it('d3: 3 раунди «один звук» і 2 «кілька значень»; у «кількох значень» відповідь — друге значення', () => {
+    for (let i = 0; i < 40; i++) {
+      const rounds = generate(3).rounds;
+      const multi = rounds.filter((r) => (r.payload as { mode: string }).mode === 'multi');
+      expect(multi).toHaveLength(2);
+      for (const r of multi) {
+        const p = r.payload as { word: string; shown: string; options: string[] };
+        const m = MULTI.find((x) => x.word === p.word)!;
+        expect(r.answer).toBe(m.other);
+        expect(p.options).not.toContain(p.shown);
+        expect(new Set(p.options).size).toBe(3);
+      }
+    }
+  });
   it('d3: картинка слова, картинка пари і третя — різні', () => {
-    for (let i = 0; i < 40; i++) for (const r of generate(3).rounds) {
+    for (let i = 0; i < 40; i++) for (const r of generate(3).rounds.filter((x) => (x.payload as { mode: string }).mode === 'swap')) {
       const p = r.payload as { word: string; options: string[] };
       const s = SWAPS.find((x) => x.word === p.word)!;
       expect(p.options).toContain(s.emoji);
