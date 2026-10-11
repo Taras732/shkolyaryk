@@ -106,8 +106,9 @@ describe('measures: CLASS_UNIT_KEYS (G2b, клас-вісь)', () => {
     }
   });
 
-  it('grade1 — лише [cm, m, kg]; grade4 — повний набір з т і км (перенесено зі старого allowedUnitsFor)', () => {
-    expect(CLASS_UNIT_KEYS.grade1).toEqual(['cm', 'm', 'kg']);
+  // 11.10.2026: програма Савченко — у 1 класі см, дм, м, кг, л
+  it('grade1 — [cm, dm, m, kg, l]; grade4 — повний набір з т і км', () => {
+    expect(CLASS_UNIT_KEYS.grade1).toEqual(['cm', 'dm', 'm', 'kg', 'l']);
     expect(CLASS_UNIT_KEYS.grade4).toEqual(['mm', 'cm', 'dm', 'm', 'km', 'g', 'kg', 't', 'ml', 'l']);
   });
 });
@@ -137,12 +138,12 @@ describe('measures: generate(difficulty, level, classLevel) — клас-віс�
     }
   });
 
-  it('grade1 при difficulty=1 генерує лише mode="unit" з набору [cm, m, kg]', () => {
+  it('grade1 при difficulty=1 генерує лише mode="unit" з набору 1 класу', () => {
     for (let i = 0; i < 20; i++) {
       const { rounds } = generate(1, 'L3', 'grade1');
       for (const r of rounds) {
         expect(r.payload.mode).toBe('unit');
-        if (r.payload.mode === 'unit') expect(['cm', 'm', 'kg']).toContain(r.payload.obj.unitKey);
+        if (r.payload.mode === 'unit') expect(['cm', 'dm', 'm', 'kg', 'l']).toContain(r.payload.obj.unitKey);
       }
     }
   });
@@ -160,14 +161,14 @@ describe('measures: generate(difficulty, level, classLevel) — клас-віс�
     }
   });
 
-  it('grade1 при difficulty=2 генерує mode="convert" у межах свого набору (m↔cm, як у старому коді)', () => {
+  it('grade1 при difficulty=2 генерує mode="convert" у межах свого набору', () => {
     for (let i = 0; i < 20; i++) {
       const { rounds } = generate(2, 'L3', 'grade1');
       for (const r of rounds) {
         expect(r.payload.mode).toBe('convert');
         if (r.payload.mode === 'convert') {
-          expect(['cm', 'm', 'kg']).toContain(r.payload.fromKey);
-          expect(['cm', 'm', 'kg']).toContain(r.payload.toKey);
+          expect(['cm', 'dm', 'm', 'kg', 'l']).toContain(r.payload.fromKey);
+          expect(['cm', 'dm', 'm', 'kg', 'l']).toContain(r.payload.toKey);
         }
       }
     }
