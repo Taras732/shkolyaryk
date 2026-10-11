@@ -23,7 +23,9 @@ import { DEFAULT_MASTERY_THRESHOLD } from './mastery-core';
 import { masteryFromAttempts, type AttemptLite } from './mastery-local-core';
 import { readLog } from './game-log';
 import { ACTIVITIES, toOfflineTaskSeed } from '@/content/activities';
-import { gameSkills, getGame } from '@/games/registry';
+// реєстр ігор — лише ліниво (11.10): статичний імпорт давав цикл registry → гра → друг → db → registry
+// («Cannot access 'plantGrow' before initialization», якщо першим завантажується модуль гри)
+const loadRegistry = () => import('@/games/registry');
 import type { ClassLevel } from '@/games/types';
 
 const read = <T,>(key: string, fallback: T): T => {
@@ -85,7 +87,8 @@ function profileClassOf(profileId: string): ClassLevel | null {
   return p?.class_level ?? null;
 }
 
-function attemptsOf(profileId: string): Attempt[] {
+async function attemptsOf(profileId: string): Promise<Attempt[]> {
+  const { gameSkills, getGame } = await loadRegistry();
   const out: Attempt[] = [];
   const cls = profileClassOf(profileId);
   for (const e of readLog(profileId)) {
@@ -106,7 +109,7 @@ export async function insertAttempt(attempt: AttemptInsert): Promise<Attempt> {
 }
 
 export async function fetchAttempts(profileId: string, skillId?: string): Promise<Attempt[]> {
-  return attemptsOf(profileId)
+  return (await attemptsOf(profileId))
     .filter((a) => !skillId || a.skill_id === skillId)
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
@@ -116,7 +119,7 @@ export async function fetchAttempts(profileId: string, skillId?: string): Promis
 const placeKey = (pid: string) => `shk.place.v1.${pid}`;
 
 export async function fetchMastery(profileId: string): Promise<SkillMastery[]> {
-  const attempts: AttemptLite[] = attemptsOf(profileId)
+  const attempts: AttemptLite[] = (await attemptsOf(profileId))
     .filter((a) => a.skill_id)
     .map((a) => ({ skillId: a.skill_id!, correct: a.correct, total: a.total, at: Date.parse(a.created_at) }));
   return masteryFromAttempts(
