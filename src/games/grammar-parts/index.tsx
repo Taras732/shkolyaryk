@@ -69,6 +69,15 @@ const grammarParts: GameDefinition<Payload, Pos> = {
   skillsFor: (_d, cl) => (cl === 'grade1' || cl === 'preschool'
     ? ['language.word.l1.word-questions']
     : ['language.word.l2.noun-intro', 'language.word.l2.adjective-intro', 'language.word.l2.verb-intro']),
+  // 11.10: «чому так» — за 💡 після відповіді
+  explain: (round) => {
+    const { target, asQuestions } = round.payload;
+    const pos = round.answer;
+    const what = pos === 'Іменник' ? 'назва предмета' : pos === 'Прикметник' ? 'ознака предмета' : 'дія';
+    return asQuestions
+      ? { steps: [`«${target}» — ${AS_QUESTION[pos]}`, `Це слово — ${what}.`] }
+      : { steps: [`«${target}» — ${pos.toLowerCase()}.`, `Відповідає на питання ${AS_QUESTION[pos]} — ${what}.`] };
+  },
   generate,
   Component,
 };

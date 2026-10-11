@@ -125,6 +125,20 @@ const ukSentences: GameDefinition<Payload, Answer> = {
   description: 'Скільки слів у реченні, доповни речення, який знак у кінці.',
   accent: '#E0F2FE',
   skillsFor: (d) => (d === 1 ? ['language.text.l1.words-in-sentence'] : d === 2 ? ['language.text.l1.words-in-sentence', 'language.text.l1.simple-sentence'] : ['language.orth.l1.end-punctuation']),
+  // 11.10: «чому так» — за 💡 після відповіді
+  explain: (round) => {
+    const p = round.payload;
+    if (p.mode === 'count') {
+      const words = p.text.replace(/[.,!?]/g, '').split(' ');
+      const small = words.some((w) => w.length <= 2);
+      return { steps: [words.join(' | '), `Слів: ${words.length}.`], why: small ? 'Маленькі слова «у», «в», «до» — теж слова.' : undefined };
+    }
+    if (p.mode === 'fill') return { steps: [p.full, 'Інші слова не підходять за змістом.'] };
+    const m = round.answer as Mark;
+    return m === '?' ? { steps: ['Ми питаємо — ставимо знак питання.', 'Голос у кінці підіймається.'] }
+      : m === '!' ? { steps: ['Сильне почуття — радість, страх, заклик — знак оклику.', 'Кажемо голосно, з почуттям.'] }
+      : { steps: ['Ми спокійно розповідаємо — ставимо крапку.', 'Голос у кінці знижується.'] };
+  },
   generate,
   Component,
 };

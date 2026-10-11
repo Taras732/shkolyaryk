@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useCallback, useState } from 'react';
+import { useEffect, useMemo, useReducer, useCallback, useState, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { gameSkills } from './registry';
@@ -28,6 +28,8 @@ import {
 
 const FEEDBACK_CORRECT_MS = 850;
 const FEEDBACK_WRONG_MS = 1100;
+/** Є пояснення «чому» (💡) — підсвітка відповіді триває довше, щоб дитина встигла натиснути значок. */
+const FEEDBACK_WITH_WHY_MS = 2300;
 
 interface ShellState {
   levelData: LevelData;
@@ -99,6 +101,45 @@ interface GameShellProps {
   onNext?: () => void;
 }
 
+/**
+ * 💡 «Чому так?» (11.10.2026): значок на час підсвітки відповіді; натиснула — опис по кроках.
+ * Головне зелене «як правильно», причина помилки — дрібним і нейтрально (EP1).
+ */
+function WhyCorner({ explain, open, onOpen, onClose, mistakes }: {
+  explain: GameExplain | null; open: boolean; onOpen: () => void; onClose: () => void; mistakes?: number;
+}) {
+  if (!explain) return null;
+  if (!open) {
+    return (
+      <button type="button" aria-label="Чому так?" onClick={onOpen}
+        style={{ alignSelf: 'center', marginTop: 12, border: 0, cursor: 'pointer', background: '#FEF3C7', borderRadius: 999,
+          padding: '8px 16px', fontWeight: 800, fontSize: 15, color: '#92400E', boxShadow: '0 3px 0 #F5D58A', animation: 'fadeInUp .25s ease both' }}>
+        💡 Чому так?
+      </button>
+    );
+  }
+  return (
+    <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeInUp .3s ease both' }}>
+      {mistakes !== undefined && mistakes > 0 && (
+        <div style={{ textAlign: 'center', fontWeight: 800, fontSize: 14.5, color: 'var(--c-primary)' }}>{encouragementFor(mistakes)}</div>
+      )}
+      <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '14px 16px' }}>
+        <div style={{ fontWeight: 900, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--c-ok-ink)', marginBottom: 8 }}>Чому так 👇</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {explain.steps.map((st, i) => (
+            <div key={i} style={{ display: 'flex', gap: 9, fontWeight: 800, fontSize: 15, color: 'var(--c-ok-ink)' }}>
+              <span style={{ flexShrink: 0 }}>✓</span>
+              <span>{st}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      {explain.why && <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--c-mut)', textAlign: 'center', lineHeight: 1.4 }}>💡 {explain.why}</div>}
+      <button className="g-btn primary" onClick={onClose}>Зрозуміло →</button>
+    </div>
+  );
+}
+
 export default function GameShell({ game, level, classLevel, profileId, onExit, onNext }: GameShellProps) {
   const { user } = useAuthStore();
   const { progress, updateProgress, profiles } = useProfileStore();
@@ -131,6 +172,9 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
 
   // EP1: пояснення «чому» для поточної помилки (null — гра його не дає).
   const [explain, setExplain] = useState<GameExplain | null>(null);
+  const [explainOpen, setExplainOpen] = useState(false);
+  const timerRef = useRef<number | undefined>(undefined);
+  const pendingRef = useRef<'ADVANCE' | 'CLEAR_FEEDBACK'>('ADVANCE');
   const [boardFilled, setBoardFilled] = useState(0);
 
   const round = state.levelData.rounds[Math.min(state.roundIndex, state.levelData.rounds.length - 1)];
@@ -152,29 +196,36 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
         return;
       }
 
-      if (checkCorrect(answer)) {
-        dispatch({ type: 'CORRECT' });
-        confetti({ particleCount: 45, spread: 42, origin: { y: 0.65 }, disableForReducedMotion: true });
-        window.setTimeout(() => dispatch({ type: 'ADVANCE' }), FEEDBACK_CORRECT_MS);
-      } else {
-        dispatch({ type: 'WRONG' });
-
-        // EP1: якщо гра вміє пояснити ЧОМУ — показуємо пояснення і НЕ прибираємо
-        // фідбек за таймером: 1.1 с не вистачить, щоб його прочитати. Далі веде
-        // дитина кнопкою. Гра без explain поводиться точно як раніше.
-        const why = game.explain?.(round, answer) ?? null;
-        if (why) setExplain(why);
-        else window.setTimeout(() => dispatch({ type: 'CLEAR_FEEDBACK' }), FEEDBACK_WRONG_MS);
-      }
+      // 11.10 (рішення Тараса): пояснення «чому» не вискакує саме — після відповіді поруч зʼявляється 💡,
+      // натиснула — пауза й опис, «Зрозуміло» — далі. Правильна відповідь підсвічується, як і раніше.
+      const ok = checkCorrect(answer);
+      const why = game.explain?.(round, answer) ?? null;
+      setExplain(why);
+      setExplainOpen(false);
+      const next = ok ? 'ADVANCE' : 'CLEAR_FEEDBACK';
+      pendingRef.current = next;
+      dispatch({ type: ok ? 'CORRECT' : 'WRONG' });
+      if (ok) confetti({ particleCount: 45, spread: 42, origin: { y: 0.65 }, disableForReducedMotion: true });
+      const ms = why ? FEEDBACK_WITH_WHY_MS : ok ? FEEDBACK_CORRECT_MS : FEEDBACK_WRONG_MS;
+      timerRef.current = window.setTimeout(() => { setExplain(null); dispatch({ type: next }); }, ms);
     },
     [state.answerState, state.finished, checkCorrect, game, round],
   );
 
-  /** «Зрозуміло» після пояснення — повертає до тієї ж задачі, ще спроба. */
+  /** 💡 — пауза: таймер переходу зупиняємо, поки дитина читає. */
+  const openExplain = useCallback(() => {
+    window.clearTimeout(timerRef.current);
+    setExplainOpen(true);
+  }, []);
+
+  /** «Зрозуміло» — далі (правильно: наступне завдання; помилка: ще спроба того самого). */
   const dismissExplain = useCallback(() => {
     setExplain(null);
-    dispatch({ type: 'CLEAR_FEEDBACK' });
+    setExplainOpen(false);
+    dispatch({ type: pendingRef.current });
   }, []);
+
+  useEffect(() => () => window.clearTimeout(timerRef.current), []);
 
   const handleMistake = useCallback(() => dispatch({ type: 'MISTAKE' }), []);
 
@@ -260,14 +311,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
                 onMistake={handleMistake}
               />
             </PreschoolProvider>
-            {explain && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', animation: 'fadeInUp .3s ease both' }}>
-                <div style={{ background: '#fff', borderRadius: 18, padding: '12px 16px', boxShadow: 'var(--c-shadow)', fontWeight: 900, fontSize: 16, color: 'var(--c-ok-ink)', textAlign: 'center' }}>
-                  {explain.steps.join(' · ')}
-                </div>
-                <button className="g-btn primary" onClick={dismissExplain} style={{ maxWidth: 260 }}>Ще раз →</button>
-              </div>
-            )}
+            <WhyCorner explain={explain} open={explainOpen} onOpen={openExplain} onClose={dismissExplain} />
           </div>
         </div>
       </div>
@@ -316,39 +360,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
             onMistake={handleMistake}
           />
 
-          {/* EP1 — «чому», а не лише «правильна відповідь: X». Акцент перевернутий:
-              головне зелене «як правильно», причина помилки — дрібним і нейтрально. */}
-          {explain && (
-            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeInUp .3s ease both' }}>
-              <div style={{ textAlign: 'center', fontWeight: 800, fontSize: 14.5, color: 'var(--c-primary)' }}>
-                {encouragementFor(state.mistakes)}
-              </div>
-
-              <div style={{ background: 'var(--c-ok-bg)', border: '1px solid var(--c-ok-line)', borderRadius: 'var(--c-r-sm)', padding: '14px 16px' }}>
-                <div style={{ fontWeight: 900, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--c-ok-ink)', marginBottom: 8 }}>
-                  Ось як правильно 👇
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                  {explain.steps.map((s, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 9, fontWeight: 800, fontSize: 15, color: 'var(--c-ok-ink)' }}>
-                      <span style={{ flexShrink: 0 }}>✓</span>
-                      <span>{s}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {explain.why && (
-                <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--c-mut)', textAlign: 'center', lineHeight: 1.4 }}>
-                  💡 {explain.why}
-                </div>
-              )}
-
-              <button className="g-btn primary" onClick={dismissExplain}>
-                Спробувати ще раз →
-              </button>
-            </div>
-          )}
+          <WhyCorner explain={explain} open={explainOpen} onOpen={openExplain} onClose={dismissExplain} mistakes={state.mistakes} />
         </div>
        </div>
       </div>

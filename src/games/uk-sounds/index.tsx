@@ -110,6 +110,24 @@ const ukSounds: GameDefinition<Payload, Answer> = {
   description: 'Голосні й приголосні, тверді й мʼякі, наголос — у словах з картинкою.',
   accent: '#FFE4E6',
   skillsFor: (d) => [d === 1 ? 'language.sounds.l1.vowels-consonants' : d === 2 ? 'language.sounds.l1.hard-soft-consonants' : 'language.sounds.l1.stress'],
+  // 11.10: «чому так» — за 💡 після відповіді
+  explain: (round) => {
+    const p = round.payload;
+    if (p.mode === 'stress') {
+      const st = round.answer as number;
+      return { steps: [p.syllables.map((x, i) => (i === st ? x.toUpperCase() : x)).join('-'), 'Наголошений склад вимовляємо сильніше й довше.'] };
+    }
+    const ch = p.word[p.at];
+    if (p.mode === 'vc') {
+      return round.answer === 'vowel'
+        ? { steps: [`«${ch}» — голосний.`, 'Голосний звук співається голосом, нічого не заважає: а-а-а.'] }
+        : { steps: [`«${ch}» — приголосний.`, 'Губи, язик чи зуби заважають повітрю — звук не проспіваєш.'] };
+    }
+    const next = p.word[p.at + 1];
+    return round.answer === 'soft'
+      ? { steps: [`«${ch}» тут мʼякий.`, next === 'ь' ? 'Після нього мʼякий знак — він помʼякшує.' : `Після нього «${next}» — вона помʼякшує.`] }
+      : { steps: [`«${ch}» тут твердий.`, next ? `Після нього «${next}» — звучить твердо.` : 'Він у кінці слова й звучить твердо.'] };
+  },
   generate,
   Component,
 };

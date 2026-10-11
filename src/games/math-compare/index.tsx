@@ -95,6 +95,16 @@ const mathCompare: GameDefinition<Payload, Sign> = {
     if (cl === 'grade2' || cl === 'grade3') return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l1.expressions'];
     return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l3.order-of-operations'];
   },
+  // 11.10: «чому так» — за 💡 після відповіді
+  explain: (round) => {
+    const { left, right, leftDisplay, rightDisplay } = round.payload;
+    const steps: string[] = [];
+    if (leftDisplay) steps.push(`${leftDisplay} = ${left}`);
+    if (rightDisplay) steps.push(`${rightDisplay} = ${right}`);
+    const word = left === right ? 'дорівнює' : left > right ? 'більше за' : 'менше за';
+    steps.push(`${left} ${word} ${right}, тому «${round.answer}».`);
+    return { steps, why: left === right ? undefined : 'Гострий кінчик знака дивиться на менше число.' };
+  },
   generate,
   Component,
 };

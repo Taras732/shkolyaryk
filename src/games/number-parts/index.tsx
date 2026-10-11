@@ -162,6 +162,14 @@ const numberParts: GameDefinition<Payload, Answer> = {
   description: 'Числа 2–10 з двох частин: скільки сховалось, яка пара, яке число пропущено.',
   accent: '#FEE2E2',
   skillsFor: (d) => (d === 3 ? ['math.count.l1.compose-10', 'math.ops.l1.unknown-addend'] : ['math.count.l1.compose-10']),
+  // 11.10: «чому так» — за 💡 після відповіді
+  explain: (round) => {
+    const p = round.payload;
+    if (p.mode === 'pair') return { steps: [`${round.answer} = ${p.total}.`, `${String(round.answer).replace(' + ', ' і ще ')} — це ${p.total}.`] };
+    const h = p.total - p.seen;
+    if (p.mode === 'hidden') return { steps: [`Усього ${p.total}, видно ${p.seen}.`, `${p.total} − ${p.seen} = ${h}, отже сховалось ${h}.`, `Перевір: ${p.seen} + ${h} = ${p.total}.`] };
+    return { steps: [`${p.total} = ${p.seen} + ${h}`, `${p.seen} і ще ${h} — це ${p.total}.`] };
+  },
   generate,
   Component,
 };

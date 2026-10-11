@@ -115,6 +115,15 @@ const mathExamples: GameDefinition<Payload, number> = {
     return ['math.ops.l3.add-sub-1000', 'math.ops.l3.mult-table-4-9', 'math.ops.l2.division-table'];
   },
 
+  // 11.10: «чому так» — за 💡 після відповіді
+  explain: (round) => {
+    const { a, b, op, correct } = round.payload;
+    const line = `${a} ${op} ${b} = ${correct}`;
+    if (op === '+') return { steps: [line, `${a} і ще ${b} — це ${correct}.`] };
+    if (op === '−') return { steps: [line, `Від ${a} забрали ${b} — лишилось ${correct}.`, `Перевір: ${correct} + ${b} = ${a}.`] };
+    if (op === '×') return { steps: [line, `${a} × ${b} — це ${b} разів по ${a}.`] };
+    return { steps: [line, `Бо ${correct} × ${b} = ${a}.`] };
+  },
   generate,
   Component,
 };

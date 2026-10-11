@@ -200,6 +200,15 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
   );
 }
 
+const LINE_RULE: Record<LineKind, string> = {
+  segment: 'Відрізок має два кінці — дві точки.',
+  ray: 'Промінь має початок — одну точку — і йде далі без кінця.',
+  line: 'Пряма не має ні початку, ні кінця — тягнеться в обидва боки.',
+  curve: 'Крива лінія — вигнута, не рівна.',
+  polyline: 'Ламана складається з відрізків, що йдуть один за одним.',
+  closed: 'Замкнена ламана: її кінець зʼєднаний з початком.',
+};
+
 const geoLines: GameDefinition<Payload, Answer> = {
   id: 'geo-lines',
   title: 'Лінії й відрізки',
@@ -209,6 +218,18 @@ const geoLines: GameDefinition<Payload, Answer> = {
   description: 'Пряма, промінь, відрізок, ламана; виміряй і накресли відрізок.',
   accent: '#FEF3C7',
   skillsFor: (d) => (d === 1 ? ['math.geom.l1.lines'] : ['math.geom.l1.segment-measure']),
+  // 11.10: «чому так» — за 💡 після відповіді
+  explain: (round) => {
+    const p = round.payload;
+    if (p.mode === 'find') return { steps: [`Це ${LINE_NAMES[p.target].title}.`, LINE_RULE[p.target]] };
+    if (p.mode === 'measure') {
+      const end = p.start + p.length;
+      return p.start === 0
+        ? { steps: ['Відрізок починається з 0.', `Кінець — на ${end}. Отже, ${p.length} см.`] }
+        : { steps: [`Початок — на ${p.start}, кінець — на ${end}.`, `${end} − ${p.start} = ${p.length} см.`], why: 'Якщо відрізок не з нуля, від кінця віднімаємо початок.' };
+    }
+    return { steps: [`Між точками має бути ${p.length} поділок лінійки.`, `Наприклад, від 0 до ${p.length} або від 2 до ${2 + p.length}.`] };
+  },
   generate,
   Component,
 };

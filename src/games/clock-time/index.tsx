@@ -206,6 +206,15 @@ const clockTime: GameDefinition<Payload, string> = {
   },
   // 11.10: 1 клас на d1 — цілі години (+ половини), далі — хвилини (2 клас)
   skillsFor: (d, cl) => ((cl === 'grade1' || cl === 'preschool') && d <= 2 ? ['math.measure.l1.clock-hours'] : ['math.measure.l2.time-units']),
+  // 11.10: «чому так» — за 💡 після відповіді (лише читання циферблата)
+  explain: (round) => {
+    const p = round.payload;
+    if (p.mode !== 'read') return null;
+    const h = p.h % 12 === 0 ? 12 : p.h % 12;
+    if (p.m === 0) return { steps: ['Довга стрілка на 12 — рівно, без хвилин.', `Коротка стрілка на ${h} — ${h}:00.`] };
+    if (p.m === 30) return { steps: ['Довга стрілка на 6 — пів години, 30 хвилин.', `Коротка — між ${h} і ${h % 12 + 1}: ${round.answer}.`] };
+    return { steps: [`Коротка стрілка — години: ${h}.`, `Довга — хвилини: ${p.m}.`, `Разом: ${round.answer}.`] };
+  },
   generate,
   Component,
 };
