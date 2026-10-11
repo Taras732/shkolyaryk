@@ -213,6 +213,8 @@ def items() -> dict[str, tuple[str, str]]:
         out.setdefault(f"w_{w}", (f"{w.capitalize()}!", RATE_WORD))
     # Речення, 1 клас (11.10): повні речення, інтонація зі знака в кінці
     out["p_sen_count"] = ("Скільки слів у реченні?", RATE_PHRASE)
+    out["p_sen_kind"] = ("Це слово чи речення?", RATE_PHRASE)
+    out["p_sen_caps"] = ("Як правильно написати?", RATE_PHRASE)
     out["p_sen_fill"] = ("Доповни речення.", RATE_PHRASE)
     out["p_sen_mark"] = ("Який знак у кінці?", RATE_PHRASE)
     dsrc = (ROOT / "src" / "games" / "uk-sentences" / "data.ts").read_text(encoding="utf-8")

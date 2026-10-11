@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData } from '../types';
 import { PromptCard, ChoiceGrid, shuffle } from '../shared/ui';
 import { hasUkAudio, sayUkSeq } from '../shared/uk-audio';
-import { COUNT, FILL, MARKS, fullText, wordCount, type Mark } from './data';
+import { CAPS, COUNT, FILL, KINDS, MARKS, fullText, wordCount, type Mark } from './data';
 
 /**
  * «Речення» (11.10.2026) — 1 клас, програма Савченко [1 МОВ 4.1]:
@@ -15,21 +15,31 @@ import { COUNT, FILL, MARKS, fullText, wordCount, type Mark } from './data';
 type Payload =
   | { mode: 'count'; id: string; text: string; emoji: string; options: number[] }
   | { mode: 'fill'; id: string; text: string; full: string; emoji: string; options: string[] }
-  | { mode: 'mark'; id: string; text: string; full: string };
+  | { mode: 'mark'; id: string; text: string; full: string }
+  | { mode: 'kind'; text: string; options: string[] }
+  | { mode: 'caps'; rule: string; options: string[] };
 type Answer = number | string;
 
-const ROUNDS = 6;
 
 export function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
   let rounds: Round<Payload, Answer>[];
   if (difficulty === 1) {
-    rounds = shuffle(COUNT).slice(0, ROUNDS).map((c, i) => ({
-      id: `r${i}`, payload: { mode: 'count', id: c.id, text: c.text, emoji: c.emoji, options: [2, 3, 4] }, answer: wordCount(c.text),
+    // 4 «скільки слів» + 2 «слово чи речення?»
+    const count: Omit<Round<Payload, Answer>, 'id'>[] = shuffle(COUNT).slice(0, 4).map((c) => ({
+      payload: { mode: 'count', id: c.id, text: c.text, emoji: c.emoji, options: [2, 3, 4] }, answer: wordCount(c.text),
     }));
+    const kinds = [shuffle(KINDS.filter((k) => k.kind === 'слово'))[0], shuffle(KINDS.filter((k) => k.kind === 'речення'))[0]];
+    const kind: Omit<Round<Payload, Answer>, 'id'>[] = kinds.map((k) => ({ payload: { mode: 'kind', text: k.text, options: ['слово', 'речення'] }, answer: k.kind }));
+    rounds = shuffle([...count, ...kind]).map((r, i) => ({ ...r, id: `r${i}` }));
   } else if (difficulty === 2) {
-    rounds = shuffle(FILL).slice(0, ROUNDS).map((f, i) => ({
-      id: `r${i}`, payload: { mode: 'fill', id: f.id, text: f.text, full: fullText.fill(f), emoji: f.emoji, options: shuffle([f.answer, ...f.wrong]) }, answer: f.answer,
+    // 4 «доповни речення» + 2 «як правильно написати?» (велика буква)
+    const fill: Omit<Round<Payload, Answer>, 'id'>[] = shuffle(FILL).slice(0, 4).map((f) => ({
+      payload: { mode: 'fill', id: f.id, text: f.text, full: fullText.fill(f), emoji: f.emoji, options: shuffle([f.answer, ...f.wrong]) }, answer: f.answer,
     }));
+    const caps: Omit<Round<Payload, Answer>, 'id'>[] = shuffle(CAPS).slice(0, 2).map((c) => ({
+      payload: { mode: 'caps', rule: c.rule, options: shuffle([c.right, ...c.wrong]) }, answer: c.right,
+    }));
+    rounds = shuffle([...fill, ...caps]).map((r, i) => ({ ...r, id: `r${i}` }));
   } else {
     // по два кожного знака — щоб не вгадувалось «завжди крапка»
     const by = (m: Mark) => shuffle(MARKS.filter((x) => x.mark === m)).slice(0, 2);
@@ -41,6 +51,8 @@ export function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
 }
 
 const PHRASES = {
+  kind: { key: 'p_sen_kind', text: 'Це слово чи речення?' },
+  caps: { key: 'p_sen_caps', text: 'Як правильно написати?' },
   count: { key: 'p_sen_count', text: 'Скільки слів у реченні?' },
   fill: { key: 'p_sen_fill', text: 'Доповни речення.' },
   mark: { key: 'p_sen_mark', text: 'Який знак у кінці?' },
@@ -53,6 +65,19 @@ const SENTENCE = { fontSize: 30, fontWeight: 800, textAlign: 'center' as const, 
 function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, Answer>) {
   const p = round.payload;
   const phrase = PHRASES[p.mode];
+  if (p.mode === 'kind' || p.mode === 'caps') {
+    // читання очима: озвучуємо лише питання (голос підказав би відповідь)
+    const sayQ = hasUkAudio(phrase.key) ? () => sayUkSeq([phrase]) : undefined;
+    return (
+      <>
+        <PromptCard question={phrase.text} answerState={answerState} say={sayQ} sayKey={round.id}>
+          {p.mode === 'kind' && <div style={SENTENCE}>{p.text}</div>}
+        </PromptCard>
+        <ChoiceGrid options={p.options.map((o) => ({ value: o, node: p.mode === 'caps' ? <span style={{ fontSize: 17, fontWeight: 800 }}>{o}</span> : undefined }))}
+          correct={round.answer} disabled={disabled} answerState={answerState} onPick={onAnswer} columns={p.mode === 'caps' ? 1 : 2} />
+      </>
+    );
+  }
   const sentence = { key: `sen_${p.id}`, text: p.mode === 'count' ? p.text : p.full };
   const first = round.id === 'r0';
 
@@ -124,7 +149,9 @@ const ukSentences: GameDefinition<Payload, Answer> = {
   icon: '✏️',
   description: 'Скільки слів у реченні, доповни речення, який знак у кінці.',
   accent: '#E0F2FE',
-  skillsFor: (d) => (d === 1 ? ['language.text.l1.words-in-sentence'] : d === 2 ? ['language.text.l1.words-in-sentence', 'language.text.l1.simple-sentence'] : ['language.orth.l1.end-punctuation']),
+  skillsFor: (d) => (d === 1 ? ['language.text.l1.words-in-sentence', 'language.word.l1.word-vs-sentence']
+    : d === 2 ? ['language.text.l1.simple-sentence', 'language.orth.l1.capital-sentence-start', 'language.orth.l1.capital-names']
+    : ['language.orth.l1.end-punctuation']),
   // 11.10: «чому так» — за 💡 після відповіді
   explain: (round) => {
     const p = round.payload;
@@ -134,6 +161,10 @@ const ukSentences: GameDefinition<Payload, Answer> = {
       return { steps: [words.join(' | '), `Слів: ${words.length}.`], why: small ? 'Маленькі слова «у», «в», «до» — теж слова.' : undefined };
     }
     if (p.mode === 'fill') return { steps: [p.full, 'Інші слова не підходять за змістом.'] };
+    if (p.mode === 'kind') return round.answer === 'речення'
+      ? { steps: ['Тут закінчена думка: велика буква на початку, знак у кінці.', 'Це речення.'] }
+      : { steps: ['Тут лише одна назва — думки ще немає.', 'Це слово.'] };
+    if (p.mode === 'caps') return { steps: [String(round.answer), p.rule] };
     const m = round.answer as Mark;
     return m === '?' ? { steps: ['Ми питаємо — ставимо знак питання.', 'Голос у кінці підіймається.'] }
       : m === '!' ? { steps: ['Сильне почуття — радість, страх, заклик — знак оклику.', 'Кажемо голосно, з почуттям.'] }

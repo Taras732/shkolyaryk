@@ -205,7 +205,7 @@ const ukSyllables: GameDefinition<BoardPayload, Answer> = {
   description: 'Веди букву до букви — почуй, як вони зливаються в склад.',
   accent: '#FEF3C7',
   // 11.10: мовні навички 1 класу (гра без класової осі)
-  skillIds: { 1: ['language.reading.l1.syllable-reading'], 2: ['language.reading.l1.syllable-reading'], 3: ['language.reading.l1.syllable-reading'] },
+  skillIds: { 1: ['language.reading.l1.syllable-reading', 'language.sounds.l1.syllable-division'], 2: ['language.reading.l1.syllable-reading', 'language.sounds.l1.syllable-division'], 3: ['language.reading.l1.syllable-reading', 'language.sounds.l1.syllable-division'] },
   generate,
   Component,
 };
