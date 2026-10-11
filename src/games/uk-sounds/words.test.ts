@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { HS_WORDS, STRESS_WORDS, VC_WORDS, VOWELS } from './words';
+import { HS_WORDS, STRESS_WORDS, VC_WORDS, VV_WORDS, VOWELS } from './words';
 import { generate } from './index';
 
 // 11.10.2026: дані розписано вручну — тест звіряє їх із правилами, щоб помилка не дійшла до дитини
@@ -22,9 +22,18 @@ describe('uk-sounds: дані', () => {
       expect(new Set(w.syllables).size).toBe(w.syllables.length);
     }
   });
-  it('генератор: 6 раундів; d2 — порівну твердих і мʼяких', () => {
+  it('генератор: 6 раундів; d2 — 2 мʼяких, 2 твердих, 1 дзвінкий, 1 глухий', () => {
     for (const d of [1, 2, 3] as const) expect(generate(d).rounds).toHaveLength(6);
     const ans = generate(2).rounds.map((r) => r.answer);
-    expect(ans.filter((a) => a === 'soft')).toHaveLength(3);
+    for (const k of ['soft', 'hard']) expect(ans.filter((a) => a === k)).toHaveLength(2);
+    for (const k of ['voiced', 'voiceless']) expect(ans.filter((a) => a === k)).toHaveLength(1);
+  });
+  it('дзвінкі/глухі: ціль — з пар, перед голосним, рід звучання правильний', () => {
+    const VOICED = 'бдзгжґ'; const VOICELESS = 'птсхшкцч';
+    for (const w of VV_WORDS) {
+      const ch = w.word[w.at];
+      expect(VOWELS.has(w.word[w.at + 1] ?? '')).toBe(true);
+      expect(w.voiced ? VOICED.includes(ch) : VOICELESS.includes(ch)).toBe(true);
+    }
   });
 });

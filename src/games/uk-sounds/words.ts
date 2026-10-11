@@ -45,6 +45,27 @@ export const HS_WORDS: HsItem[] = [
   { word: 'день', emoji: '☀️', at: 0, soft: false }, { word: 'тінь', emoji: '🌳', at: 0, soft: true },
 ];
 
+/**
+ * Дзвінкі й глухі (11.10): приголосний із пар б-п, д-т, з-с, г-х, ж-ш, ц, ч — лише ПЕРЕД голосним,
+ * не в кінці слова (там дзвінкий може звучати глухіше — це вже 2 клас).
+ */
+export interface VvItem {
+  word: string;
+  emoji: string;
+  at: number;
+  voiced: boolean;
+}
+
+export const VV_WORDS: VvItem[] = [
+  { word: 'банан', emoji: '🍌', at: 0, voiced: true }, { word: 'дим', emoji: '💨', at: 0, voiced: true },
+  { word: 'зуб', emoji: '🦷', at: 0, voiced: true }, { word: 'гора', emoji: '⛰️', at: 0, voiced: true },
+  { word: 'жук', emoji: '🪲', at: 0, voiced: true }, { word: 'дуб', emoji: '🌳', at: 0, voiced: true },
+  { word: 'пес', emoji: '🐶', at: 0, voiced: false }, { word: 'тато', emoji: '👨', at: 0, voiced: false },
+  { word: 'сом', emoji: '🐟', at: 0, voiced: false }, { word: 'хата', emoji: '🏡', at: 0, voiced: false },
+  { word: 'шапка', emoji: '🧢', at: 0, voiced: false }, { word: 'кит', emoji: '🐋', at: 0, voiced: false },
+  { word: 'цибуля', emoji: '🧅', at: 0, voiced: false }, { word: 'чай', emoji: '🍵', at: 0, voiced: false },
+];
+
 export interface StressItem {
   word: string;
   emoji: string;

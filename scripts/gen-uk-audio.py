@@ -227,6 +227,7 @@ def items() -> dict[str, tuple[str, str]]:
     # Звуки в слові, 1 клас (11.10)
     out["p_snd_vc"] = ("Голосний чи приголосний?", RATE_PHRASE)
     out["p_snd_hs"] = ("Твердий чи мʼякий?", RATE_PHRASE)
+    out["p_snd_vv"] = ("Дзвінкий чи глухий?", RATE_PHRASE)
     out["p_snd_stress"] = ("Де наголос?", RATE_PHRASE)
     wsrc = (ROOT / "src" / "games" / "uk-sounds" / "words.ts").read_text(encoding="utf-8")
     for w in set(re.findall(r"word: '([^']+)'", wsrc)):

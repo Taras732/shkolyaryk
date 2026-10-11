@@ -1,7 +1,7 @@
 import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData } from '../types';
 import { PromptCard, ChoiceGrid, shuffle } from '../shared/ui';
 import { hasUkAudio, sayUkSeq } from '../shared/uk-audio';
-import { HS_WORDS, STRESS_WORDS, VC_WORDS, VOWELS, wordKey } from './words';
+import { HS_WORDS, STRESS_WORDS, VC_WORDS, VV_WORDS, VOWELS, wordKey } from './words';
 
 /**
  * «Звуки в слові» (11.10.2026) — 1 клас, програма Савченко [1 МОВ 4.1]: голосні й приголосні,
@@ -15,6 +15,7 @@ import { HS_WORDS, STRESS_WORDS, VC_WORDS, VOWELS, wordKey } from './words';
 type Payload =
   | { mode: 'vc'; word: string; emoji: string; at: number }
   | { mode: 'hs'; word: string; emoji: string; at: number }
+  | { mode: 'vv'; word: string; emoji: string; at: number }
   | { mode: 'stress'; word: string; emoji: string; syllables: string[] };
 type Answer = string | number;
 
@@ -27,12 +28,13 @@ export function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
       id: `r${i}`, payload: { mode: 'vc', word: w.word, emoji: w.emoji, at: w.at }, answer: VOWELS.has(w.word[w.at]) ? 'vowel' : 'cons',
     }));
   } else if (difficulty === 2) {
-    // пари поруч не ставимо, але в сесії половина твердих, половина мʼяких
-    const soft = shuffle(HS_WORDS.filter((w) => w.soft)).slice(0, ROUNDS / 2);
-    const hard = shuffle(HS_WORDS.filter((w) => !w.soft)).slice(0, ROUNDS / 2);
-    rounds = shuffle([...soft, ...hard]).map((w, i) => ({
-      id: `r${i}`, payload: { mode: 'hs', word: w.word, emoji: w.emoji, at: w.at }, answer: w.soft ? 'soft' : 'hard',
-    }));
+    // 4 «твердий чи мʼякий» (порівну) + 2 «дзвінкий чи глухий» (один такий, один такий)
+    const soft = shuffle(HS_WORDS.filter((w) => w.soft)).slice(0, 2);
+    const hard = shuffle(HS_WORDS.filter((w) => !w.soft)).slice(0, 2);
+    const hs: Omit<Round<Payload, Answer>, 'id'>[] = [...soft, ...hard].map((w) => ({ payload: { mode: 'hs', word: w.word, emoji: w.emoji, at: w.at }, answer: w.soft ? 'soft' : 'hard' }));
+    const vv: Omit<Round<Payload, Answer>, 'id'>[] = [shuffle(VV_WORDS.filter((w) => w.voiced))[0], shuffle(VV_WORDS.filter((w) => !w.voiced))[0]]
+      .map((w) => ({ payload: { mode: 'vv', word: w.word, emoji: w.emoji, at: w.at }, answer: w.voiced ? 'voiced' : 'voiceless' }));
+    rounds = shuffle([...hs, ...vv]).map((r, i) => ({ ...r, id: `r${i}` }));
   } else {
     rounds = shuffle(STRESS_WORDS).slice(0, ROUNDS).map((w, i) => ({
       id: `r${i}`, payload: { mode: 'stress', word: w.word, emoji: w.emoji, syllables: w.syllables }, answer: w.stress,
@@ -66,6 +68,7 @@ function Word({ word, at }: { word: string; at: number }) {
 const PHRASES = {
   vc: { key: 'p_snd_vc', text: 'Голосний чи приголосний?' },
   hs: { key: 'p_snd_hs', text: 'Твердий чи мʼякий?' },
+  vv: { key: 'p_snd_vv', text: 'Дзвінкий чи глухий?' },
   stress: { key: 'p_snd_stress', text: 'Де наголос?' },
 } as const;
 
@@ -89,7 +92,9 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
 
   const options = p.mode === 'vc'
     ? [{ value: 'vowel', node: <Chip color={RED} label="голосний" /> }, { value: 'cons', node: <Chip color={BLUE} label="приголосний" /> }]
-    : [{ value: 'hard', node: <Chip color={BLUE} label="твердий" /> }, { value: 'soft', node: <Chip color={GREEN} label="мʼякий" /> }];
+    : p.mode === 'vv'
+      ? [{ value: 'voiced', node: <span style={{ fontSize: 16 }}>🔔 дзвінкий</span> }, { value: 'voiceless', node: <span style={{ fontSize: 16 }}>🤫 глухий</span> }]
+      : [{ value: 'hard', node: <Chip color={BLUE} label="твердий" /> }, { value: 'soft', node: <Chip color={GREEN} label="мʼякий" /> }];
   return (
     <>
       <PromptCard question={phrase.text} answerState={answerState} say={say} sayKey={round.id}>
@@ -109,7 +114,7 @@ const ukSounds: GameDefinition<Payload, Answer> = {
   icon: '🔴',
   description: 'Голосні й приголосні, тверді й мʼякі, наголос — у словах з картинкою.',
   accent: '#FFE4E6',
-  skillsFor: (d) => [d === 1 ? 'language.sounds.l1.vowels-consonants' : d === 2 ? 'language.sounds.l1.hard-soft-consonants' : 'language.sounds.l1.stress'],
+  skillsFor: (d) => (d === 1 ? ['language.sounds.l1.vowels-consonants'] : d === 2 ? ['language.sounds.l1.hard-soft-consonants', 'language.sounds.l1.voiced-voiceless'] : ['language.sounds.l1.stress']),
   // 11.10: «чому так» — за 💡 після відповіді
   explain: (round) => {
     const p = round.payload;
@@ -118,6 +123,11 @@ const ukSounds: GameDefinition<Payload, Answer> = {
       return { steps: [p.syllables.map((x, i) => (i === st ? x.toUpperCase() : x)).join('-'), 'Наголошений склад вимовляємо сильніше й довше.'] };
     }
     const ch = p.word[p.at];
+    if (p.mode === 'vv') {
+      return round.answer === 'voiced'
+        ? { steps: [`«${ch}» — дзвінкий.`, 'Поклади руку на горло й скажи його: горло тремтить — є голос.'] }
+        : { steps: [`«${ch}» — глухий.`, 'Поклади руку на горло: не тремтить — лише шум, без голосу.'] };
+    }
     if (p.mode === 'vc') {
       return round.answer === 'vowel'
         ? { steps: [`«${ch}» — голосний.`, 'Голосний звук співається голосом, нічого не заважає: а-а-а.'] }
