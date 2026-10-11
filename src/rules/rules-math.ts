@@ -184,7 +184,7 @@ const ORDER_OF_OPERATIONS: RuleLessonDef = {
   id: 'math.order-of-operations',
   title: 'Порядок дій',
   subject: 'math',
-  skillIds: ['math.ops.l3.order-of-operations'],
+  skillIds: ['math.ops.l2.order-of-operations'],
   bands: ['L3', 'L4'],
   build: (band, rng) => {
     const n = taskCount(band);

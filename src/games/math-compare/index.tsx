@@ -93,7 +93,7 @@ const mathCompare: GameDefinition<Payload, Sign> = {
   skillsFor: (d, cl) => {
     if (cl === 'grade1' || cl === 'preschool') return d === 1 ? ['math.count.l1.compare-numbers-20'] : ['math.ops.l1.expressions'];
     if (cl === 'grade2' || cl === 'grade3') return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l1.expressions'];
-    return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l3.order-of-operations'];
+    return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l2.order-of-operations'];
   },
   // 11.10: «чому так» — за 💡 після відповіді
   explain: (round) => {
