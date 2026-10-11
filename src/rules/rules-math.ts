@@ -363,7 +363,7 @@ const THROUGH_TEN: RuleLessonDef = {
   id: 'math.through-ten',
   title: 'Через десяток',
   subject: 'math',
-  skillIds: ['math.ops.l1.add-sub-carry-20'],
+  skillIds: ['math.ops.l2.add-sub-carry-20'],
   bands: ['L1', 'L2'],
   build: (band, rng) => {
     const n = taskCount(band);

@@ -219,6 +219,8 @@ const moneyBasics: GameDefinition<Payload, string> = {
     2: ['math.measure.l3.money'],
     3: ['math.measure.l3.money'],
   },
+  // 11.10: 1–2 клас — гроші в грі (гривні без копійок), з 3 класу — дії з грошима
+  skillsFor: (_d, cl) => (cl === 'grade3' || cl === 'grade4' ? ['math.measure.l3.money'] : ['math.measure.l1.money-play']),
   generate,
   Component,
 };

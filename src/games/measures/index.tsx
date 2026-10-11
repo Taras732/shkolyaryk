@@ -192,9 +192,16 @@ const measures: GameDefinition<Payload, string> = {
   // seed skill-graph нема окремого skill для об'єму/температури — ці раунди лишаються
   // непокритими в skillIds (успадковано з A3, не розширюємо тут).
   skillIds: {
-    1: ['math.measure.l2.length-units', 'math.measure.l2.mass-units'],
-    2: ['math.measure.l2.length-units', 'math.measure.l2.mass-units', 'math.measure.l3.named-numbers-convert'],
+    1: ['math.measure.l1.length-units', 'math.measure.l1.mass-units'],
+    2: ['math.measure.l1.length-units', 'math.measure.l1.mass-units', 'math.measure.l3.named-numbers-convert'],
     3: ['math.measure.l3.named-numbers-convert'],
+  },
+  // 11.10: одиниці за класом (CLASS_UNIT_KEYS); d2 — переведення одиниць
+  skillsFor: (d, cl) => {
+    const units = cl === 'grade1' || cl === 'preschool'
+      ? ['math.measure.l1.length-units', 'math.measure.l1.mass-units']
+      : ['math.measure.l1.length-units', 'math.measure.l1.mass-units', 'math.measure.l1.capacity-litre'];
+    return d === 2 ? [...units, 'math.measure.l3.named-numbers-convert'] : units;
   },
   generate,
   Component,

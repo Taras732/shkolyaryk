@@ -203,6 +203,8 @@ const clockTime: GameDefinition<Payload, string> = {
     2: ['math.measure.l2.time-units'],
     3: ['math.measure.l2.time-units'],
   },
+  // 11.10: 1 клас на d1 — цілі години (+ половини), далі — хвилини (2 клас)
+  skillsFor: (d, cl) => ((cl === 'grade1' || cl === 'preschool') && d === 1 ? ['math.measure.l1.clock-hours'] : ['math.measure.l2.time-units']),
   generate,
   Component,
 };

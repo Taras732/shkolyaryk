@@ -100,9 +100,19 @@ const mathExamples: GameDefinition<Payload, number> = {
   // Гра спільна для L0 (лише +, межа 10) і L3 (+,−,×,÷ залежно від складності, межа 100);
   // skillIds не розрізняє рівень профілю, тож відображає складніший L3-контент.
   skillIds: {
-    1: ['math.ops.l2.add-sub-no-carry-100', 'math.ops.l2.mult-table-2-5'],
-    2: ['math.ops.l2.add-sub-carry-100', 'math.ops.l2.mult-table-6-9', 'math.ops.l2.division-table'],
-    3: ['math.ops.l2.add-sub-carry-100', 'math.ops.l2.mult-table-2-5'],
+    1: ['math.ops.l2.add-sub-no-carry-100', 'math.ops.l2.mult-table-2-3'],
+    2: ['math.ops.l2.add-sub-carry-100', 'math.ops.l3.mult-table-4-9', 'math.ops.l2.division-table'],
+    3: ['math.ops.l2.add-sub-carry-100', 'math.ops.l2.mult-table-2-3'],
+  },
+  // 11.10: навички за класом × складністю (CLASS_BAND). 1 клас d2–3 дає перехід через десяток — це вже 2 клас
+  skillsFor: (d, cl) => {
+    if (cl === 'grade1' || cl === 'preschool') return d === 1 ? ['math.ops.l1.add-sub-no-carry-20'] : ['math.ops.l1.add-sub-no-carry-20', 'math.ops.l2.add-sub-carry-20'];
+    if (cl === 'grade2') {
+      if (d === 1) return ['math.ops.l2.add-sub-no-carry-100', 'math.ops.l2.add-sub-carry-100'];
+      if (d === 2) return ['math.ops.l2.add-sub-carry-100', 'math.ops.l2.mult-table-2-3', 'math.ops.l3.mult-table-4-9'];
+      return ['math.ops.l2.add-sub-carry-100', 'math.ops.l2.mult-table-2-3', 'math.ops.l3.mult-table-4-9', 'math.ops.l2.division-table'];
+    }
+    return ['math.ops.l3.add-sub-1000', 'math.ops.l3.mult-table-4-9', 'math.ops.l2.division-table'];
   },
   generate,
   Component,

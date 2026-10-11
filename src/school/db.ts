@@ -23,7 +23,8 @@ import { DEFAULT_MASTERY_THRESHOLD } from './mastery-core';
 import { masteryFromAttempts, type AttemptLite } from './mastery-local-core';
 import { readLog } from './game-log';
 import { ACTIVITIES, toOfflineTaskSeed } from '@/content/activities';
-import { getGame } from '@/games/registry';
+import { gameSkills, getGame } from '@/games/registry';
+import type { ClassLevel } from '@/games/types';
 
 const read = <T,>(key: string, fallback: T): T => {
   try {
@@ -46,6 +47,7 @@ const write = (key: string, v: unknown) => {
 const SEED = [...MATH_SKILLS, ...LANGUAGE_SKILLS];
 
 const SKILLS: Skill[] = SEED.map((s, i) => ({
+  orn_refs: s.orn ?? [],
   id: s.id,
   subject: s.subject,
   strand: s.strand,
@@ -77,12 +79,20 @@ export async function fetchOfflineTasks(): Promise<OfflineTask[]> {
 /** Скільки раундів мала гра, коли журнал ще не писав `total` (записи до 11.10). */
 const OLD_TOTAL = 5;
 
+/** Клас дитини з локального списку профілів — для записів журналу до 11.10 (без поля cls). */
+function profileClassOf(profileId: string): ClassLevel | null {
+  const p = read<{ id: string; class_level?: ClassLevel | null }[]>('shk_guest_profiles', []).find((x) => x.id === profileId);
+  return p?.class_level ?? null;
+}
+
 function attemptsOf(profileId: string): Attempt[] {
   const out: Attempt[] = [];
+  const cls = profileClassOf(profileId);
   for (const e of readLog(profileId)) {
     const total = e.total ?? OLD_TOTAL;
     const correct = Math.max(0, total - e.mistakes);
-    const skills = getGame(e.gameId)?.skillIds?.[e.difficulty as 1 | 2 | 3] ?? [];
+    const g = getGame(e.gameId);
+    const skills = g ? gameSkills(g, e.difficulty, (e.cls as ClassLevel | undefined) ?? cls) : [];
     const base = { profile_id: profileId, game_id: e.gameId, difficulty: String(e.difficulty), correct, total, duration_sec: null, created_at: new Date(e.at).toISOString() };
     if (skills.length === 0) out.push({ ...base, id: `${e.at}:${e.gameId}`, skill_id: null });
     else skills.forEach((skill_id, i) => out.push({ ...base, id: `${e.at}:${e.gameId}:${i}`, skill_id }));

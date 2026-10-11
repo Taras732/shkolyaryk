@@ -152,7 +152,7 @@ const CHA_SHCHA: RuleLessonDef = {
   id: 'language.cha-shcha',
   title: 'ЧА і ЩА',
   subject: 'language',
-  skillIds: ['language.orth.l2.zhy-shy-cha-shcha'],
+  skillIds: ['language.orth.l2.after-sibilants'],
   bands: ['L1', 'L2'],
   build: (band, rng) => {
     const n = taskCount(band);

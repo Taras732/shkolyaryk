@@ -246,9 +246,9 @@ const timesTables: GameDefinition<BoardPayload, Answer> = {
   // Таблицю обирає дитина, тож skill за складністю приблизний: обидві половини таблиці,
   // на «Складно» — ще й табличне ділення.
   skillIds: {
-    1: ['math.ops.l2.mult-table-2-5', 'math.ops.l2.mult-table-6-9'],
-    2: ['math.ops.l2.mult-table-2-5', 'math.ops.l2.mult-table-6-9'],
-    3: ['math.ops.l2.mult-table-6-9', 'math.ops.l2.division-table'],
+    1: ['math.ops.l2.mult-table-2-3', 'math.ops.l3.mult-table-4-9'],
+    2: ['math.ops.l2.mult-table-2-3', 'math.ops.l3.mult-table-4-9'],
+    3: ['math.ops.l3.mult-table-4-9', 'math.ops.l2.division-table'],
   },
   generate,
   Component,

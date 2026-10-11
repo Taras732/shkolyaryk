@@ -227,6 +227,13 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'seasons-weather': ['preschool', 'grade1', 'grade2'],
 };
 
+/** Навички, які тренує гра на цій складності для цього класу (skillsFor, інакше skillIds). */
+export function gameSkills(g: GameDefinition, difficulty: number, classLevel?: ClassLevel | null): string[] {
+  const d = difficulty as 1 | 2 | 3;
+  if (g.skillsFor && classLevel) return g.skillsFor(d, classLevel);
+  return g.skillIds?.[d] ?? [];
+}
+
 /** Ігри, доступні для навчального КЛАСУ дитини (G3). Явне звуження + fallback на трек. */
 export function gamesForClass(classLevel: ClassLevel): GameDefinition[] {
   const track = classToProfileLevel(classLevel);

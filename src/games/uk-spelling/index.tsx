@@ -31,9 +31,20 @@ const ukSpelling: GameDefinition<Payload, string> = {
   accent: '#FEF9C3',
   // теми різняться за класом — тут навички 2 класу на «Легко/Середньо» і 3 класу на «Складно»
   skillIds: {
-    1: ['language.orth.l2.zhy-shy-cha-shcha', 'language.orth.l2.soft-sign'],
+    1: ['language.orth.l2.after-sibilants', 'language.orth.l2.soft-sign'],
     2: ['language.orth.l2.capital-geo-names', 'language.orth.l3.final-consonant-check'],
-    3: ['language.orth.l3.apostrophe', 'language.sounds.l3.doubled-consonants', 'language.sounds.l3.unstressed-e-y-check', 'language.orth.l3.prefix-roz-bez'],
+    3: ['language.orth.l2.apostrophe', 'language.sounds.l3.doubled-consonants', 'language.sounds.l3.unstressed-e-y-check', 'language.orth.l3.prefix-roz-bez'],
+  },
+  // 11.10: теми правопису за класом (TOPICS_BY): 2 клас і 3–4 клас вчать різне на тій самій складності
+  skillsFor: (d, cl) => {
+    if (cl === 'grade3' || cl === 'grade4') {
+      if (d === 1) return ['language.orth.l2.apostrophe', 'language.sounds.l3.doubled-consonants'];
+      if (d === 2) return ['language.sounds.l3.unstressed-e-y-check', 'language.orth.l3.prefix-roz-bez', 'language.orth.l3.final-consonant-check'];
+      return ['language.orth.l2.apostrophe', 'language.sounds.l3.doubled-consonants', 'language.sounds.l3.unstressed-e-y-check', 'language.orth.l3.prefix-roz-bez', 'language.orth.l3.final-consonant-check'];
+    }
+    if (d === 1) return ['language.orth.l2.after-sibilants', 'language.orth.l2.soft-sign'];
+    if (d === 2) return ['language.orth.l2.capital-geo-names', 'language.sounds.l2.voiced-final', 'language.orth.l2.soft-sign'];
+    return ['language.orth.l2.after-sibilants', 'language.orth.l2.soft-sign', 'language.orth.l2.capital-geo-names', 'language.sounds.l2.voiced-final'];
   },
   generate,
   explain: (round) => explainSpelling(round),

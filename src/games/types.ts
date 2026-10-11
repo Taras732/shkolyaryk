@@ -195,6 +195,11 @@ export interface GameDefinition<TPayload = any, TAnswer = any> {
    */
   skillIds?: Partial<Record<Difficulty, string[]>>;
   /**
+   * Навички за парою клас × складність (11.10.2026): гра для 1 і для 3 класу на тій самій
+   * складності тренує різне. Є — перемагає skillIds; немає — береться skillIds[difficulty].
+   */
+  skillsFor?: (difficulty: Difficulty, classLevel: ClassLevel) => string[];
+  /**
    * Згенерувати набір раундів для складності + рівня профілю.
    * `classLevel` (G2) — навчальний клас дитини для двовісної складності
    * (клас × difficulty). Опційний: старі одновісні ігри його ігнорують,

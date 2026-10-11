@@ -85,9 +85,15 @@ const mathCompare: GameDefinition<Payload, Sign> = {
   // Гра спільна для L0 (межа завжди 10, без масштабування складністю) і L3
   // (diff1 → до 100, diff2-3 → до 1000); skillIds відображає L3-масштаб.
   skillIds: {
-    1: ['math.count.l2.compare-100'],
+    1: ['math.count.l1.compare-100'],
     2: ['math.count.l3.compare-1000'],
     3: ['math.count.l3.compare-1000'],
+  },
+  // 11.10: навички за класом × складністю (що реально генерує CLASS_COMPARE_CFG)
+  skillsFor: (d, cl) => {
+    if (cl === 'grade1' || cl === 'grade2' || cl === 'preschool') return d === 1 ? ['math.count.l1.compare-numbers-20'] : ['math.ops.l1.expressions'];
+    if (cl === 'grade3') return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l1.expressions'];
+    return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l3.order-of-operations'];
   },
   generate,
   Component,

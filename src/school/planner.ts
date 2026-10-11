@@ -5,6 +5,7 @@
 import { fetchMastery, fetchSkills, fetchDailyPlan, createDailyPlan, fetchOfflineTasks } from './db';
 import { buildDayPlan } from './planner-core';
 import { GAMES } from '@/games/registry';
+import { CLASS_LEVELS } from '@/games/types';
 import type { DailyPlan, DailyPlanItem } from './types';
 
 /**
@@ -14,9 +15,11 @@ import type { DailyPlan, DailyPlanItem } from './types';
 function buildGameBySkill(): Map<string, string> {
   const map = new Map<string, string>();
   for (const game of GAMES) {
-    if (!game.skillIds) continue;
-    for (const ids of Object.values(game.skillIds)) {
-      for (const skillId of ids ?? []) {
+    const lists: string[][] = Object.values(game.skillIds ?? {}).map((ids) => ids ?? []);
+    // навички за класом (skillsFor) — усі класи й складності
+    if (game.skillsFor) for (const cl of CLASS_LEVELS) for (const d of [1, 2, 3] as const) lists.push(game.skillsFor(d, cl));
+    for (const ids of lists) {
+      for (const skillId of ids) {
         if (!map.has(skillId)) map.set(skillId, game.id);
       }
     }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useReducer, useCallback, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { gameSkills } from './registry';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { recordActivity } from '@/utils/activity';
 import { logGame } from '@/school/game-log';
@@ -204,7 +205,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
     // результату й гейтиться на user.id, як recordGameResult (гість не має
     // рядка в БД).
     setPrereqHint(null);
-    const skillIds = game.skillIds?.[state.difficulty] ?? [];
+    const skillIds = gameSkills(game, state.difficulty, classLevel);
     if (skillIds.length > 0 && isWeakResult(state.stars)) {
       fetchPrereqHint(profileId, skillIds)
         .then(setPrereqHint)

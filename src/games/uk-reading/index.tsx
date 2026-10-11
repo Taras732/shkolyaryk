@@ -166,6 +166,8 @@ const ukReading: GameDefinition<BoardPayload, Answer> = {
   icon: '📗',
   description: 'Короткий текст і три питання: хто, що, чому.',
   accent: '#DCFCE7',
+  // 11.10: мовні навички 1 класу (гра без класової осі)
+  skillIds: { 1: ['language.reading.l1.sentence-reading', 'language.reading.l1.comprehension-simple'], 2: ['language.reading.l1.comprehension-simple'], 3: ['language.reading.l2.fluent-reading'] },
   generate,
   Component,
 };

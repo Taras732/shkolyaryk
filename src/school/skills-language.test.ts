@@ -38,9 +38,10 @@ function topoSort(skills: SeedSkill[]): { order: string[]; cyclic: string[] } {
 }
 
 describe('LANGUAGE_SKILLS — структура', () => {
-  it('має 55–70 навичок (з ≥8 на кожен grade_band)', () => {
+  // 11.10.2026: стеля 70 → 80 — звірка з програмою Савченко додала навички 1–2 класу
+  it('має 55–80 навичок (з ≥8 на кожен grade_band)', () => {
     expect(LANGUAGE_SKILLS.length).toBeGreaterThanOrEqual(55);
-    expect(LANGUAGE_SKILLS.length).toBeLessThanOrEqual(70);
+    expect(LANGUAGE_SKILLS.length).toBeLessThanOrEqual(80);
   });
 
   it('усі id унікальні', () => {
