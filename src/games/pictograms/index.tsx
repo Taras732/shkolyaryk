@@ -96,7 +96,7 @@ const pictograms: GameDefinition<Payload, Answer> = {
   icon: '📊',
   description: 'Прочитай малюнок-таблицю: скільки, чого найбільше, на скільки більше.',
   accent: '#FEF3C7',
-  skillsFor: (d) => (d === 3 ? ['math.data.l1.simple-charts', 'math.ops.l1.more-less-by'] : ['math.data.l1.simple-charts']),
+  skillsFor: (d, cl) => (cl === 'grade2' ? ['math.data.l2.charts'] : d === 3 ? ['math.data.l1.simple-charts', 'math.ops.l1.more-less-by'] : ['math.data.l1.simple-charts']),
   // «чому так» — за 💡 після відповіді
   explain: (round) => {
     const p = round.payload;

@@ -168,6 +168,8 @@ const ukReading: GameDefinition<BoardPayload, Answer> = {
   accent: '#DCFCE7',
   // 11.10: мовні навички 1 класу (гра без класової осі)
   skillIds: { 1: ['language.reading.l1.sentence-reading', 'language.reading.l1.comprehension-simple'], 2: ['language.reading.l1.comprehension-simple'], 3: ['language.reading.l2.fluent-reading'] },
+  // 11.10: у 2 класі дитина читає сама й відповідає — читання мовчки; d2–3 — персонажі й порядок подій
+  skillsFor: (d, cl) => (cl === 'grade2' ? (d === 1 ? ['language.reading.l2.silent-reading'] : ['language.reading.l2.silent-reading', 'language.reading.l2.characters-events']) : (({ 1: ['language.reading.l1.sentence-reading', 'language.reading.l1.comprehension-simple'], 2: ['language.reading.l1.comprehension-simple'], 3: ['language.reading.l2.fluent-reading'] } as Record<number, string[]>)[d])),
   generate,
   Component,
 };

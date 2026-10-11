@@ -241,7 +241,7 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   // буквар і склади — дошкілля та 1 клас; у 2–4 класі це вже пройдене
   'uk-letters': ['preschool', 'grade1'],
   'uk-syllables': ['preschool', 'grade1'],
-  'pictograms': ['grade1'],
+  'pictograms': ['grade1', 'grade2'],
   'space-time': ['grade1'],
   'write-digits': ['grade1'],
   'make-problem': ['grade1'],

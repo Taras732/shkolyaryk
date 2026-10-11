@@ -184,7 +184,8 @@ const wordProblems: GameDefinition<WordProblemPayload, number> = {
   // 11.10: навички за класом (CLASS_CFG); 1 клас d2 — задачі «на … більше/менше»
   skillsFor: (d, cl) => {
     if (cl === 'grade1' || cl === 'preschool') return d === 2 ? ['math.ops.l1.word-problems-simple', 'math.ops.l1.more-less-by'] : ['math.ops.l1.word-problems-simple'];
-    if (cl === 'grade2') return ['math.ops.l2.word-problems-100'];
+    // 2 клас: d2 — «у … разів», d3 — дві дії (складені задачі)
+    if (cl === 'grade2') return d === 1 ? ['math.ops.l2.word-problems-100'] : d === 2 ? ['math.ops.l2.word-problems-100', 'math.ops.l2.times-more-less'] : ['math.ops.l2.word-problems-100', 'math.ops.l2.compound-problems'];
     return ['math.ops.l3.word-problems-1000'];
   },
   generate,

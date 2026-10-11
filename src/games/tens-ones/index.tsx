@@ -1,4 +1,4 @@
-import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData } from '../types';
+import type { GameDefinition, GameComponentProps, Round, Difficulty, LevelData, ClassLevel } from '../types';
 import { PromptCard, ChoiceGrid, shuffle } from '../shared/ui';
 import { hasUkAudio, sayUkSeq } from '../shared/uk-audio';
 
@@ -13,7 +13,8 @@ import { hasUkAudio, sayUkSeq } from '../shared/uk-audio';
 type Payload =
   | { mode: 'build'; n: number; options: number[] }
   | { mode: 'part'; n: number; ask: 'десятків' | 'одиниць'; options: number[] }
-  | { mode: 'compare'; a: number; b: number };
+  | { mode: 'compare'; a: number; b: number }
+  | { mode: 'split'; n: number; options: number[] };
 type Answer = number;
 
 const ROUNDS = 5;
@@ -26,8 +27,23 @@ function numberOptions(n: number, lo: number, hi: number): number[] {
   return shuffle([n, ...[...new Set(pool)].slice(0, 2)]);
 }
 
-export function generate(difficulty: Difficulty): LevelData<Payload, Answer> {
+export function generate(difficulty: Difficulty, _level?: unknown, classLevel?: ClassLevel): LevelData<Payload, Answer> {
   let rounds: Round<Payload, Answer>[];
+  if (classLevel === 'grade2' && difficulty === 2) {
+    // 2 клас (11.10): розрядний склад — сума розрядних доданків «47 = 40 + _» або «47 = _ + 7»
+    rounds = Array.from({ length: ROUNDS }, (_, i) => {
+      const n = randInt(21, 99);
+      const ones = n % 10 === 0 ? 1 : n % 10;
+      const m = Math.floor(n / 10) * 10 + ones;
+      return { id: `r${i}`, payload: { mode: 'split', n: m, options: shuffle([...new Set([ones, Math.floor(m / 10), ones + 10 <= 99 ? ones + 10 : ones + 1])]) }, answer: ones };
+    });
+    return { difficulty, rounds };
+  }
+  if (classLevel === 'grade2' && difficulty === 1) {
+    // 2 клас: одразу двоцифрові 21–99 (11–20 — це 1 клас)
+    rounds = Array.from({ length: ROUNDS }, (_, i) => { const n = randInt(21, 99); return { id: `r${i}`, payload: { mode: 'build', n, options: numberOptions(n, 10, 99) }, answer: n }; });
+    return { difficulty, rounds };
+  }
   if (difficulty === 1) {
     const ns = shuffle([11, 12, 13, 14, 15, 16, 17, 18, 19, 20]).slice(0, ROUNDS);
     rounds = ns.map((n, i) => ({ id: `r${i}`, payload: { mode: 'build', n, options: numberOptions(n, 10, 20) }, answer: n }));
@@ -84,6 +100,7 @@ const PHRASES = {
   build: { key: 'p_to_build', text: 'Яке це число?' },
   part: { key: 'p_to_part', text: 'Скільки в числі' },
   compare: { key: 'p_to_compare', text: 'Яке число більше?' },
+  split: { key: 'p_to_split', text: 'Розклади на десятки й одиниці' },
 } as const;
 
 function Component({ round, disabled, answerState, onAnswer }: GameComponentProps<Payload, Answer>) {
@@ -114,6 +131,19 @@ function Component({ round, disabled, answerState, onAnswer }: GameComponentProp
       </>
     );
   }
+  if (p.mode === 'split') {
+    const tens = p.n - (p.n % 10);
+    return (
+      <>
+        <PromptCard question="Розклади на десятки й одиниці" answerState={answerState} sayKey={round.id}>
+          <div style={{ fontSize: 48, fontWeight: 900, textAlign: 'center', fontFamily: 'var(--font-round)' }}>
+            {p.n} = <span style={{ color: '#2563EB' }}>{tens}</span> + <span style={{ display: 'inline-block', minWidth: 50, borderBottom: '4px solid #DC2626', color: '#16A34A' }}>{answerState === 'correct' ? round.answer : ''}</span>
+          </div>
+        </PromptCard>
+        <ChoiceGrid options={p.options.map((n) => ({ value: n }))} correct={round.answer} disabled={disabled} answerState={answerState} onPick={onAnswer} columns={3} />
+      </>
+    );
+  }
   return (
     <>
       <PromptCard question={phrase.text} answerState={answerState} say={say} sayKey={round.id} />
@@ -131,7 +161,7 @@ const tensOnes: GameDefinition<Payload, Answer> = {
   icon: '🧱',
   description: 'Числа 11–100: десятки й одиниці, яке число, яке більше.',
   accent: '#DBEAFE',
-  skillsFor: (d) => (d === 1 ? ['math.count.l1.numbers-11-20', 'math.ops.l1.compose-decompose-20'] : d === 2 ? ['math.count.l1.numbers-100'] : ['math.count.l1.compare-100']),
+  skillsFor: (d, cl) => (d === 1 ? ['math.count.l1.numbers-11-20', 'math.ops.l1.compose-decompose-20'] : d === 2 ? [cl === 'grade2' ? 'math.count.l2.place-value-sum' : 'math.count.l1.numbers-100'] : ['math.count.l1.compare-100']),
   // «чому так» — за 💡 після відповіді
   explain: (round) => {
     const p = round.payload;
@@ -140,6 +170,7 @@ const tensOnes: GameDefinition<Payload, Answer> = {
       return { steps: [`${t} ${t === 1 ? 'десяток' : t < 5 ? 'десятки' : 'десятків'} і ${o} ${o === 1 ? 'одиниця' : o >= 2 && o <= 4 ? 'одиниці' : 'одиниць'}.`, `${t * 10} + ${o} = ${p.n}.`], why: 'Спершу пишемо десятки, потім одиниці: 4 десятки і 7 одиниць — 47, а не 74.' };
     }
     if (p.mode === 'part') return { steps: [`У числі ${p.n}: ${Math.floor(p.n / 10)} — десятки, ${p.n % 10} — одиниці.`, 'Ліва цифра — десятки, права — одиниці.'] };
+    if (p.mode === 'split') return { steps: [`${p.n} = ${p.n - (p.n % 10)} + ${p.n % 10}`, `${Math.floor(p.n / 10)} десятки — це ${p.n - (p.n % 10)}, а ${p.n % 10} — одиниці.`] };
     const [ta, tb] = [Math.floor(p.a / 10), Math.floor(p.b / 10)];
     return ta !== tb
       ? { steps: [`Порівнюємо десятки: ${ta} і ${tb}.`, `Більше десятків — більше число: ${Math.max(p.a, p.b)}.`] }
