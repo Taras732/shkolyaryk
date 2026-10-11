@@ -16,6 +16,9 @@ from pathlib import Path
 import edge_tts
 
 VOICE = "uk-UA-PolinaNeural"
+# англійські ключі (en_…) — британський голос, як у підручнику Academy Stars
+EN_VOICE = "en-GB-SoniaNeural"
+EN_RATE = "-20%"
 RATE_PHRASE = "-15%"
 RATE_NAME = "-35%"  # назва букви/цифри — повільно й чітко
 # слова — майже звичайний темп: на -35% синтезатор «ковтав» кінець («кіт» звучав як «кін», 09.10)
@@ -196,6 +199,13 @@ def items() -> dict[str, tuple[str, str]]:
     out["odd_same"] = ("Молодець! Решта — однакові.", RATE_PHRASE)
     for cid, plural in re.findall(r"id: '([a-z]+)', plural: '([^']+)'", osrc):
         out[f"odd_{cid}"] = (f"Молодець! Решта — {plural}.", RATE_PHRASE)
+    # Англійська стежка Острова Слів (11.10): фрази українською, слова — англійським голосом (ключ en_…)
+    out["p_en_find"] = ("Послухай і знайди!", RATE_PHRASE)
+    out["p_en_new"] = ("Нове слово!", RATE_PHRASE)
+    out["p_en_know"] = ("Ти вже знаєш ці слова!", RATE_PHRASE)
+    esrc = (ROOT / "src" / "games" / "en-topics" / "words.ts").read_text(encoding="utf-8")
+    for w in re.findall(r"W\('([^']+)', '", esrc):
+        out[f"en_w_{w}"] = (f"{w.capitalize()}.", EN_RATE)
     return out
 
 
@@ -227,7 +237,7 @@ async def main() -> None:
         path = OUT / f"{key}.mp3"
         if path.exists():
             continue
-        voice = VOICE
+        voice = EN_VOICE if key.startswith("en_") else VOICE
         if key in OVERRIDES:
             voice, text, rate = OVERRIDES[key]
         await edge_tts.Communicate(text, voice, rate=rate).save(str(path))

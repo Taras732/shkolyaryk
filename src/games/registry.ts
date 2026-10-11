@@ -37,6 +37,7 @@ import englishWordPicture from './english-word-picture';
 import englishWords from './english-words';
 import enReading from './en-reading';
 import enInstructions from './en-instructions';
+import enTopics from './en-topics';
 // --- Наука ---
 import colorsFind from './colors-find';
 import shapes from './shapes';
@@ -98,7 +99,7 @@ export const GAMES: GameDefinition[] = [
   // Мова
   ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
-  englishWords, enReading, enInstructions, lettersFindEn, englishWordPicture,
+  englishWords, enReading, enInstructions, lettersFindEn, englishWordPicture, enTopics,
   // Наука
   colorsFind, shapes, dressWeather, animalSounds, dressFriend, xylophoneRepeat, coloring, pysanka, waterStates, sinkFloat, animalsHabitat, plantGrow, seasonsWeather, gears,
   // Логіка
