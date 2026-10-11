@@ -64,6 +64,9 @@ export const MATH_SKILLS: SeedSkill[] = [
   { id: 'math.data.l1.simple-charts', subject: 'math', strand: 'Робота з даними', topic: 'Таблиці і діаграми', title: 'Прості таблиці й піктограми (читання)', grade_band: 'L1', prerequisites: ['math.count.l1.compare-numbers-20'], orn: ['1 МАО 2.1'], sort: 290 },
 
   // нові навички 1 класу за програмою Савченко (11.10.2026)
+  // 11.10: з підручника Гісь/Філяк (план 1 семестру, тиждень 12); у тексті програми окремим результатом не названо — коду немає
+  { id: 'math.count.l1.number-line', subject: 'math', strand: 'Числа й лічба', topic: 'Числовий промінь', title: 'Числовий промінь: місце числа, пропущене число', grade_band: 'L1', prerequisites: ['math.count.l1.forward-back-1-10'], sort: 199 },
+  { id: 'math.count.l1.even-odd', subject: 'math', strand: 'Числа й лічба', topic: 'Парні й непарні', title: 'Парні й непарні числа (лічба парами)', grade_band: 'L1', prerequisites: ['math.count.l1.compose-10'], sort: 200 },
   { id: 'math.ops.l1.add-sub-10', subject: 'math', strand: 'Дії з числами', topic: 'Додавання і віднімання', title: 'Додавання й віднімання одноцифрових чисел у межах 10', grade_band: 'L1', prerequisites: ['math.ops.l1.add-sub-objects-10'], orn: ['1 МАО 4.3'], sort: 201 },
   { id: 'math.ops.l1.more-less-by', subject: 'math', strand: 'Дії з числами', topic: 'Порівняння', title: 'На скільки більше / менше; збільшити й зменшити на кілька одиниць', grade_band: 'L1', prerequisites: ['math.ops.l1.add-sub-10'], orn: ['1 МАО 4.3'], sort: 202 },
   { id: 'math.ops.l1.unknown-addend', subject: 'math', strand: 'Дії з числами', topic: 'Рівняння', title: 'Невідомий доданок', grade_band: 'L1', prerequisites: ['math.ops.l1.add-sub-10'], orn: ['1 МАО 4.8', '1 МАО 4.1'], sort: 203 },

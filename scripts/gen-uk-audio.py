@@ -222,6 +222,10 @@ def items() -> dict[str, tuple[str, str]]:
     wsrc = (ROOT / "src" / "games" / "uk-sounds" / "words.ts").read_text(encoding="utf-8")
     for w in set(re.findall(r"word: '([^']+)'", wsrc)):
         out.setdefault(f"w_{w}", (f"{w.capitalize()}!", RATE_WORD))
+    # Числовий ряд, 1 клас (11.10)
+    out["p_nl_gap"] = ("Яке число пропущено?", RATE_PHRASE)
+    out["p_nl_order"] = ("Котрий за рахунком?", RATE_PHRASE)
+    out["p_nl_parity"] = ("Парне чи непарне?", RATE_PHRASE)
     # Склад числа, 1 клас (11.10)
     out["p_parts_hidden"] = ("Скільки сховалось?", RATE_PHRASE)
     out["p_parts_pair"] = ("Що разом дає", RATE_PHRASE)
