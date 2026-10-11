@@ -13,11 +13,15 @@ const PreschoolCtx = createContext(false);
 export const usePreschool = () => useContext(PreschoolCtx);
 /** Ігри-дошки (самі ведуть раунди) повідомляють шапці прогрес 0..5 — морквинки завжди в шапці. */
 const BoardProgressCtx = createContext<(filled: number) => void>(() => {});
+/** 1 клас у дошкільній рамці (11.10): варіанти бувають ширші за кулю — фішка з підписом, набір монет. */
+const SchoolCtx = createContext(false);
 export const useBoardProgress = () => useContext(BoardProgressCtx);
-export function PreschoolProvider({ children, onBoardProgress }: { children: ReactNode; onBoardProgress?: (filled: number) => void }) {
+export function PreschoolProvider({ children, onBoardProgress, school = false }: { children: ReactNode; onBoardProgress?: (filled: number) => void; school?: boolean }) {
   return (
     <PreschoolCtx.Provider value>
-      <BoardProgressCtx.Provider value={onBoardProgress ?? (() => {})}>{children}</BoardProgressCtx.Provider>
+      <SchoolCtx.Provider value={school}>
+        <BoardProgressCtx.Provider value={onBoardProgress ?? (() => {})}>{children}</BoardProgressCtx.Provider>
+      </SchoolCtx.Provider>
     </PreschoolCtx.Provider>
   );
 }
@@ -99,6 +103,7 @@ export function Balloons<T extends string | number>({
   /** Сітка в кілька рядків (ігри на кшталт «Знайди такий самий»: 6 / 9 / 12 картинок). */
   columns?: number;
 }) {
+  const school = useContext(SchoolCtx);
   const [sel, setSel] = useState<T | null>(null);
   // новий раунд чи повтор після помилки — кружечки знову цілі
   useEffect(() => {
@@ -110,10 +115,12 @@ export function Balloons<T extends string | number>({
   const cols = columns ?? (n > 9 ? 4 : 3);
   const d = grid ? (cols >= 4 ? 70 : 84) : n <= 3 ? 90 : n === 4 ? 74 : 60;
   const text = options.some((o) => (typeof o.node === 'string' || o.node === undefined) && String(o.node ?? o.value).length > 2);
+  // 1 клас: варіант-розмітка (фішка з підписом, монети, вираз) — «пігулка» за вмістом, з переносом рядка
+  const pill = school && options.some((o) => o.node !== undefined && typeof o.node !== 'string' && typeof o.node !== 'number');
   return (
     <div style={grid
-      ? { display: 'grid', gridTemplateColumns: `repeat(${cols}, ${d}px)`, justifyContent: 'center', gap: 10, padding: '4px 0 10px' }
-      : { display: 'flex', flexWrap: 'nowrap', justifyContent: 'center', gap: n <= 3 ? 14 : 8, padding: '4px 0 10px' }}>
+      ? { display: 'grid', gridTemplateColumns: pill ? `repeat(${cols}, auto)` : `repeat(${cols}, ${d}px)`, justifyContent: 'center', gap: 10, padding: '4px 0 10px' }
+      : { display: 'flex', flexWrap: pill ? 'wrap' : 'nowrap', justifyContent: 'center', gap: n <= 3 ? 14 : 8, padding: '4px 0 10px' }}>
       {options.map((o, i) => {
         const picked = sel === o.value;
         const ok = picked && answerState === 'correct';
@@ -130,10 +137,11 @@ export function Balloons<T extends string | number>({
               style={{
                 ...BIG,
                 minWidth: d,
-                height: d,
-                padding: text ? '0 16px' : 0,
+                height: pill ? 'auto' : d,
+                minHeight: d,
+                padding: pill ? '10px 16px' : text ? '0 16px' : 0,
                 border: 0,
-                borderRadius: d,
+                borderRadius: pill ? 32 : d,
                 background: ok ? '#22C55E' : '#fff',
                 color: ok ? '#fff' : INK[i % INK.length],
                 fontSize: text ? 20 : Math.round(d * 0.56),

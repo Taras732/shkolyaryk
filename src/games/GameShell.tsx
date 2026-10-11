@@ -39,6 +39,9 @@ interface ShellState {
   answerState: AnswerState;
   finished: boolean;
   stars: 0 | 1 | 2 | 3;
+  /** Номер запуску рівня (11.10): ключ компонента гри — інакше після зміни складності на місці
+   *  гра з тим самим round.id («r0») не перезапускається й тримає варіанти від попереднього рівня. */
+  epoch: number;
 }
 
 type Action =
@@ -84,6 +87,7 @@ function reducer(state: ShellState, action: Action): ShellState {
         answerState: 'idle',
         finished: false,
         stars: 0,
+        epoch: state.epoch + 1,
       };
     default:
       return state;
@@ -162,6 +166,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
       answerState: 'idle',
       finished: false,
       stars: 0,
+      epoch: 0,
     };
   });
 
@@ -271,8 +276,11 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
   // 11.10: примірка вигляду (варіант А) — на дев-стенді ?frame=kids відкриває будь-яку гру в дошкільній рамці
   const kidsFrame = DEV_HOST && new URLSearchParams(window.location.search).get('frame') === 'kids';
   const preschool = classLevel === 'preschool' || kidsFrame;
+  // 11.10 (рішення Тараса, варіант А): 1 клас грає в дошкільній рамці (небо, бульбашка, кульки) — текст лишається.
+  // Фініш у 1 класу шкільний: дошкільний годує друга-звірятко, а друга в 1 класі на головній немає.
+  const kidsPlay = preschool || classLevel === 'grade1';
 
-  if (!state.finished && preschool) {
+  if (!state.finished && kidsPlay) {
     const isBoard = round.answer === BOARD_DONE;
     const carrots = isBoard ? boardFilled : Math.round((state.roundIndex / total) * 5);
     return (
@@ -301,9 +309,9 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
             )}
           </div>
           <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 12, paddingBottom: 12 }}>
-            <PreschoolProvider onBoardProgress={setBoardFilled}>
+            <PreschoolProvider onBoardProgress={setBoardFilled} school={classLevel !== 'preschool'}>
               <GameComponent
-                key={round.id}
+                key={`${state.epoch}-${round.id}`}
                 round={round}
                 roundIndex={state.roundIndex}
                 totalRounds={total}
@@ -352,7 +360,7 @@ export default function GameShell({ game, level, classLevel, profileId, onExit, 
 
         <div className="g-scroll" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <GameComponent
-            key={round.id}
+            key={`${state.epoch}-${round.id}`}
             round={round}
             roundIndex={state.roundIndex}
             totalRounds={total}
