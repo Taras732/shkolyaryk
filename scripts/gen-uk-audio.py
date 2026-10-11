@@ -204,6 +204,11 @@ def items() -> dict[str, tuple[str, str]]:
                      ("polyline", "ламану"), ("closed", "замкнену ламану")):
         out[f"line_{lid}"] = (f"{say}.", RATE_NAME)
     out["p_measure"] = ("Яка довжина відрізка?", RATE_PHRASE)
+    # Склад числа, 1 клас (11.10)
+    out["p_parts_hidden"] = ("Скільки сховалось?", RATE_PHRASE)
+    out["p_parts_pair"] = ("Що разом дає", RATE_PHRASE)
+    out["p_parts_missing"] = ("Яке число пропущено?", RATE_PHRASE)
+    out["n_10"] = ("Десять.", RATE_NAME)
     out["p_draw_seg"] = ("Накресли відрізок", RATE_PHRASE)
     for n, w in ((2, "два сантиметри"), (3, "три сантиметри"), (4, "чотири сантиметри"), (5, "пʼять сантиметрів"),
                  (6, "шість сантиметрів"), (7, "сім сантиметрів"), (8, "вісім сантиметрів")):
