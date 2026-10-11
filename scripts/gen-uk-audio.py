@@ -204,6 +204,17 @@ def items() -> dict[str, tuple[str, str]]:
                      ("polyline", "ламану"), ("closed", "замкнену ламану")):
         out[f"line_{lid}"] = (f"{say}.", RATE_NAME)
     out["p_measure"] = ("Яка довжина відрізка?", RATE_PHRASE)
+    # Речення, 1 клас (11.10): повні речення, інтонація зі знака в кінці
+    out["p_sen_count"] = ("Скільки слів у реченні?", RATE_PHRASE)
+    out["p_sen_fill"] = ("Доповни речення.", RATE_PHRASE)
+    out["p_sen_mark"] = ("Який знак у кінці?", RATE_PHRASE)
+    dsrc = (ROOT / "src" / "games" / "uk-sentences" / "data.ts").read_text(encoding="utf-8")
+    for sid, text in re.findall(r"id: '(c\d+)', text: '([^']+)'", dsrc):
+        out[f"sen_{sid}"] = (text, RATE_PHRASE)
+    for sid, text, ans in re.findall(r"id: '(f\d+)', text: '([^']+)', answer: '([^']+)'", dsrc):
+        out[f"sen_{sid}"] = (text.replace("___", ans), RATE_PHRASE)
+    for sid, text, mark in re.findall(r"id: '(m\d+)', text: '([^']+)', mark: '([.?!])'", dsrc):
+        out[f"sen_{sid}"] = (text + mark, RATE_PHRASE)
     # Звуки в слові, 1 клас (11.10)
     out["p_snd_vc"] = ("Голосний чи приголосний?", RATE_PHRASE)
     out["p_snd_hs"] = ("Твердий чи мʼякий?", RATE_PHRASE)
