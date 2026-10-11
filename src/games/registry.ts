@@ -21,6 +21,7 @@ import perimeterArea from './perimeter-area';
 import cubeNet from './cube-net';
 import gears from './gears';
 import commandMachine from './command-machine';
+import geoLines from './geo-lines';
 // --- Мова ---
 import lettersFind from './letters-find';
 import syllableBuild from './syllable-build';
@@ -95,7 +96,7 @@ import pzRiver from './pz-river';
 export const GAMES: GameDefinition[] = [
   // Математика
   counting, addition, compare, pzShare, pourKids, pzScales, pzPath, mathExamples, timesTables, mathCompare,
-  columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
+  geoLines, columnArithmetic, fractionsCompare, clockTime, moneyBasics, recognizeDigit, measures, numberTiles, wordProblems, perimeterArea, cubeNet,
   // Мова
   ukLetters, ukSyllables, syllableWords, ukReading, ukSpelling, lettersFind, syllableBuild, readingSpeed, grammarParts,
   // Англійська
@@ -217,6 +218,8 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'cube-net': ['grade3', 'grade4'],
   // пари «однакові / сума 10» — рахунок першого десятка; для 3–4 класу запросто (аудит 07.10)
   'number-tiles': ['grade1', 'grade2'],
+  // лінії й відрізки — геометрія 1 класу (11.10)
+  'geo-lines': ['grade1', 'grade2'],
   // мова/світ для старших
   'reading-speed': ['grade2', 'grade3', 'grade4'],
   // 11.10: 1 клас — варіант з питаннями хто? що? / який? / що робить? (без термінів)
