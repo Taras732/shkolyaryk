@@ -151,6 +151,8 @@ const columnArithmetic: GameDefinition<Payload, number> = {
     2: ['math.ops.l3.add-sub-1000'],
     3: ['math.ops.l3.add-sub-1000'],
   },
+  // 11.10: 2 клас — двоцифрові до 100; 3–4 — тризначні й більші
+  skillsFor: (_d, cl) => (cl === 'grade2' ? ['math.ops.l2.add-sub-carry-100', 'math.ops.l2.estimate-check'] : ['math.ops.l3.add-sub-1000']),
   generate,
   Component,
 };

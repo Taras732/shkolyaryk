@@ -60,7 +60,8 @@ const CLASS_CFG: Record<ClassLevel, Record<Difficulty, ClassCfg>> = {
   // дошкілля гри не бачить (levels: L3); значення — безпечний дефолт
   preschool: { 1: { addMax: 10, mulMax: 0 }, 2: { addMax: 10, mulMax: 0 }, 3: { addMax: 20, mulMax: 0 } },
   grade1: { 1: { addMax: 20, mulMax: 0 }, 2: { addMax: 20, mulMax: 0 }, 3: { addMax: 20, mulMax: 0 } },
-  grade2: { 1: { addMax: 100, mulMax: 5 }, 2: { addMax: 100, mulMax: 9 }, 3: { addMax: 100, mulMax: 9 } },
+  // 11.10: програма 2 класу — таблиці лише на 2 і 3
+  grade2: { 1: { addMax: 100, mulMax: 3 }, 2: { addMax: 100, mulMax: 3 }, 3: { addMax: 100, mulMax: 3 } },
   grade3: { 1: { addMax: 500, mulMax: 9 }, 2: { addMax: 1000, mulMax: 9 }, 3: { addMax: 1000, mulMax: 9 } },
   grade4: { 1: { addMax: 1000, mulMax: 9 }, 2: { addMax: 1000, mulMax: 9 }, 3: { addMax: 1000, mulMax: 9 } },
 };

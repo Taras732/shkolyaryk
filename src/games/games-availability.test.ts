@@ -24,7 +24,9 @@ describe('gamesForClass (G3) — доступність ігор за класо
     expect(idsFor('grade1')).not.toContain('times-tables');
     expect(idsFor('grade1')).not.toContain('column-arithmetic');
     expect(idsFor('grade2')).toContain('times-tables');
-    expect(idsFor('grade2')).toContain('fractions-compare');
+    // 11.10: у програмі 1–2 класу дробів немає — з 3 класу
+    expect(idsFor('grade2')).not.toContain('fractions-compare');
+    expect(idsFor('grade3')).toContain('fractions-compare');
   });
 
   it('магічний квадрат — лише 3–4 клас', () => {

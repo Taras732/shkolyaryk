@@ -173,7 +173,9 @@ function draw(band: GradeBand, pool: Entry[], count: number): Entry[] {
 export function generate(difficulty: Difficulty, level: ProfileLevel = 'L3', classLevel?: ClassLevel): LevelData<Payload, Pos> {
   const asQuestions = classLevel === 'grade1';
   // 1 клас — найпростіші речення на будь-якій складності
-  const band = asQuestions ? 'L1' : gradeBandFor(level, difficulty);
+  // 11.10: банк речень за класом (2 клас — прості, 4 клас — складні), а не за складністю: інакше 2 клас на d3 отримував «філософ»
+  const byClass: Partial<Record<ClassLevel, GradeBand>> = { grade2: 'L2', grade3: 'L3', grade4: 'L4' };
+  const band = asQuestions ? 'L1' : (classLevel && byClass[classLevel]) || gradeBandFor(level, difficulty);
   const pool = POOL_BY_BAND[band];
   const chosen = draw(band, pool, ROUNDS_PER_LEVEL);
   const rounds: Round<Payload, Pos>[] = chosen.map((entry, i) => ({

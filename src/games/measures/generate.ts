@@ -133,7 +133,8 @@ export const CLASS_UNIT_KEYS: Record<ClassLevel, string[]> = {
   preschool: ['cm', 'm', 'kg'],
   // 11.10: програма 1 класу — см, дм, м, кг, л (Савченко [1 МАО 4.7])
   grade1: ['cm', 'dm', 'm', 'kg', 'l'],
-  grade2: ['cm', 'dm', 'm', 'g', 'kg', 'l'],
+  // 11.10: програма 2 класу додає міліметр
+  grade2: ['mm', 'cm', 'dm', 'm', 'g', 'kg', 'l'],
   grade3: ['mm', 'cm', 'dm', 'm', 'km', 'g', 'kg', 'ml', 'l'],
   grade4: ['mm', 'cm', 'dm', 'm', 'km', 'g', 'kg', 't', 'ml', 'l'],
 };

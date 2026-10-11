@@ -221,7 +221,8 @@ export function gamesForLevel(level: ProfileLevel): GameDefinition[] {
 const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   // старші математичні теми — не раніше відповідного класу НУШ
   'times-tables': ['grade2', 'grade3', 'grade4'],
-  'fractions-compare': ['grade2', 'grade3', 'grade4'],
+  // 11.10: у програмі 1–2 класу дробів немає — з 3 класу
+  'fractions-compare': ['grade3', 'grade4'],
   // стовпчик — не в програмі 1 класу (Савченко, звірка 10.10): лише з 2 класу
   'column-arithmetic': ['grade2', 'grade3', 'grade4'],
   'perimeter-area': ['grade2', 'grade3', 'grade4'],
@@ -237,6 +238,9 @@ const AVAILABLE_BY_CLASS: Record<string, ClassLevel[]> = {
   'geo-shapes': ['grade1'],
   // числа до 100 — 2 півріччя 1 класу; у план дня поки не додано (жовтень)
   'tens-ones': ['grade1', 'grade2'],
+  // буквар і склади — дошкілля та 1 клас; у 2–4 класі це вже пройдене
+  'uk-letters': ['preschool', 'grade1'],
+  'uk-syllables': ['preschool', 'grade1'],
   'pictograms': ['grade1'],
   'space-time': ['grade1'],
   'write-digits': ['grade1'],
