@@ -1,0 +1,95 @@
+<!DOCTYPE html><html lang="uk"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Паспорт проєкту — Школярик</title>
+<style>
+:root{--bg:#0e0f12;--card:#181a20;--ink:#eceae4;--mut:#8b8f98;--acc:#c9a24b;--ok:#5fbf8f;--line:rgba(255,255,255,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.6}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+header{padding:30px 0 22px;border-bottom:1px solid var(--line);background:radial-gradient(120% 100% at 85% 0%,rgba(201,162,75,.08),transparent 60%)}
+.crumb{font-size:.78rem;color:var(--mut)}.crumb a{color:var(--acc);text-decoration:none}
+h1{font-size:1.7rem;margin:6px 0 4px}
+.tagline{color:var(--mut)}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.chip{font-family:"SF Mono",ui-monospace,monospace;font-size:.74rem;border:1px solid var(--line);color:#cfccc4;padding:6px 11px;border-radius:20px;background:var(--card)}
+.chip b{color:var(--acc)}
+.status{font-size:.72rem;font-weight:700;padding:5px 12px;border-radius:20px;color:var(--ok);background:rgba(95,191,143,.14)}
+section{padding:24px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+h2{font-size:1.05rem;color:var(--acc);margin-bottom:12px;display:flex;align-items:center;gap:9px}
+h2 .n{font-family:"SF Mono",monospace;font-size:.72rem;color:var(--mut);border:1px solid var(--line);border-radius:6px;padding:1px 7px}
+ul{margin:0 0 0 2px;list-style:none}
+li{position:relative;padding:5px 0 5px 20px;color:#d4d1c9}
+li::before{content:"";position:absolute;left:2px;top:12px;width:6px;height:6px;background:var(--acc);transform:rotate(45deg)}
+p{color:#d4d1c9;margin-bottom:8px}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:8px 16px;font-size:.9rem}
+.kv dt{color:var(--mut)}.kv dd{color:#e6e3db}
+code{font-family:"SF Mono",monospace;font-size:.84rem;background:rgba(255,255,255,.05);padding:2px 6px;border-radius:5px;color:#e6d3a8}
+.cmd{background:#0a0b0e;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-family:"SF Mono",monospace;font-size:.82rem;color:#cfd6dd;overflow-x:auto;white-space:pre;margin:6px 0}
+footer{padding:26px 0 60px;color:var(--mut);font-size:.8rem}
+a{color:var(--acc)}
+</style></head><body>
+<header><div class="wrap">
+<div class="crumb"><a href="../00_DEV.html">← D:/Dev карта</a></div>
+<h1>Школярик</h1>
+<p class="tagline">Освітньо-ігровий застосунок для дітей 3–8 років — навчання через гру.</p>
+<div class="meta">
+  <span class="status">⭐ Активний · Option A SLIM (family-only)</span>
+  <span class="chip">Тип: <b>Web-застосунок (PWA)</b></span>
+  <span class="chip">Папка: <b>D:/Dev/shkolyaryk</b></span>
+  <span class="chip">Репо: <b>Taras732/shkolyaryk</b></span>
+  <span class="chip">Live: <b>shkolyaryk.kuznya.studio</b></span>
+  <span class="chip">Оновлено: <b>2026-06-20</b></span>
+</div>
+</div></header>
+<main class="wrap">
+
+<section><h2><span class="n">1</span>Концепція</h2>
+<p>Дитячий навчальний застосунок: набір міні-ігор (математика, мова, наука) для дошкільнят і молодших школярів 3–8 років. Навчання через гру — острови/хаб з ~36 інтерактивними іграми, батьківський дашборд зі статистикою прогресу. Поточна ціль — <b>Option A SLIM</b>: family-only реліз для 4 доньок Тараса + дружини як валідаційний пілот.</p></section>
+
+<section><h2><span class="n">2</span>Функціонал</h2>
+<ul>
+<li>Хаб з островами/іграми (~36 навчальних міні-ігор)</li>
+<li>Онбординг + вибір ролі (дитина / батько) + профілі дітей</li>
+<li>Батьківський дашборд: статистика та прогрес</li>
+<li>Supabase Auth (email/пароль) + dev-login без бекенду</li>
+<li>PWA: офлайн-доступ, встановлення на пристрій (vite-plugin-pwa)</li>
+<li>Анти-монотонність: процедурна генерація завдань із варіативністю контенту</li>
+</ul></section>
+
+<section><h2><span class="n">3</span>Стек / Архітектура</h2>
+<dl class="kv">
+<dt>Технології</dt><dd>Vite 5 + React 18 + TypeScript (web-збірка). Роутинг — react-router-dom 6, стан — Zustand, бекенд — Supabase, ефекти — canvas-confetti, іконки — lucide-react. PWA через vite-plugin-pwa. <br><i>Примітка: нативна версія — Expo SDK 54 / React Native (див. CLAUDE.md); цей каталог містить веб-збірку для GH Pages.</i></dd>
+<dt>Ключові папки/файли</dt><dd><code>src/pages/</code> (Hub, GamePlayer, Auth, Onboarding, ParentDashboard, RoleSelect, Welcome), <code>src/components/</code>, <code>src/stores/</code>, <code>src/utils/</code>, <code>vite.config.ts</code>, <code>index.html</code>, <code>supabase/</code>, <code>dist/</code> (білд)</dd>
+<dt>Залежності/сервіси</dt><dd>Supabase (Auth + БД), GitHub Pages (хостинг web). BMAD workflow (<code>.bmad/stories/</code>, <code>/sm /dev /qa</code>)</dd>
+</dl></section>
+
+<section><h2><span class="n">4</span>Запуск / Деплой</h2>
+<div class="cmd">npm install          # перший раз
+npm run dev          # dev-сервер Vite (localhost:5173)
+npm run build        # tsc + vite build → dist/
+npm run preview      # локальний перегляд білду
+npm run lint         # ESLint</div>
+<p>Деплой: статичний білд <code>dist/</code> → <b>GitHub Pages</b>, домен <b>shkolyaryk.kuznya.studio</b>. Нативні збірки (iOS/Android) — через EAS Build/Update (хмарні, працюють з Windows).</p></section>
+
+<section><h2><span class="n">5</span>Статус / Етапи</h2>
+<ul>
+<li>✅ Каркас, auth, хаб, ігри, батьківський дашборд, PWA — готово</li>
+<li>✅ Web LIVE на shkolyaryk.kuznya.studio (GH Pages)</li>
+<li>⏭️ Option A SLIM: Math + Lang + Science, Tier 0 (родина), gate ~2026-08-18</li>
+<li>🔴 Cloud-sync відсутній у main (MMKV, губиться при reinstall) — SHK-257, blocker US-100</li>
+</ul></section>
+
+<section><h2><span class="n">6</span>Приватність / Секрети</h2>
+<p>Секрети у <code>.env</code> (у <code>.gitignore</code>): ключі Supabase — <code>EXPO_PUBLIC_SUPABASE_URL</code> / <code>EXPO_PUBLIC_SUPABASE_ANON_KEY</code> (нативно) та відповідні <code>VITE_*</code>/публічні ключі у web. Шаблон — <code>.env.example</code>. Значення тут не наводяться. Дані дітей (профілі, прогрес) — у Supabase; family-only режим мінімізує PII.<br>⚠️ <b>Шляхова залежність:</b> цей каталог використовується як Docker mount / cron на <b>node-auto</b> — <u>папку не переміщати й не перейменовувати</u>.</p></section>
+
+<section><h2><span class="n">7</span>Доки / Лінки</h2>
+<ul>
+<li><code>README.md</code>, <code>CLAUDE.md</code> (контекст+стек), <code>prd.md</code>, <code>SUPABASE_SETUP.md</code></li>
+<li>Source of truth (ТЗ, геймдизайн): <code>10_Projects/Школярик/</code> у vault</li>
+<li>Vault-нотатки: [[shk]] (хаб), [[project_shk_option_a_validation]], [[project_shk_home_learning_os]], [[shkolyaryk_design]]</li>
+<li>Feedback-бот: <a href="https://t.me/shkolyaryk_feedback_bot">@shkolyaryk_feedback_bot</a> (проєкт shkolyaryk-bot)</li>
+</ul></section>
+
+</main>
+<footer><div class="wrap">Паспорт проєкту · D:/Dev/shkolyaryk · оновлено 2026-07-09. Тримати актуальним при суттєвих змінах.</div></footer>
+</body></html>
