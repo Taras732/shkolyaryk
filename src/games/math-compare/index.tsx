@@ -91,8 +91,8 @@ const mathCompare: GameDefinition<Payload, Sign> = {
   },
   // 11.10: навички за класом × складністю (що реально генерує CLASS_COMPARE_CFG)
   skillsFor: (d, cl) => {
-    if (cl === 'grade1' || cl === 'grade2' || cl === 'preschool') return d === 1 ? ['math.count.l1.compare-numbers-20'] : ['math.ops.l1.expressions'];
-    if (cl === 'grade3') return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l1.expressions'];
+    if (cl === 'grade1' || cl === 'preschool') return d === 1 ? ['math.count.l1.compare-numbers-20'] : ['math.ops.l1.expressions'];
+    if (cl === 'grade2' || cl === 'grade3') return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l1.expressions'];
     return d === 1 ? ['math.count.l1.compare-100'] : ['math.ops.l3.order-of-operations'];
   },
   generate,

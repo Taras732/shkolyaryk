@@ -59,8 +59,9 @@ describe('math-compare: generate', () => {
 });
 
 describe('math-compare: CLASS_COMPARE_CFG (G2b, обрій за класом)', () => {
-  it('кількість дій не спадає grade1 (лише +) → grade2 (4 дії) → grade3 → grade4', () => {
-    expect(CLASS_COMPARE_CFG.grade1.opsAllowed).toEqual(['+']);
+  // 11.10.2026: програма Савченко — у 1 класі вирази «сума і різниця»
+  it('кількість дій не спадає grade1 (+ і −) → grade2 (4 дії) → grade3 → grade4', () => {
+    expect(CLASS_COMPARE_CFG.grade1.opsAllowed).toEqual(['+', '−']);
     expect(CLASS_COMPARE_CFG.grade2.opsAllowed).toHaveLength(4);
     const order = ['grade1', 'grade2', 'grade3', 'grade4'] as const;
     for (let i = 1; i < order.length; i++) {
@@ -94,12 +95,12 @@ describe('math-compare: generate — класовий масштаб (G2b, class
     }
   });
 
-  it('grade1 difficulty=3 (два вирази) — вирази лише на "+", жодних інших знаків', () => {
+  it('grade1 difficulty=3 (два вирази) — лише сума й різниця, без × і ÷', () => {
     for (let i = 0; i < 20; i++) {
       const { rounds } = generate(3, 'L3', 'grade1');
       for (const r of rounds) {
         for (const text of [r.payload.leftDisplay, r.payload.rightDisplay]) {
-          if (text) expect(/[−×÷]/.test(text)).toBe(false);
+          if (text) expect(/[×÷]/.test(text)).toBe(false);
         }
       }
     }

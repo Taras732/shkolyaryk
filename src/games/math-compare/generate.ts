@@ -71,8 +71,9 @@ interface ClassCompareCfg {
  */
 export const CLASS_COMPARE_CFG: Record<ClassLevel, ClassCompareCfg> = {
   preschool: { opsAllowed: ['+'], addSubRange: [1, 10], mulDivRange: [2, 5], useOrderOfOps: false },
-  grade1: { opsAllowed: ['+'], addSubRange: [1, 10], mulDivRange: [2, 5], useOrderOfOps: false },
-  grade2: { opsAllowed: ['+', '−', '×', '÷'], addSubRange: [1, 10], mulDivRange: [2, 5], useOrderOfOps: false },
+  // 11.10 програма Савченко: 1 клас — сума й різниця в межах 10; 2 клас — числа до 100 (сума ≤ 100), × і ÷ лише на 2 і 3
+  grade1: { opsAllowed: ['+', '−'], addSubRange: [1, 10], mulDivRange: [2, 5], useOrderOfOps: false },
+  grade2: { opsAllowed: ['+', '−', '×', '÷'], addSubRange: [10, 50], mulDivRange: [2, 3], useOrderOfOps: false },
   grade3: { opsAllowed: ['+', '−', '×', '÷'], addSubRange: [10, 99], mulDivRange: [2, 9], useOrderOfOps: false },
   grade4: { opsAllowed: ['+', '−', '×', '÷'], addSubRange: [10, 100], mulDivRange: [2, 9], useOrderOfOps: true },
 };
