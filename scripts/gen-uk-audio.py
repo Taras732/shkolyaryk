@@ -222,6 +222,15 @@ def items() -> dict[str, tuple[str, str]]:
     wsrc = (ROOT / "src" / "games" / "uk-sounds" / "words.ts").read_text(encoding="utf-8")
     for w in set(re.findall(r"word: '([^']+)'", wsrc)):
         out.setdefault(f"w_{w}", (f"{w.capitalize()}!", RATE_WORD))
+    # Фігури й тіла, 1 клас (11.10): назви у знахідному відмінку після «Знайди»
+    for sid, say in (("triangle", "трикутник"), ("quad", "чотирикутник"), ("square", "квадрат"), ("circle", "круг")):
+        out[f"shp_{sid}"] = (f"{say}.", RATE_NAME)
+    for sid, say in (("cube", "куб"), ("sphere", "кулю"), ("cylinder", "циліндр"), ("cone", "конус"), ("pyramid", "піраміду")):
+        out[f"sld_{sid}"] = (f"{say}.", RATE_NAME)
+    for oid, name in (("dice", "кубик"), ("ball", "мʼяч"), ("can", "банка"), ("cone", "ріжок морозива")):
+        out[f"q_form_{oid}"] = (f"Яку форму має {name}?", RATE_PHRASE)
+    out["p_shp_angles"] = ("Скільки кутів?", RATE_PHRASE)
+    out["p_shp_sides"] = ("Скільки сторін?", RATE_PHRASE)
     # Числовий ряд, 1 клас (11.10)
     out["p_nl_gap"] = ("Яке число пропущено?", RATE_PHRASE)
     out["p_nl_order"] = ("Котрий за рахунком?", RATE_PHRASE)
