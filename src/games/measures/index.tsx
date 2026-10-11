@@ -198,7 +198,8 @@ const measures: GameDefinition<Payload, string> = {
   },
   // 11.10: одиниці за класом (CLASS_UNIT_KEYS); d2 — переведення одиниць
   skillsFor: (d, cl) => {
-    const units = cl === 'grade1' || cl === 'preschool'
+    // 11.10: з літром і дециметром — і в 1 класі (програма Савченко)
+    const units = cl === 'preschool'
       ? ['math.measure.l1.length-units', 'math.measure.l1.mass-units']
       : ['math.measure.l1.length-units', 'math.measure.l1.mass-units', 'math.measure.l1.capacity-litre'];
     return d === 2 ? [...units, 'math.measure.l3.named-numbers-convert'] : units;
