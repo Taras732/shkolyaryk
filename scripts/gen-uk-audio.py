@@ -243,6 +243,20 @@ def items() -> dict[str, tuple[str, str]]:
     out["p_shp_angles"] = ("Скільки кутів?", RATE_PHRASE)
     out["p_shp_sides"] = ("Скільки сторін?", RATE_PHRASE)
     out["p_pict"] = ("Подивись на малюнок.", RATE_PHRASE)
+    # Простір і довжина, 1 клас (11.10): питання полиці (без «між»), дні тижня, частини доби
+    stsrc = (ROOT / "src" / "games" / "space-time" / "index.tsx").read_text(encoding="utf-8")
+    st_items = re.findall(r"\{ e: '[^']+', ins: '([^']+)', gen: '([^']+)' \}", stsrc)
+    for ri, rel in enumerate(["над", "під", "ліворуч від", "праворуч від"]):
+        for ii, (ins, gen) in enumerate(st_items):
+            out[f"q_shelf_{ri}_{ii}"] = (f"Що лежить {rel} {ins if ri < 2 else gen}?", RATE_PHRASE)
+    st_days = ["понеділок", "вівторок", "середа", "четвер", "пʼятниця", "субота", "неділя"]
+    for di, d in enumerate(st_days):
+        out[f"q_day_{di}_1"] = (f"Сьогодні {d}. Який день буде завтра?", RATE_PHRASE)
+        out[f"q_day_{di}_0"] = (f"Сьогодні {d}. Який день був учора?", RATE_PHRASE)
+    for pi, pa in enumerate(["ранку", "дня", "вечора", "ночі"]):
+        out[f"q_part_{pi}"] = (f"Що буває після {pa}?", RATE_PHRASE)
+    out["p_rib_long"] = ("Яка стрічка найдовша?", RATE_PHRASE)
+    out["p_rib_short"] = ("Яка стрічка найкоротша?", RATE_PHRASE)
     # Десятки й одиниці, 1 клас (11.10)
     out["p_to_build"] = ("Яке це число?", RATE_PHRASE)
     out["p_to_compare"] = ("Яке число більше?", RATE_PHRASE)
