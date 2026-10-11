@@ -242,6 +242,7 @@ def items() -> dict[str, tuple[str, str]]:
         out[f"q_form_{oid}"] = (f"Яку форму має {name}?", RATE_PHRASE)
     out["p_shp_angles"] = ("Скільки кутів?", RATE_PHRASE)
     out["p_shp_sides"] = ("Скільки сторін?", RATE_PHRASE)
+    out["p_pict"] = ("Подивись на малюнок.", RATE_PHRASE)
     # Десятки й одиниці, 1 клас (11.10)
     out["p_to_build"] = ("Яке це число?", RATE_PHRASE)
     out["p_to_compare"] = ("Яке число більше?", RATE_PHRASE)
